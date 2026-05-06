@@ -7,6 +7,9 @@
 - [A Dark Room GitHub](https://github.com/doublespeakgames/adarkroom)
 - [The making of A Dark Room](https://www.pocketgamer.biz/shedding-light-the-making-of-a-dark-room/)
 - [Level 13 GitHub](https://github.com/nroutasuo/level13)
+- [Fallen London](https://www.failbettergames.com/games/fallen-london)
+- [Twine](https://twinery.org/)
+- [ink](https://www.inklestudios.com/ink/)
 - [Machinations: How to design idle games](https://machinations.io/articles/idle-games-and-how-to-design-them)
 - [GameAnalytics: core loop](https://www.gameanalytics.com/blog/how-to-perfect-your-games-core-loop)
 - [Vite guide](https://vite.dev/guide/)
@@ -48,6 +51,22 @@ Machinations 的 idle game 设计文章强调低门槛核心循环、经济设�
 - 随机事件要被状态调制，不做孤立的随机奖惩。
 - 日志既记录玩家，也记录世界照常运转。
 
+### 状态账本
+
+文字游戏最怕“选项很多但世界不记得”。Twine 和 ink 都强调变量、条件逻辑和分支能力；`Fallen London` 的长期魅力也来自选择、声望、职业、地点和季节活动持续积累。对本项目的启示：
+
+- 少做一次性选项，多做可被后续读取的状态。
+- 选择后果用 flag/tag/quality 组织，避免不可维护的指数级分支。
+- 短会话需要“近日摘要”和清晰的下一步。
+
+### 仙侠系统语法
+
+修仙游戏常见复杂度来自五行、风水、灵根、功法、丹药、法宝、寿元、天劫和宗门关系。对本项目的启示：
+
+- 早期不展示全表，但核心数据结构要预留。
+- 寿元和时间推进必须参与设计。
+- 地点、季节、相性和关系共同调制事件，比纯随机更有修仙味。
+
 ## 程序经验
 
 - Vite 适合轻量静态 Web 游戏，后续部署到 GitHub Pages、Netlify、Vercel 都容易。
@@ -55,4 +74,3 @@ Machinations 的 idle game 设计文章强调低门槛核心循环、经济设�
 - IndexedDB 适合后续大量结构化存档和日志。
 - PWA service worker 可让游戏在无网络时仍打开基础资源。
 - 核心游戏逻辑应独立于 React，便于测试、迁移和未来可能的移动壳封装。
-

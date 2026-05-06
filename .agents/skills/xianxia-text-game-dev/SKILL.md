@@ -19,17 +19,23 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Keep the tone detached and observational. The game records consequences; it does not moralize or flatter the player.
 - Start from ordinary lives, not disaster survival or chosen-one melodrama.
 - Do not lock the player into a cultivation path at the beginning. Paths should emerge from repeated behavior, missed chances, and accumulated consequences.
+- Treat lifespan/time pressure as a first-class system, not just flavor text.
+- Reserve data space for spiritual roots, five elements, technique affinity, pill properties, location qi, tribulations, and sect rules even if the first UI hides most of it.
 - Tie resources to fantasy meaning. `灵气` is not just currency; `心魔` and `丹毒` are costs, `因果` is long-tail consequence.
 - Every new system needs a loop: input, output, risk, unlock, and recovery path.
 - Prefer short repeatable text over long exposition in core UI.
 - Add surprise through unlocking, event consequences, and changed verbs, not through hidden arbitrary punishments.
 - Make the world feel alive through calendars, locations, prices, NPC traces, and state-weighted events that continue whether or not the player focuses on them.
+- Important choices must enter a state ledger as flags, tags, or qualities that future events, prices, NPCs, tribulations, or logs can read.
+- Maintain lightweight location and relationship ledgers from the first prototype.
+- Combat should be low-to-medium emphasis but present as risk events: avoid/flee, negotiate, ask for help, or fight.
 - Repetition must upgrade: manual action -> routine -> batch/retreat -> automation/infrastructure -> new decision layer.
 
 ## Implementation Rules
 
 - Keep simulation logic pure and testable outside the browser.
 - Model resources, actions, unlocks, events, realms, and save data with typed structures.
+- Model locations, NPC/relationship entries, and choice flags/tags/qualities explicitly.
 - Save data must include a version and migration path.
 - Random systems should accept a seed or random provider for testing.
 - UI should render current state from game state; avoid storing authoritative state only in UI components.
