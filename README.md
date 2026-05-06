@@ -26,4 +26,9 @@
 
 ## 本地环境
 
-当前已安装 Node.js LTS，可用于后续 Web 原型、测试和构建。详情见 `docs/dev-environment.md`。
+本项目在两台机器上开发：
+
+- 工作电脑：见 `docs/dev-environment.md`。
+- 个人 PC：见 `docs/dev-environment-pc.md`。
+
+切换机器后先运行 `npm ci` 确保依赖一致。两台机器的环境差异和兼容性说明见 `docs/dev-environment-pc.md`。
