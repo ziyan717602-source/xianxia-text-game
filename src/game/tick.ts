@@ -25,8 +25,8 @@ function processSingleTick(state: GameState): GameState {
   }
 
   // 恢复体力
-  if (newState.resources.stamina < INITIAL_MAX_STAMINA) {
-    newState.resources.stamina = Math.min(INITIAL_MAX_STAMINA, newState.resources.stamina + STAMINA_RECOVERY_PER_TICK);
+  if (newState.resources.essence < INITIAL_MAX_STAMINA) {
+    newState.resources.essence = Math.min(INITIAL_MAX_STAMINA, newState.resources.essence + STAMINA_RECOVERY_PER_TICK);
   }
 
   return newState;

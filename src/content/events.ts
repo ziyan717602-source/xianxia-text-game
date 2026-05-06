@@ -19,17 +19,19 @@ export interface EventChoice {
 
 export const EVENTS: ActiveEvent[] = [
   {
-    id: 'canjuan_heat',
-    text: '你偶然翻阅的残卷突然微微发热，字迹浮现。这似乎是一种基础的吐纳之法。',
-    condition: (state) => !state.choices.flags['unlocked_tuna'] && state.resources.knowledge >= 2,
+    id: 'find_jade_slip',
+    text: '破败的茅草屋角落里，你在枯坐中摸到了一块沾满灰尘的硬物。抹去灰尘，竟是一枚残破的玉简。玉简边缘锐利，不小心划破了你的手指。',
+    condition: (state) => !state.choices.flags['found_jade_slip'] && state.resources.insight >= 2,
     weight: () => 100, // 只要满足条件就很容易触发
     choices: [
       {
-        text: '仔细阅读',
+        text: '探查玉简',
         effect: (state) => {
           const newState = { ...state };
-          newState.resources = { ...state.resources, qi: state.resources.qi + 10 };
-          return { state: newState, log: '你感受到一丝灵气入体。' };
+          // 刺痛带来神识的开启和一丝灵气
+          newState.resources = { ...state.resources, qi: state.resources.qi + 1 };
+          newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'found_jade_slip': true } };
+          return { state: newState, log: '一丝微凉的气息顺着指尖游走全身，你仿佛看到了玉简中记录的吐纳之法。' };
         }
       }
     ]
@@ -82,7 +84,7 @@ export const EVENTS: ActiveEvent[] = [
         text: '驻足倾听',
         effect: (state) => {
           const newState = { ...state };
-          newState.resources = { ...state.resources, knowledge: state.resources.knowledge + 2 };
+          newState.resources = { ...state.resources, insight: state.resources.insight + 2 };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'heard_rumor_1': true } };
           return { state: newState, log: '你听闻了些许修行界轶事，见闻有所增长。' };
         }

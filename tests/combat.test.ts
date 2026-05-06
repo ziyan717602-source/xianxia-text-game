@@ -51,7 +51,7 @@ describe('Combat System', () => {
     
     expect(result.success).toBe(true);
     expect(result.state.choices.qualities['combat_experience']).toBe(1);
-    expect(result.state.resources.knowledge).toBe(2);
+    expect(result.state.resources.insight).toBe(2);
   });
 
   it('should handle failed fight', () => {

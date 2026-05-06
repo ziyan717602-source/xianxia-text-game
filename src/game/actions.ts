@@ -5,7 +5,7 @@ export const ACTIONS: Record<string, Action> = {
   'tuna': {
     id: 'tuna',
     name: '吐纳',
-    cost: { stamina: 10 },
+    cost: { essence: 10 },
     output: { qi: 1 },
     cooldown: 0,
     riskProbability: 0,
@@ -14,17 +14,17 @@ export const ACTIONS: Record<string, Action> = {
   'caiyao': {
     id: 'caiyao',
     name: '采药',
-    cost: { stamina: 20 },
+    cost: { essence: 20 },
     output: { herbs: 1 },
     cooldown: 0,
     riskProbability: 0.1, // Maybe encounter something
     conditions: {},
   },
-  'dushu': {
-    id: 'dushu',
-    name: '读书',
-    cost: { stamina: 15 },
-    output: { knowledge: 1 },
+  'kuzuo': {
+    id: 'kuzuo',
+    name: '枯坐',
+    cost: { essence: 5 },
+    output: { insight: 1 },
     cooldown: 0,
     riskProbability: 0,
     conditions: {},
@@ -32,18 +32,18 @@ export const ACTIONS: Record<string, Action> = {
   'xunshan': {
     id: 'xunshan',
     name: '巡山',
-    cost: { stamina: 30 },
-    output: { knowledge: 1, herbs: 2 },
+    cost: { essence: 30 },
+    output: { insight: 1, herbs: 2 },
     cooldown: 0,
     riskProbability: 0.3,
     conditions: {},
   },
-  'xiuxi': {
-    id: 'xiuxi',
-    name: '休息',
+  'tiaoxi': {
+    id: 'tiaoxi',
+    name: '调息',
     cost: {},
-    // 休息通常是消耗时间换取体力，目前 tick 机制自带恢复，这里暂定立即回复少量体力并消耗部分寿元(时间)
-    output: { stamina: 30 }, 
+    // 调息通常是消耗时间换取体力，目前 tick 机制自带恢复，这里暂定立即回复少量体力并消耗部分寿元(时间)
+    output: { essence: 30 }, 
     cooldown: 0,
     riskProbability: 0,
     conditions: {},
@@ -63,7 +63,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   }
 
   // Check costs
-  if (action.cost.stamina && state.resources.stamina < action.cost.stamina) {
+  if (action.cost.essence && state.resources.essence < action.cost.essence) {
     return { state, log: `体力不足，无法进行${action.name}`, success: false };
   }
   if (action.cost.qi && state.resources.qi < action.cost.qi) {
@@ -79,10 +79,10 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   const newState = { ...state };
   newState.resources = { ...state.resources };
 
-  if (action.cost.stamina) newState.resources.stamina -= action.cost.stamina;
+  if (action.cost.essence) newState.resources.essence -= action.cost.essence;
   if (action.cost.qi) newState.resources.qi -= action.cost.qi;
-  // xiuxi special case: cost time (lifespan)
-  if (actionId === 'xiuxi') {
+  // tiaoxi special case: cost time (lifespan)
+  if (actionId === 'tiaoxi') {
     newState.resources.lifespan -= 10; // cost some time
     newState.time = { ...newState.time, tick: newState.time.tick + 10 };
   }
@@ -90,7 +90,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   // Risk check
   const rand = random ? random() : Math.random();
   if (rand < action.riskProbability) {
-    // Basic risk consequence for now: action fails, maybe stamina lost
+    // Basic risk consequence for now: action fails, maybe essence lost
     return { 
       state: newState, 
       log: `进行${action.name}时遭遇意外，未能获得收益。`, 
@@ -100,15 +100,15 @@ export function performAction(state: GameState, actionId: string, random?: () =>
 
   // Add outputs
   if (action.output.qi) newState.resources.qi += action.output.qi;
-  if (action.output.stamina) {
-    newState.resources.stamina = Math.min(
+  if (action.output.essence) {
+    newState.resources.essence = Math.min(
       100, // INITIAL_MAX_STAMINA, TODO refactor to central config
-      newState.resources.stamina + action.output.stamina
+      newState.resources.essence + action.output.essence
     );
   }
   if (action.output.herbs) newState.resources.herbs += action.output.herbs;
   if (action.output.coins) newState.resources.coins += action.output.coins;
-  if (action.output.knowledge) newState.resources.knowledge += action.output.knowledge;
+  if (action.output.insight) newState.resources.insight += action.output.insight;
 
   // Record action count
   const countKey = `action_${actionId}_count`;

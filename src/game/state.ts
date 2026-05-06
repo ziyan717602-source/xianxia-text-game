@@ -13,10 +13,10 @@ export function createInitialState(seed?: number): GameState {
   return {
     resources: {
       qi: 0,
-      stamina: INITIAL_MAX_STAMINA,
+      essence: INITIAL_MAX_STAMINA,
       herbs: 0,
       coins: 0,
-      knowledge: 0,
+      insight: 0,
       lifespan: MORTAL_LIFESPAN_YEARS * DAYS_PER_YEAR * TICKS_PER_DAY,
       wounds: 0,
     },
@@ -29,7 +29,7 @@ export function createInitialState(seed?: number): GameState {
       day: 1,
     },
     currentLocationId: 'home', // '居处'
-    unlockedActions: ['dushu', 'xiuxi'], // Basic actions to start the game
+    unlockedActions: ['kuzuo'], // Basic actions to start the game
     relationships: {},
     choices: {
       flags: {},

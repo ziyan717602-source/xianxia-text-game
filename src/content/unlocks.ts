@@ -9,7 +9,7 @@ export interface UnlockRule {
 export const UNLOCKS: UnlockRule[] = [
   {
     id: 'unlock_tuna',
-    condition: (state) => state.resources.qi >= 10,
+    condition: (state) => state.resources.qi >= 1,
     effect: (state) => {
       if (!state.unlockedActions.includes('tuna')) {
         return {
@@ -43,7 +43,7 @@ export const UNLOCKS: UnlockRule[] = [
   },
   {
     id: 'unlock_canjuan',
-    condition: (state) => state.resources.knowledge >= 3,
+    condition: (state) => state.resources.insight >= 3,
     effect: (state) => {
       if (!state.choices.flags['unlocked_canjuan']) {
         return {

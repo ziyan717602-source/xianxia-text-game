@@ -1,45 +1,48 @@
 import { describe, it, expect } from 'vitest';
-import { createInitialState } from '../src/game/state';
 import { rollEvent } from '../src/game/events';
+import { createInitialState } from '../src/game/state';
+import { EVENTS } from '../src/content/events';
 
 describe('Event System', () => {
   it('should not roll event if conditions are not met', () => {
     const state = createInitialState();
-    // knowledge is 0, so canjuan_heat shouldn't trigger, location is home, so others shouldn't trigger
-    const event = rollEvent(state, () => 0.5);
+    state.resources.insight = 0; // Less than 2, won't trigger find_jade_slip
+    const event = rollEvent(state);
     expect(event).toBeNull();
   });
 
-  it('should roll canjuan_heat when knowledge >= 2', () => {
-    let state = createInitialState();
-    state.resources.knowledge = 2;
-
+  it('should roll find_jade_slip when insight >= 2', () => {
+    const state = createInitialState();
+    state.resources.insight = 2; // Condition met
+    
+    // Use a fixed random function that always returns 0.5
     const event = rollEvent(state, () => 0.5);
     expect(event).not.toBeNull();
-    expect(event?.id).toBe('canjuan_heat');
+    expect(event?.id).toBe('find_jade_slip');
   });
 
   it('should handle choice effect correctly', () => {
-    let state = createInitialState();
-    state.resources.knowledge = 2;
-
-    const event = rollEvent(state, () => 0.5);
+    const state = createInitialState();
+    state.resources.qi = 0;
+    
+    const event = EVENTS.find(e => e.id === 'find_jade_slip');
     expect(event).toBeDefined();
 
     if (event) {
-      const choice = event.choices[0]; // 仔细阅读
+      const choice = event.choices[0]; // 探查玉简
       const result = choice.effect(state);
-      expect(result.state.resources.qi).toBe(10);
-      expect(result.log).toContain('灵气入体');
+      expect(result.state.resources.qi).toBe(1);
+      expect(result.log).toContain('玉简中记录的吐纳之法');
     }
   });
 
   it('should roll location specific events', () => {
-    let state = createInitialState();
+    const state = createInitialState();
     state.currentLocationId = 'mountain_path';
-
+    state.choices.flags['found_jade_slip'] = true; // prevent find_jade_slip
+    
+    // We expect wounded_cultivator
     const event = rollEvent(state, () => 0.5);
-    expect(event).not.toBeNull();
     expect(event?.id).toBe('wounded_cultivator');
   });
 });

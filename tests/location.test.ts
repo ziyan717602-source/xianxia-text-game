@@ -3,15 +3,15 @@ import { createInitialState } from '../src/game/state';
 import { moveToLocation, getAvailableActionsAtLocation } from '../src/game/location';
 
 describe('Location System', () => {
-  it('should move to a new location if stamina is sufficient', () => {
+  it('should move to a new location if essence is sufficient', () => {
     let state = createInitialState();
-    state.resources.stamina = 100;
+    state.resources.essence = 100;
     state.currentLocationId = 'home';
 
     const result = moveToLocation(state, 'mountain_path');
     expect(result.success).toBe(true);
     expect(result.state.currentLocationId).toBe('mountain_path');
-    expect(result.state.resources.stamina).toBe(95);
+    expect(result.state.resources.essence).toBe(95);
   });
 
   it('should fail to move if location does not exist', () => {
@@ -27,9 +27,9 @@ describe('Location System', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should fail to move if stamina is too low', () => {
+  it('should fail to move if essence is too low', () => {
     let state = createInitialState();
-    state.resources.stamina = 4;
+    state.resources.essence = 4;
 
     const result = moveToLocation(state, 'mountain_path');
     expect(result.success).toBe(false);
@@ -41,13 +41,13 @@ describe('Location System', () => {
     state.currentLocationId = 'home';
     state.unlockedActions = ['tuna']; // Only tuna is unlocked
 
-    // home has ['tuna', 'dushu', 'xiuxi']
+    // home has ['tuna', 'guanxiang', 'tiaoxi']
     const actions = getAvailableActionsAtLocation(state);
     expect(actions).toEqual(['tuna']);
 
     // unlock another
-    state.unlockedActions = ['tuna', 'xiuxi'];
+    state.unlockedActions = ['tuna', 'tiaoxi'];
     const actions2 = getAvailableActionsAtLocation(state);
-    expect(actions2).toEqual(['tuna', 'xiuxi']);
+    expect(actions2).toEqual(['tuna', 'tiaoxi']);
   });
 });

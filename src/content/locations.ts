@@ -4,7 +4,7 @@ export const LOCATIONS: Record<string, Location> = {
   'home': {
     id: 'home',
     name: '居处',
-    availableActions: ['tuna', 'dushu', 'xiuxi'],
+    availableActions: ['tuna', 'guanxiang', 'tiaoxi'],
     eventWeights: {
       'safe_event': 10,
     },

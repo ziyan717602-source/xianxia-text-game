@@ -14,8 +14,9 @@ describe('Unlock System', () => {
   });
 
   it('should not unlock if conditions are not met', () => {
-    let state = createInitialState();
-    state.resources.qi = 9;
+    const state = createInitialState(123);
+    state.resources.qi = 0; // less than 1
+    state.resources.herbs = 2; // less than 5
 
     const nextState = checkUnlocks(state);
     expect(nextState.unlockedActions).not.toContain('tuna');
@@ -25,8 +26,8 @@ describe('Unlock System', () => {
     let state = createInitialState();
     // simulate tuna 10 times
     for (let i = 0; i < 10; i++) {
-      // Need enough stamina to perform
-      state.resources.stamina = 100;
+      // Need enough essence to perform
+      state.resources.essence = 100;
       state = performAction(state, 'tuna').state;
     }
 

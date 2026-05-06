@@ -19,15 +19,16 @@ describe('Game State Initialization', () => {
 
     // Check resources
     expect(state.resources.qi).toBe(0);
-    expect(state.resources.stamina).toBeGreaterThan(0); // Assuming 100
+    expect(state.resources.essence).toBeGreaterThan(0); // Assuming 100
     expect(state.resources.lifespan).toBeGreaterThan(0);
     expect(state.resources.wounds).toBe(0);
     expect(state.resources.herbs).toBe(0);
     expect(state.resources.coins).toBe(0);
-    expect(state.resources.knowledge).toBe(0);
+    expect(state.resources.insight).toBe(0);
 
     // Check empty structures
-    expect(state.unlockedActions).toEqual([]);
+    // Check empty structures
+    expect(state.unlockedActions).toEqual(['kuzuo']);
     expect(state.relationships).toEqual({});
     expect(state.choices.flags).toEqual({});
     expect(state.choices.tags).toEqual({});

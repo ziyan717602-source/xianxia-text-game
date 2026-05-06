@@ -40,10 +40,10 @@ export enum Season {
  */
 export interface Resources {
   qi: number;        // 气 (修为/灵气)
-  stamina: number;   // 体力
+  essence: number;   // 体力
   herbs: number;     // 药
   coins: number;     // 钱 (银两)
-  knowledge: number; // 见闻
+  insight: number; // 见闻
   lifespan: number;  // 寿元 (剩余可用时间/tick)
   wounds: number;    // 伤
 }

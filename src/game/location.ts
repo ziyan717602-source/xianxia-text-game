@@ -17,15 +17,15 @@ export function moveToLocation(state: GameState, locationId: string): MoveResult
     return { state, log: `你已经在${targetLocation.name}了。`, success: false };
   }
 
-  // To move, maybe it takes stamina or time. Let's make it cost a bit of stamina or just time.
-  // For simplicity, let's say moving takes 5 stamina.
+  // To move, maybe it takes essence or time. Let's make it cost a bit of essence or just time.
+  // For simplicity, let's say moving takes 5 essence.
   const costStamina = 5;
-  if (state.resources.stamina < costStamina) {
+  if (state.resources.essence < costStamina) {
     return { state, log: '体力不足，无法赶路。', success: false };
   }
 
   const newState = { ...state };
-  newState.resources = { ...state.resources, stamina: state.resources.stamina - costStamina };
+  newState.resources = { ...state.resources, essence: state.resources.essence - costStamina };
   newState.currentLocationId = locationId;
 
   return {

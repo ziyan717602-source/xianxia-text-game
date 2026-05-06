@@ -69,7 +69,7 @@ export function resolveCombatEvent(
       if (playerRoll >= enemyRoll) {
         log = `你与${enemy.name}斗法，经过一番周折将其击败。`;
         newState = adjustQuality(newState, 'combat_experience', 1);
-        newState.resources = { ...newState.resources, knowledge: newState.resources.knowledge + 2 };
+        newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
         success = true;
       } else {
         log = `你不敌${enemy.name}，败下阵来，受了不小的伤。`;

@@ -54,12 +54,12 @@ export function App() {
         <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px' }}>
           <h3>状态</h3>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            <li>体力: {resources.stamina.toFixed(0)}</li>
+            <li>精元: {resources.essence.toFixed(0)}</li>
             <li>真气: {resources.qi.toFixed(0)}</li>
             <li>寿元: {Math.floor(resources.lifespan / (360 * 10))} 年 (剩余 tick: {resources.lifespan})</li>
             <li>草药: {resources.herbs}</li>
             <li>钱币: {resources.coins}</li>
-            <li>见闻: {resources.knowledge}</li>
+            <li>神识: {resources.insight}</li>
             <li>伤势: {resources.wounds}</li>
           </ul>
         </div>
