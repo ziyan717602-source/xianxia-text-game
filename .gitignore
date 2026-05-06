@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+build/
+coverage/
+
+# Logs and temp files
+*.log
+.logs/
+tmp/
+temp/
+
+# Local env
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+!.vscode/extensions.json
+
+# Local saves and screenshots
+*.local.json
+screenshots/
+playwright-report/
+test-results/
+
