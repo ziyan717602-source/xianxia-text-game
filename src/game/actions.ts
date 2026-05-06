@@ -110,6 +110,16 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   if (action.output.coins) newState.resources.coins += action.output.coins;
   if (action.output.knowledge) newState.resources.knowledge += action.output.knowledge;
 
+  // Record action count
+  const countKey = `action_${actionId}_count`;
+  newState.choices = {
+    ...newState.choices,
+    qualities: {
+      ...newState.choices.qualities,
+      [countKey]: (newState.choices.qualities[countKey] || 0) + 1
+    }
+  };
+
   return {
     state: newState,
     log: `进行了${action.name}。`,
