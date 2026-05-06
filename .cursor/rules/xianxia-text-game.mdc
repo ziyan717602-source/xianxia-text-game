@@ -5,7 +5,7 @@ globs:
 alwaysApply: true
 ---
 
-Read `AGENTS.md` before changing code.
+Read `AGENTS.md` before changing code. For design, content, economy, or UI direction, also read `docs/design-direction.md`.
 
 Keep the project original: do not use proprietary characters, place names, sect names, plotlines, items, or special terminology from existing xianxia works.
 

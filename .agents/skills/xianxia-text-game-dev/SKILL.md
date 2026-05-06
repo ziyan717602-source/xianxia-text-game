@@ -9,17 +9,22 @@ Use this workflow for this repository's original cultivation-themed text increme
 
 ## Start
 
-1. Read `AGENTS.md`, `docs/game-design.md`, and `docs/experience.md`.
+1. Read `AGENTS.md`, `docs/design-direction.md`, `docs/game-design.md`, and `docs/experience.md`.
 2. Identify whether the task is design, implementation, testing, balancing, content writing, or research.
 3. Keep the work original. Use genre-level concepts only; do not copy names, storylines, maps, item names, sects, or prose from existing IP.
 
 ## Design Rules
 
 - Preserve gradual revelation: the player should not see the whole system at launch.
+- Keep the tone detached and observational. The game records consequences; it does not moralize or flatter the player.
+- Start from ordinary lives, not disaster survival or chosen-one melodrama.
+- Do not lock the player into a cultivation path at the beginning. Paths should emerge from repeated behavior, missed chances, and accumulated consequences.
 - Tie resources to fantasy meaning. `灵气` is not just currency; `心魔` and `丹毒` are costs, `因果` is long-tail consequence.
 - Every new system needs a loop: input, output, risk, unlock, and recovery path.
 - Prefer short repeatable text over long exposition in core UI.
 - Add surprise through unlocking, event consequences, and changed verbs, not through hidden arbitrary punishments.
+- Make the world feel alive through calendars, locations, prices, NPC traces, and state-weighted events that continue whether or not the player focuses on them.
+- Repetition must upgrade: manual action -> routine -> batch/retreat -> automation/infrastructure -> new decision layer.
 
 ## Implementation Rules
 
@@ -28,6 +33,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Save data must include a version and migration path.
 - Random systems should accept a seed or random provider for testing.
 - UI should render current state from game state; avoid storing authoritative state only in UI components.
+- Default to Vite + TypeScript + React for the browser shell, but keep `src/game` framework-independent.
 
 ## Testing Checklist
 
@@ -36,6 +42,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Save/load survives refresh and future version migration.
 - Breakthrough and risk systems have tests for success, failure, and edge thresholds.
 - Browser smoke test covers first-run start, several actions, save refresh, and reset.
+- World/event tests cover seeded event generation, route weighting, missed-event expiry, and automation unlock thresholds.
 
 ## Documentation
 

@@ -1,6 +1,6 @@
 # GitHub Copilot Instructions
 
-Follow `AGENTS.md` as the project source of truth.
+Follow `AGENTS.md` as the project source of truth. For design work, also read `docs/design-direction.md`.
 
 This is an original xianxia text incremental game inspired by the design structure of `A Dark Room`, not a clone and not a derivative of any existing novel/game IP.
 

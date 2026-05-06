@@ -15,7 +15,7 @@
 
 - `AGENTS.md`：主指令源。
 - `.github/copilot-instructions.md`：让 GitHub Copilot 继承同一套项目约束。
-- `CLAUDE.md`：让 Claude Code 读取 `AGENTS.md`。
+- `CLAUDE.md`：通过 `@AGENTS.md` 导入同一套项目约束。
 - `.cursor/rules/xianxia-text-game.mdc`：让 Cursor 在修改项目时遵循同样的原创和测试要求。
 - `.agents/skills/xianxia-text-game-dev/SKILL.md`：仓库级专用 skill。
 - `C:\Users\user\.codex\skills\xianxia-text-game-dev\SKILL.md`：本机 Codex 专用全局 skill，重启 Codex 后生效。
