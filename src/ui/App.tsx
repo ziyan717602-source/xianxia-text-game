@@ -3,16 +3,22 @@ import { useGameLoop } from './useGameLoop';
 import { ACTIONS } from '../game/actions';
 
 export function App() {
-  const { gameState, logs, doAction } = useGameLoop();
+  const { gameState, logs, doAction, saveGame, resetGame } = useGameLoop();
   const { resources, time, unlockedActions } = gameState;
 
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '800px', margin: '0 auto', color: '#333', backgroundColor: '#fafafa', minHeight: '100vh' }}>
-      <header style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px' }}>
-        <h1 style={{ margin: 0 }}>文字修仙 (测试版)</h1>
-        <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#666' }}>
-          Tick: {time.tick} | 境界: {gameState.realm}
-        </p>
+      <header style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ margin: 0 }}>文字修仙 (测试版)</h1>
+          <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#666' }}>
+            Tick: {time.tick} | 境界: {gameState.realm}
+          </p>
+        </div>
+        <div>
+          <button onClick={saveGame} style={{ padding: '4px 8px', marginRight: '10px', cursor: 'pointer' }}>保存进度</button>
+          <button onClick={() => { if(window.confirm('重置将丢失所有进度，确认？')) resetGame(); }} style={{ padding: '4px 8px', cursor: 'pointer', color: 'red' }}>重置游戏</button>
+        </div>
       </header>
 
       <div style={{ display: 'flex', gap: '20px' }}>
