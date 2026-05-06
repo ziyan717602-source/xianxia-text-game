@@ -148,6 +148,7 @@ export interface GameState {
   unlockedActions: string[];
   relationships: Record<string, Relationship>;
   choices: ChoiceState;
+  activeEventId: string | null;
   seed: number;
 }
 

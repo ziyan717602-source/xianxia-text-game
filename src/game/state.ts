@@ -29,13 +29,14 @@ export function createInitialState(seed?: number): GameState {
       day: 1,
     },
     currentLocationId: 'home', // '居处'
-    unlockedActions: [], // Empty at start, or maybe just basic actions
+    unlockedActions: ['dushu', 'xiuxi'], // Basic actions to start the game
     relationships: {},
     choices: {
       flags: {},
       tags: {},
       qualities: {},
     },
+    activeEventId: null,
     seed: seed ?? Math.floor(Math.random() * 1000000),
   };
 }

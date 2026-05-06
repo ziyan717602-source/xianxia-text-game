@@ -1,13 +1,41 @@
 import React from 'react';
 import { useGameLoop } from './useGameLoop';
 import { ACTIONS } from '../game/actions';
+import { EVENTS } from '../content/events';
 
 export function App() {
-  const { gameState, logs, doAction, saveGame, resetGame } = useGameLoop();
-  const { resources, time, unlockedActions } = gameState;
+  const { gameState, logs, doAction, handleEventChoice, saveGame, resetGame } = useGameLoop();
+  const { resources, time, unlockedActions, activeEventId } = gameState;
+
+  const activeEvent = activeEventId ? EVENTS.find(e => e.id === activeEventId) : null;
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '800px', margin: '0 auto', color: '#333', backgroundColor: '#fafafa', minHeight: '100vh' }}>
+    <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '800px', margin: '0 auto', color: '#333', backgroundColor: '#fafafa', minHeight: '100vh', position: 'relative' }}>
+      
+      {/* 活跃事件弹窗 */}
+      {activeEvent && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10
+        }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', maxWidth: '500px', width: '100%' }}>
+            <h2>机缘/变故</h2>
+            <p>{typeof activeEvent.text === 'function' ? activeEvent.text(gameState) : activeEvent.text}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+              {activeEvent.choices.map((choice, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => handleEventChoice(idx)}
+                  style={{ padding: '10px', cursor: 'pointer' }}
+                >
+                  {choice.text}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <header style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ margin: 0 }}>文字修仙 (测试版)</h1>
@@ -50,31 +78,13 @@ export function App() {
                   <button 
                     key={actionId} 
                     onClick={() => doAction(actionId)}
+                    disabled={!!activeEventId}
                     style={{ padding: '8px 16px', cursor: 'pointer', background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
                   >
                     {action.name}
                   </button>
                 );
               })
-            )}
-            
-            {/* 为了测试初始，硬编码一个休息按钮 */}
-            {!unlockedActions.includes('xiuxi') && (
-              <button 
-                onClick={() => doAction('xiuxi')}
-                style={{ padding: '8px 16px', cursor: 'pointer', background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
-              >
-                休息 (测试内置)
-              </button>
-            )}
-            {!unlockedActions.includes('tuna') && resources.knowledge >= 2 && (
-              <button 
-                onClick={() => doAction('tuna')}
-                style={{ padding: '8px 16px', cursor: 'pointer', background: '#e0f7fa', border: '1px solid #00bcd4', borderRadius: '4px' }}
-                title="满足隐藏条件，强行吐纳"
-              >
-                吐纳 (测试强制)
-              </button>
             )}
           </div>
         </div>
