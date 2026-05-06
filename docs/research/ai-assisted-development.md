@@ -13,9 +13,9 @@
 
 ## 对本项目的具体配置
 
-- `agents.md`：主指令源。
+- `AGENTS.md`：主指令源。
 - `.github/copilot-instructions.md`：让 GitHub Copilot 继承同一套项目约束。
-- `CLAUDE.md`：让 Claude Code 读取 `agents.md`。
+- `CLAUDE.md`：让 Claude Code 读取 `AGENTS.md`。
 - `.cursor/rules/xianxia-text-game.mdc`：让 Cursor 在修改项目时遵循同样的原创和测试要求。
 - `.agents/skills/xianxia-text-game-dev/SKILL.md`：仓库级专用 skill。
 - `C:\Users\user\.codex\skills\xianxia-text-game-dev\SKILL.md`：本机 Codex 专用全局 skill，重启 Codex 后生效。
@@ -28,4 +28,3 @@
 - [GitHub Copilot repository custom instructions](https://docs.github.com/en/copilot/customizing-copilot/adding-repository-custom-instructions-for-github-copilot)
 - [Claude Code memory](https://docs.anthropic.com/en/docs/claude-code/memory)
 - [Cursor rules](https://docs.cursor.com/context/rules)
-

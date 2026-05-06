@@ -5,24 +5,25 @@
 ## 当前状态
 
 - 本机已安装 Git。
-- 当前目录初始化为本地 git 仓库后，可立即版本管理。
+- 当前目录已初始化为本地 git 仓库。
+- 远端仓库已配置为 `origin`：`https://github.com/ziyan717602-source/xianxia-text-game.git`。
+- 本地 `main` 已跟踪 `origin/main`。
 - 未检测到 GitHub CLI `gh`，因此无法自动创建 GitHub 远程仓库。
-- 当前还缺少用户的云端仓库 URL，不能安全地替你设置真实 `origin`。
 
 ## 推荐云端方案
 
-优先使用 GitHub 私有仓库或公开仓库：
+当前已经完成远端配置。日常同步使用：
 
 ```powershell
-git remote add origin https://github.com/<your-name>/<repo-name>.git
-git branch -M main
-git push -u origin main
+git status --short
+git pull --rebase
+git push
 ```
 
-如果使用 Gitee、GitLab 或自建 Git 服务，只需替换远程 URL：
+如果以后迁移到 Gitee、GitLab 或自建 Git 服务，再替换远程 URL：
 
 ```powershell
-git remote add origin https://gitee.com/<your-name>/<repo-name>.git
+git remote set-url origin https://gitee.com/<your-name>/<repo-name>.git
 git push -u origin main
 ```
 
@@ -48,5 +49,4 @@ git push
 - 云端只存源码、文档、测试和小型素材。
 - 不提交 `node_modules`、构建产物、临时截图、私钥和本地存档。
 - 如果后续有大图、音频或模型文件，使用 Git LFS 或外部素材库。
-- 每台电脑拉取后先阅读 `README.md` 和 `agents.md`。
-
+- 每台电脑拉取后先阅读 `README.md` 和 `AGENTS.md`。

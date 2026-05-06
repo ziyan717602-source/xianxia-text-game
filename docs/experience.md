@@ -17,7 +17,7 @@
 ### 实现玩法前
 
 ```text
-请先阅读 agents.md、docs/game-design.md、docs/experience.md。
+请先阅读 AGENTS.md、docs/game-design.md、docs/experience.md。
 我要实现 [系统名]。先给出资源流、解锁条件、失败/代价、测试点，再修改代码。
 不要使用任何现有仙侠 IP 的专有名称或剧情。
 ```
@@ -44,6 +44,7 @@
 - Playwright / browser testing：适合验证本地 Web 游戏是否能点击、存档、刷新恢复。
 - GitHub/Cursor/Claude Code：通过仓库指令文件保持一致行为。
 - Web 调研：只把机制级经验写入仓库，避免搬运受版权保护的文本和设定。
+- Node.js：WindowsApps 中 Codex 自带的 `node.exe` 可能被系统权限拦截；已安装官方 Node.js LTS 到 `C:\Program Files\nodejs`，当前会话必要时把该路径临时前置到 PATH。
 
 ## 待补充
 
@@ -51,4 +52,3 @@
 - 实际技术栈、测试命令、构建命令。
 - 云端远程仓库 URL。
 - 部署目标：GitHub Pages、Netlify、Vercel 或自托管。
-

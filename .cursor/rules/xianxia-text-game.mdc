@@ -5,11 +5,10 @@ globs:
 alwaysApply: true
 ---
 
-Read `agents.md` before changing code.
+Read `AGENTS.md` before changing code.
 
 Keep the project original: do not use proprietary characters, place names, sect names, plotlines, items, or special terminology from existing xianxia works.
 
 For gameplay code, separate pure simulation from UI. Resource changes, unlock rules, events, save migrations, and random outcomes should be testable without a browser.
 
 Update `docs/experience.md` when a workflow, prompt, tool, or implementation lesson should carry into future development.
-
