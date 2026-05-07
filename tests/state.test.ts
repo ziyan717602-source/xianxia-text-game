@@ -42,6 +42,8 @@ describe('Game State Initialization', () => {
     expect(state.cultivation.activeTechniqueId).toBe('small_breathing');
     expect(state.alchemy.knownRecipeIds).toEqual([]);
     expect(state.alchemy.brewedRecipeCounts).toEqual({});
+    expect(state.breakthrough.preparation).toEqual({});
+    expect(state.breakthrough.lastTargetId).toBeNull();
   });
 
   it('should generate a random seed if none is provided', () => {

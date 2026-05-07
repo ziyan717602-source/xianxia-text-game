@@ -1,7 +1,10 @@
 import { Action, Realm } from '../game/types';
 import { PILL_RECIPES } from './alchemy';
+import { BREAKTHROUGH_RULES } from './breakthroughs';
 
 const SMALL_QI_PILL_COST = PILL_RECIPES.small_qi_pill.requiredResources;
+const QI_LAYER_2_COST = BREAKTHROUGH_RULES.qi_layer_2.requiredResources;
+const QI_LAYER_3_COST = BREAKTHROUGH_RULES.qi_layer_3.requiredResources;
 
 export const ACTIONS: Record<string, Action> = {
   kuzuo: {
@@ -176,6 +179,47 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['has_qi_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  stabilize_bottleneck: {
+    id: 'stabilize_bottleneck',
+    name: '稳固关口',
+    cost: { essence: 35, qi: 3, insight: 1 },
+    output: {},
+    cooldown: 30,
+    riskProbability: 0,
+    conditions: {
+      forbiddenFlags: ['reached_qi_layer_3'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  breakthrough_qi_2: {
+    id: 'breakthrough_qi_2',
+    name: '冲炼气二层',
+    cost: QI_LAYER_2_COST,
+    output: {},
+    cooldown: 60,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['prepared_qi_layer_2'],
+      forbiddenFlags: ['reached_qi_layer_2'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  breakthrough_qi_3: {
+    id: 'breakthrough_qi_3',
+    name: '冲炼气三层',
+    cost: QI_LAYER_3_COST,
+    output: {},
+    cooldown: 70,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['prepared_qi_layer_3'],
+      forbiddenFlags: ['reached_qi_layer_3'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },

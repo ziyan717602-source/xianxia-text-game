@@ -1,0 +1,125 @@
+import { describe, expect, it } from 'vitest';
+import { BREAKTHROUGH_RULES } from '../src/content/breakthroughs';
+import { performAction } from '../src/game/actions';
+import { getBreakthroughSuccessChance, getBreakthroughSummary } from '../src/game/breakthrough';
+import { getAvailableActionsAtLocation } from '../src/game/location';
+import { createInitialState } from '../src/game/state';
+import { Realm } from '../src/game/types';
+import { checkUnlocks } from '../src/game/unlock';
+
+function createReadyQiState() {
+  let state = createInitialState(20260507);
+  state.realm = Realm.QiCondensation;
+  state.realmLayer = 1;
+  state.currentLocationId = 'home';
+  state.resources.essence = 100;
+  state.resources.qi = 80;
+  state.resources.insight = 10;
+  state.choices.qualities.quiet_cultivation = 4;
+  state = checkUnlocks(state);
+  return state;
+}
+
+describe('Breakthrough system', () => {
+  it('should prepare the next qi bottleneck before breakthrough', () => {
+    let state = createReadyQiState();
+
+    expect(getAvailableActionsAtLocation(state)).toContain('stabilize_bottleneck');
+
+    const result = performAction(state, 'stabilize_bottleneck');
+    expect(result.success).toBe(true);
+    state = checkUnlocks(result.state);
+
+    expect(state.breakthrough.preparation.qi_layer_2).toBe(1);
+    expect(state.choices.flags.prepared_qi_layer_2).toBe(true);
+    expect(state.unlockedActions).toContain('breakthrough_qi_2');
+    expect(getBreakthroughSummary(state).join(' / ')).toContain('炼气二层');
+  });
+
+  it('should advance to qi layer two on success', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+
+    const result = performAction(state, 'breakthrough_qi_2', () => 0);
+
+    expect(result.success).toBe(true);
+    expect(result.state.realm).toBe(Realm.QiCondensation);
+    expect(result.state.realmLayer).toBe(2);
+    expect(result.state.choices.flags.reached_qi_layer_2).toBe(true);
+    expect(result.state.breakthrough.successes.qi_layer_2).toBe(1);
+  });
+
+  it('should record partial breakthrough without adding wounds', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    const chance = getBreakthroughSuccessChance(state, BREAKTHROUGH_RULES.qi_layer_2);
+
+    const result = performAction(state, 'breakthrough_qi_2', () => chance + 0.03);
+
+    expect(result.state.realmLayer).toBe(1);
+    expect(result.state.choices.flags.half_broke_qi_layer_2).toBe(true);
+    expect(result.state.breakthrough.preparation.qi_layer_2).toBe(2);
+    expect(result.state.resources.wounds).toBe(0);
+  });
+
+  it('should leave wounds and lifespan loss on failed breakthrough', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    const beforeLifespan = state.resources.lifespan;
+
+    const result = performAction(state, 'breakthrough_qi_2', () => 0.99);
+
+    expect(result.state.realmLayer).toBe(1);
+    expect(result.state.choices.flags.failed_qi_layer_2).toBe(true);
+    expect(result.state.breakthrough.failures.qi_layer_2).toBe(1);
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.resources.lifespan).toBe(beforeLifespan - 20 - 60);
+  });
+
+  it('should make dantoxin and wounds reduce breakthrough chance', () => {
+    const cleanState = createReadyQiState();
+    const toxicState = createReadyQiState();
+    toxicState.resources.dantoxin = 30;
+    toxicState.resources.wounds = 2;
+
+    const cleanChance = getBreakthroughSuccessChance(cleanState, BREAKTHROUGH_RULES.qi_layer_2);
+    const toxicChance = getBreakthroughSuccessChance(toxicState, BREAKTHROUGH_RULES.qi_layer_2);
+
+    expect(toxicChance).toBeLessThan(cleanChance);
+  });
+
+  it('should prepare layer three after reaching qi layer two', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    state = checkUnlocks(performAction(state, 'breakthrough_qi_2', () => 0).state);
+    state.resources.essence = 100;
+    state.resources.qi = 80;
+    state.resources.insight = 10;
+
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+
+    expect(state.breakthrough.preparation.qi_layer_3).toBe(1);
+    expect(state.choices.flags.prepared_qi_layer_3).toBe(true);
+    expect(state.unlockedActions).toContain('breakthrough_qi_3');
+  });
+
+  it('should hide bottleneck preparation after the current implemented qi cap', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    state = checkUnlocks(performAction(state, 'breakthrough_qi_2', () => 0).state);
+    state.resources.essence = 100;
+    state.resources.qi = 100;
+    state.resources.insight = 10;
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    state = checkUnlocks(performAction(state, 'breakthrough_qi_3', () => 0).state);
+
+    expect(state.realmLayer).toBe(3);
+    expect(getAvailableActionsAtLocation(state)).not.toContain('stabilize_bottleneck');
+  });
+});

@@ -1,4 +1,5 @@
 import { GameState, Realm } from '../game/types';
+import { getNextBreakthroughRule } from '../game/breakthrough';
 
 export interface UnlockRule {
   id: string;
@@ -208,6 +209,68 @@ export const UNLOCKS: UnlockRule[] = [
           choices: {
             ...state.choices,
             flags: { ...state.choices.flags, 'unlocked_take_qi_pill': true, has_qi_pill: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_stabilize_bottleneck',
+    condition: (state) => {
+      const rule = getNextBreakthroughRule(state);
+      return Boolean(rule) && state.resources.qi >= 20 && state.resources.insight >= 3;
+    },
+    effect: (state) => {
+      if (!state.unlockedActions.includes('stabilize_bottleneck')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'stabilize_bottleneck'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_stabilize_bottleneck: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_breakthrough_qi_2',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.realmLayer === 1 &&
+      Boolean(state.choices.flags.prepared_qi_layer_2) &&
+      !state.choices.flags.reached_qi_layer_2,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('breakthrough_qi_2')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'breakthrough_qi_2'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_breakthrough_qi_2: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_breakthrough_qi_3',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.realmLayer === 2 &&
+      Boolean(state.choices.flags.prepared_qi_layer_3) &&
+      !state.choices.flags.reached_qi_layer_3,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('breakthrough_qi_3')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'breakthrough_qi_3'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_breakthrough_qi_3: true }
           }
         };
       }

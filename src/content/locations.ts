@@ -15,6 +15,9 @@ export const LOCATIONS: Record<string, Location> = {
       'study_qi_formula',
       'brew_qi_pill',
       'take_qi_pill',
+      'stabilize_bottleneck',
+      'breakthrough_qi_2',
+      'breakthrough_qi_3',
       'rike_tuna',
     ],
     eventWeights: {

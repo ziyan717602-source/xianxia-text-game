@@ -1,5 +1,6 @@
 import { GameState, GameTime, Realm, SpiritualRoot, Season } from './types';
 import { createInitialAlchemyState } from './alchemy';
+import { createInitialBreakthroughState } from './breakthrough';
 import { createInitialCultivationState } from './cultivation';
 import { createInitialWorldState } from './world';
 
@@ -59,6 +60,7 @@ export function createInitialState(seed?: number): GameState {
     world: createInitialWorldState(time),
     cultivation: createInitialCultivationState(stateSeed),
     alchemy: createInitialAlchemyState(),
+    breakthrough: createInitialBreakthroughState(),
     activeEventId: null,
     seed: stateSeed,
   };

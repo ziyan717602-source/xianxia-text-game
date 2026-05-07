@@ -106,4 +106,24 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('take_qi_pill');
     expect(state.choices.flags.has_qi_pill).toBe(true);
   });
+
+  it('should unlock bottleneck preparation and qi breakthrough actions in sequence', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.resources.qi = 30;
+    state.resources.insight = 4;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('stabilize_bottleneck');
+
+    state.choices.flags.prepared_qi_layer_2 = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('breakthrough_qi_2');
+
+    state.realmLayer = 2;
+    state.choices.flags.prepared_qi_layer_3 = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('breakthrough_qi_3');
+  });
 });

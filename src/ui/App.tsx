@@ -4,6 +4,7 @@ import { EVENTS } from '../content/events';
 import { LOCATIONS } from '../content/locations';
 import { SELECTABLE_ORIGINS } from '../content/origins';
 import { getAlchemySummary } from '../game/alchemy';
+import { getBreakthroughSummary } from '../game/breakthrough';
 import { getCultivationSummary } from '../game/cultivation';
 import { getAvailableActionsAtLocation } from '../game/location';
 import { getOriginName, hasSelectedOrigin } from '../game/origins';
@@ -51,6 +52,7 @@ export function App() {
   const visibleResourceIds = getVisibleResourceIds(gameState);
   const availableActionIds = getAvailableActionsAtLocation(gameState);
   const alchemySummary = getAlchemySummary(gameState);
+  const breakthroughSummary = getBreakthroughSummary(gameState);
   const cultivationSummary = getCultivationSummary(gameState);
   const recentSummary = getRecentSummary(gameState);
   const worldLogs = gameState.world.logs;
@@ -161,6 +163,14 @@ export function App() {
             <div className="ledger-block" aria-label="炼丹">
               <h3>炼丹</h3>
               {alchemySummary.map((line, index) => (
+                <p key={`${index}-${line}`}>{line}</p>
+              ))}
+            </div>
+          )}
+          {breakthroughSummary.length > 0 && (
+            <div className="ledger-block" aria-label="突破">
+              <h3>突破</h3>
+              {breakthroughSummary.map((line, index) => (
                 <p key={`${index}-${line}`}>{line}</p>
               ))}
             </div>

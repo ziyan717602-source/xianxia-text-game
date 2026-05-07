@@ -131,6 +131,17 @@ export interface AlchemyState {
 }
 
 /**
+ * 突破账本
+ */
+export interface BreakthroughState {
+  preparation: Record<string, number>;
+  attempts: Record<string, number>;
+  failures: Record<string, number>;
+  successes: Record<string, number>;
+  lastTargetId: string | null;
+}
+
+/**
  * 行动定义 (静态配置)
  */
 export interface Action {
@@ -186,6 +197,7 @@ export interface GameState {
   world: WorldState;
   cultivation: CultivationState;
   alchemy: AlchemyState;
+  breakthrough: BreakthroughState;
   activeEventId: string | null;
   seed: number;
 }

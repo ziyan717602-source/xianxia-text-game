@@ -118,5 +118,22 @@ describe('Save and Migration System', () => {
     expect(migrated.state.resources.qiPills).toBe(0);
     expect(migrated.state.resources.dantoxin).toBe(0);
     expect(migrated.state.alchemy.brewedRecipeCounts).toEqual({});
+    expect(migrated.state.breakthrough.preparation).toEqual({});
+  });
+
+  it('should migrate V6 saves by adding breakthrough ledger', () => {
+    const state = createInitialState(246);
+    const { breakthrough, ...stateWithoutBreakthrough } = state;
+    const migrated = migrateSaveData({
+      version: 6,
+      state: stateWithoutBreakthrough,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 246,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.breakthrough.attempts).toEqual({});
+    expect(migrated.state.breakthrough.lastTargetId).toBeNull();
   });
 });

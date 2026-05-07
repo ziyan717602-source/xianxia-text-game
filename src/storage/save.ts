@@ -1,11 +1,12 @@
 import { GameState, Realm, SaveData } from '../game/types';
 import { createInitialAlchemyState } from '../game/alchemy';
+import { createInitialBreakthroughState } from '../game/breakthrough';
 import { createInitialCultivationState } from '../game/cultivation';
 import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
 
-export const CURRENT_SAVE_VERSION = 6;
+export const CURRENT_SAVE_VERSION = 7;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -69,6 +70,14 @@ export function migrateSaveData(data: any): SaveData {
       alchemy: migratedData.state.alchemy ?? createInitialAlchemyState(),
     };
     migratedData.version = 6;
+  }
+
+  if (migratedData.version === 6) {
+    migratedData.state = {
+      ...migratedData.state,
+      breakthrough: migratedData.state.breakthrough ?? createInitialBreakthroughState(),
+    };
+    migratedData.version = 7;
   }
 
   return migratedData as SaveData;

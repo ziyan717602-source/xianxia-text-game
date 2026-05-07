@@ -1,6 +1,7 @@
 import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
 import { applyAlchemyOutputModifiers, brewRecipe, consumePill, learnRecipe, SMALL_QI_PILL_RECIPE_ID } from './alchemy';
+import { resolveBreakthrough, stabilizeBreakthrough } from './breakthrough';
 import { applyCultivationOutputModifiers, attuneTechnique, revealRoot } from './cultivation';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
 import { RESOURCE_LABELS } from './resources';
@@ -25,6 +26,9 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   study_qi_formula: 'alchemy_affinity',
   brew_qi_pill: 'alchemy_affinity',
   take_qi_pill: 'alchemy_affinity',
+  stabilize_bottleneck: 'quiet_cultivation',
+  breakthrough_qi_2: 'quiet_cultivation',
+  breakthrough_qi_3: 'quiet_cultivation',
   caiyao: 'alchemy_affinity',
   bianyao: 'alchemy_affinity',
   xunshan: 'combat_edge',
@@ -155,6 +159,18 @@ export function performAction(state: GameState, actionId: string, random?: () =>
 
   if (actionId === 'take_qi_pill') {
     const result = consumePill(newState, SMALL_QI_PILL_RECIPE_ID);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'stabilize_bottleneck') {
+    const result = stabilizeBreakthrough(newState);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'breakthrough_qi_2' || actionId === 'breakthrough_qi_3') {
+    const result = resolveBreakthrough(newState, actionId, random);
     newState = result.state;
     customLog = result.log;
   }
