@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
+// One-off migration script from the 2026-05-07 thematic rename pass.
+// Keep for audit history; do not run during normal development.
+
 function walk(dir) {
   let results = [];
   const list = fs.readdirSync(dir);

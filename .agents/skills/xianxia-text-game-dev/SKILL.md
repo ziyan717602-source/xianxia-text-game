@@ -9,7 +9,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 
 ## Start
 
-1. Read `AGENTS.md`, `docs/design-direction.md`, `docs/game-design.md`, and `docs/experience.md`.
+1. Read `AGENTS.md`, `docs/project-status.md`, `PLAN.md`, `docs/design-direction.md`, `docs/game-design.md`, and `docs/experience.md`.
 2. Identify whether the task is design, implementation, testing, balancing, content writing, or research.
 3. Keep the work original. Use genre-level concepts only; do not copy names, storylines, maps, item names, sects, or prose from existing IP.
 
@@ -40,6 +40,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Random systems should accept a seed or random provider for testing.
 - UI should render current state from game state; avoid storing authoritative state only in UI components.
 - Default to Vite + TypeScript + React for the browser shell, but keep `src/game` framework-independent.
+- The current repository has completed the phase 1A skeleton. Before implementing new features, check `docs/reviews/2026-05-07-current-project-review.md` so you do not duplicate work and so you address known consistency gaps first.
 
 ## Testing Checklist
 

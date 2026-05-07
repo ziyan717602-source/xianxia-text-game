@@ -1,6 +1,6 @@
 # 技术路线
 
-更新时间：2026-05-06
+更新时间：2026-05-07
 
 ## 目标
 
@@ -30,6 +30,25 @@ tests           逻辑测试与浏览器烟测
 ```
 
 UI 不保存权威状态。所有关键状态都来自 `src/game`。
+
+## 当前实现状态
+
+截至 2026-05-07，项目已实现：
+
+- Vite + React + TypeScript 工程。
+- `src/game` 纯逻辑骨架。
+- `src/content` 事件、地点、解锁配置。
+- `src/storage/save.ts` localStorage 存档和迁移入口。
+- `src/ui` 主界面和 game loop hook。
+- Vitest 基础测试。
+
+当前架构缺口：
+
+- 行动仍硬编码在 `src/game/actions.ts`，后续应迁到 `src/content/actions.ts`。
+- UI 尚未使用地点行动过滤。
+- UI 尚未实现资源渐进揭示。
+- 时间模型尚未推进 day/season/year。
+- 离线 tick 尚未批量结算。
 
 ## 状态模型
 

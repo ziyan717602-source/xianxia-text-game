@@ -30,10 +30,16 @@
 - 随机事件应支持固定 seed 或可注入随机源，便于测试。
 - 默认技术栈为 Vite + TypeScript + React，核心游戏逻辑保持框架无关。详见 `docs/technical-direction.md`。
 
+## 当前实现状态
+
+- 阶段 1A 原型骨架已完成：Vite/React/TypeScript、核心 `src/game` 逻辑、事件弹窗、localStorage 存档、Vitest 测试已存在。
+- 当前优先级是阶段 1B 一致性清洗，详见 `PLAN.md` 和 `docs/reviews/2026-05-07-current-project-review.md`。
+- 每次切换开发机后先运行 `npm ci`；当前工作机如遇 WindowsApps `node.exe` 权限问题，先将 `C:\Program Files\nodejs` 前置到 PATH。
+
 ## 开发流程
 
 - 改动前先阅读 `docs/game-design.md`、`docs/experience.md` 和本文件。
-- 设计改动前还要阅读 `docs/design-direction.md`。
+- 设计改动前还要阅读 `docs/design-direction.md`；实现改动前阅读 `docs/project-status.md` 和 `PLAN.md`。
 - 每次引入新玩法，补充或更新对应设计记录，尤其是资源循环、失败条件、解锁条件。
 - 重要经验沉淀到 `docs/experience.md`，包括 AI 工具提示词、测试方法、踩坑和可复用脚本。
 - 外部资料沉淀到 `docs/research/`，记录来源链接、可借鉴点和不可直接复用的版权边界。
@@ -42,6 +48,9 @@
 ## 代码质量
 
 - 核心游戏逻辑要有单元测试：资源 tick、境界突破、事件触发、存档读写、解锁条件。
+- UI 行动列表必须通过地点可用行动和解锁状态共同过滤，不能只读 `unlockedActions`。
+- UI 资源面板必须遵循渐进揭示，不能开局展示所有资源。
+- tick 离线结算不能长期依赖逐 tick while 循环，涉及离线收益时要做批量结算。
 - UI 改动要做至少一次浏览器烟测；复杂交互使用 Playwright 或 Codex in-app browser。
 - 数值变更要说明目的：延长节奏、减少等待、提高决策密度、降低惩罚等。
 - 不引入大框架或复杂服务端，除非它能明显降低长期维护成本。

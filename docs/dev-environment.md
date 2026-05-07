@@ -1,6 +1,6 @@
 # 本地开发环境
 
-更新时间：2026-05-06
+更新时间：2026-05-07
 
 ## 已安装
 
@@ -27,6 +27,8 @@ npm --version
 & 'C:\Program Files\nodejs\node.exe' --version
 & 'C:\Program Files\nodejs\npm.cmd' --version
 ```
+
+2026-05-07 验证：在当前 Codex shell 中直接执行 `npm` 会提示命令不存在；将 `C:\Program Files\nodejs` 前置到 PATH 后，`npm test` 与 `npm run build` 均可通过。
 
 ## 后续建议
 
