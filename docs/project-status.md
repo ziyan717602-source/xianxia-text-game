@@ -15,6 +15,13 @@
 - `npm ci`、`npm test`、`npm run build`、`npm run smoke` 可在当前工作机通过。
 - GitHub 远端 `origin/main` 已同步。
 
+### 资料与内容准备
+
+- `docs/research/2026-05-07-content-prep.md`：整理仙侠类型、气、五行、节气、药性分类、增量循环和互动叙事状态变量资料，并记录来源边界。
+- `docs/content-bank/world-event-seeds.md`：准备地点、节气、NPC、关系标签、事件种子、近日摘要和世界日志短句素材。
+- `docs/content-bank/cultivation-system-seeds.md`：准备灵根、五行相性、功法轴、突破结构、道途倾向和劫数素材。
+- `docs/content-bank/alchemy-herb-seeds.md`：准备原创草药、药性轴、丹方结构、丹毒风险和炼丹事件素材。
+
 ### 核心逻辑
 
 - `GameState` 类型：资源、境界、灵根、时间、地点、关系、选择状态、活动事件、seed。
@@ -57,7 +64,7 @@
 ### 系统一致性
 
 - 选择 flags/tags/qualities 影响事件权重、文案和价格。
-- 第一批季节、关系、道途调制事件。
+- 第一批季节、关系、道途调制事件；优先从 `docs/content-bank/world-event-seeds.md` 转为数据。
 
 ### 修仙味
 
@@ -65,6 +72,7 @@
 - 灵根、五行、功法相性、丹药药性的数据结构与首批效果。
 - 宗门传闻、外门规矩、坊市身份。
 - 轻量斗法与避战/交涉事件链。
+- 将 `docs/content-bank/` 的素材筛选成首批可测试内容，避免一次性堆设定。
 
 ### 反坐牢
 

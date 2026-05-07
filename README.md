@@ -11,7 +11,9 @@
 - `docs/research/similar-games.md`：同类游戏与可借鉴机制。
 - `docs/research/incremental-design-patterns.md`：增量/文字游戏设计调研补充。
 - `docs/research/xianxia-text-game-audit.md`：仙侠/文字游戏特点审视与设计查漏。
+- `docs/research/2026-05-07-content-prep.md`：阶段 1C/2 后续内容资料准备与来源边界。
 - `docs/research/ai-assisted-development.md`：AI 辅助开发工作流经验。
+- `docs/content-bank/`：节气、地点、NPC、灵根、五行、炼丹和草药的原创机制化素材库。
 - `docs/project-status.md`：已开发、待开发工作梳理。
 - `docs/reviews/2026-05-07-current-project-review.md`：当前代码与游戏设计全面审查。
 - `docs/reports/`：历史进度报告和审计报告。
@@ -38,8 +40,9 @@ npm run smoke
 ## 下一步
 
 1. 完成阶段 1C 剩余项：状态调制事件、近日摘要、世界日志和首轮数值手感测试。
-2. 调整“枯坐 -> 玉简 -> 吐纳 -> 日课 -> 引气入体 -> 炼气一层”的前 20-30 分钟节奏。
-3. 扩展坊市、宗门传闻和第一批长期后果事件。
+2. 按 `docs/content-bank/` 落地第一批地点/节气/关系调制事件，保持短文本和状态账本可读。
+3. 调整“枯坐 -> 玉简 -> 吐纳 -> 日课 -> 引气入体 -> 炼气一层”的前 20-30 分钟节奏。
+4. 扩展坊市、宗门传闻和第一批长期后果事件。
 
 ## 本地环境
 

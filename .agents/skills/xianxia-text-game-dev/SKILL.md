@@ -10,8 +10,9 @@ Use this workflow for this repository's original cultivation-themed text increme
 ## Start
 
 1. Read `AGENTS.md`, `docs/project-status.md`, `PLAN.md`, `docs/design-direction.md`, `docs/game-design.md`, and `docs/experience.md`.
-2. Identify whether the task is design, implementation, testing, balancing, content writing, or research.
-3. Keep the work original. Use genre-level concepts only; do not copy names, storylines, maps, item names, sects, or prose from existing IP.
+2. For content, event, location, cultivation, alchemy, sect, NPC, or balancing work, also read `docs/content-bank/README.md` and the relevant content-bank file before changing game content.
+3. Identify whether the task is design, implementation, testing, balancing, content writing, or research.
+4. Keep the work original. Use genre-level concepts only; do not copy names, storylines, maps, item names, sects, or prose from existing IP.
 
 ## Design Rules
 
@@ -56,4 +57,5 @@ Use this workflow for this repository's original cultivation-themed text increme
 
 - Add durable lessons to `docs/experience.md`.
 - Add external references to `docs/research/` with links and copyright notes.
+- Keep mechanism-ready content in `docs/content-bank/`; each item should be convertible into state, event data, logs, resources, or tests.
 - Update `PLAN.md` when a milestone is completed or split.

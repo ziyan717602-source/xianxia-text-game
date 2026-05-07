@@ -40,6 +40,7 @@
 
 - 改动前先阅读 `docs/game-design.md`、`docs/experience.md` 和本文件。
 - 设计改动前还要阅读 `docs/design-direction.md`；实现改动前阅读 `docs/project-status.md` 和 `PLAN.md`。
+- 内容、事件、地点、灵根、丹药或宗门相关改动前，还要阅读 `docs/content-bank/README.md` 和对应素材文件。
 - 每次引入新玩法，补充或更新对应设计记录，尤其是资源循环、失败条件、解锁条件。
 - 重要经验沉淀到 `docs/experience.md`，包括 AI 工具提示词、测试方法、踩坑和可复用脚本。
 - 外部资料沉淀到 `docs/research/`，记录来源链接、可借鉴点和不可直接复用的版权边界。
@@ -53,6 +54,7 @@
 - tick 离线结算不能长期依赖逐 tick while 循环，涉及离线收益时要做批量结算。
 - UI 改动要做至少一次浏览器烟测；当前可运行 `npm run smoke` 做基础 Edge/CDP 烟测，复杂交互再使用 Playwright 或 Codex in-app browser。
 - 数值变更要说明目的：延长节奏、减少等待、提高决策密度、降低惩罚等。
+- 内容素材要先机制化再落地：每条事件至少明确地点/季节/条件/权重/后果，不把长设定直接塞进 UI。
 - 不引入大框架或复杂服务端，除非它能明显降低长期维护成本。
 - 禁止把 API key、私有 token、登录态、个人路径写进仓库。
 
