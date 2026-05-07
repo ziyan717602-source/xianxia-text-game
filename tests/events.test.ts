@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { rollEvent } from '../src/game/events';
 import { createInitialState } from '../src/game/state';
 import { EVENTS } from '../src/content/events';
+import { Realm } from '../src/game/types';
 
 describe('Event System', () => {
   it('should not roll event if conditions are not met', () => {
@@ -144,5 +145,43 @@ describe('Event System', () => {
     expect(result.state.choices.flags.heard_outer_gate_rules).toBe(true);
     expect(result.state.choices.tags.sect_trace).toBe('heard_rules');
     expect(result.state.choices.qualities.sect_trace).toBe(1);
+  });
+
+  it('should expose and resolve the meridian dantoxin event', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.dantoxin = 60;
+    state.resources.essence = 80;
+    state.resources.qi = 10;
+
+    const event = EVENTS.find(e => e.id === 'dantoxin_in_meridians');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.choices.flags.dantoxin_in_meridians_seen).toBe(true);
+    expect(result.state.choices.flags.forced_out_dantoxin).toBe(true);
+    expect(result.state.resources.dantoxin).toBe(50);
+    expect(result.state.resources.qi).toBe(6);
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
+  it('should let the meridian dantoxin event point to a cleansing formula', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.dantoxin = 60;
+    state.resources.herbs = 2;
+
+    const event = EVENTS.find(e => e.id === 'dantoxin_in_meridians')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.choices.flags.sought_cleansing_formula).toBe(true);
+    expect(result.state.resources.herbs).toBe(1);
+    expect(result.state.resources.insight).toBe(2);
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
   });
 });

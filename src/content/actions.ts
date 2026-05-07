@@ -4,6 +4,7 @@ import { BREAKTHROUGH_RULES } from './breakthroughs';
 
 const SMALL_QI_PILL_COST = PILL_RECIPES.small_qi_pill.requiredResources;
 const STABILIZING_POWDER_COST = PILL_RECIPES.stabilizing_powder.requiredResources;
+const CLEANSING_PILL_COST = PILL_RECIPES.cleansing_pill.requiredResources;
 const QI_LAYER_2_COST = BREAKTHROUGH_RULES.qi_layer_2.requiredResources;
 const QI_LAYER_3_COST = BREAKTHROUGH_RULES.qi_layer_3.requiredResources;
 
@@ -198,6 +199,33 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  study_cleansing_formula: {
+    id: 'study_cleansing_formula',
+    name: '辨清躁方',
+    cost: { essence: 20, herbs: 3, insight: 4 },
+    output: {},
+    cooldown: 25,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['known_recipe_small_qi_pill'],
+      forbiddenFlags: ['known_recipe_cleansing_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  brew_cleansing_pill: {
+    id: 'brew_cleansing_pill',
+    name: '炼清躁丸',
+    cost: CLEANSING_PILL_COST,
+    output: {},
+    cooldown: 40,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['known_recipe_cleansing_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   take_qi_pill: {
     id: 'take_qi_pill',
     name: '服小聚气丸',
@@ -220,6 +248,19 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['has_stabilizing_powder'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  take_cleansing_pill: {
+    id: 'take_cleansing_pill',
+    name: '服清躁丸',
+    cost: { cleansingPills: 1 },
+    output: {},
+    cooldown: 10,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['has_cleansing_pill'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },

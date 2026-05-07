@@ -127,6 +127,26 @@ describe('Unlock System', () => {
     expect(state.choices.flags.has_stabilizing_powder).toBe(true);
   });
 
+  it('should unlock cleansing formula after dantoxin becomes heavy', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.known_recipe_small_qi_pill = true;
+    state.resources.dantoxin = 30;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_cleansing_formula');
+
+    state.choices.flags.known_recipe_cleansing_pill = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('brew_cleansing_pill');
+
+    state.resources.cleansingPills = 1;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('take_cleansing_pill');
+    expect(state.choices.flags.has_cleansing_pill).toBe(true);
+  });
+
   it('should unlock bottleneck preparation and qi breakthrough actions in sequence', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

@@ -8,6 +8,7 @@ export const RESOURCE_LABELS: Record<ResourceId, string> = {
   herbs: '草药',
   qiPills: '小聚气丸',
   stabilizingPowders: '稳息散',
+  cleansingPills: '清躁丸',
   coins: '钱币',
   insight: '神识',
   dantoxin: '丹毒',
@@ -36,6 +37,10 @@ export function getVisibleResourceIds(state: GameState): ResourceId[] {
 
   if (state.resources.stabilizingPowders > 0 || Boolean(state.choices.flags.has_stabilizing_powder)) {
     visible.push('stabilizingPowders');
+  }
+
+  if (state.resources.cleansingPills > 0 || Boolean(state.choices.flags.has_cleansing_pill)) {
+    visible.push('cleansingPills');
   }
 
   if (state.resources.coins > 0 || state.currentLocationId === 'market') {

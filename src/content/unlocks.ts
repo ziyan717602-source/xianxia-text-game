@@ -243,6 +243,50 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_study_cleansing_formula',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['known_recipe_small_qi_pill']) &&
+      (
+        state.resources.dantoxin >= 30 ||
+        Boolean(state.choices.flags['dantoxin_in_meridians_seen']) ||
+        Boolean(state.choices.flags['sought_cleansing_formula'])
+      ) &&
+      !state.choices.flags['known_recipe_cleansing_pill'],
+    effect: (state) => {
+      if (!state.unlockedActions.includes('study_cleansing_formula')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'study_cleansing_formula'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_study_cleansing_formula: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_brew_cleansing_pill',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['known_recipe_cleansing_pill']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('brew_cleansing_pill')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'brew_cleansing_pill'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_brew_cleansing_pill: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_take_qi_pill',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&
@@ -277,6 +321,29 @@ export const UNLOCKS: UnlockRule[] = [
               ...state.choices.flags,
               unlocked_take_stabilizing_powder: true,
               has_stabilizing_powder: true
+            }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_take_cleansing_pill',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.resources.cleansingPills > 0,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('take_cleansing_pill')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'take_cleansing_pill'],
+          choices: {
+            ...state.choices,
+            flags: {
+              ...state.choices.flags,
+              unlocked_take_cleansing_pill: true,
+              has_cleansing_pill: true
             }
           }
         };

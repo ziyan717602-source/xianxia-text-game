@@ -4,7 +4,8 @@ import { AlchemyState, GameState, Resources } from './types';
 
 export const SMALL_QI_PILL_RECIPE_ID = 'small_qi_pill';
 export const STABILIZING_POWDER_RECIPE_ID = 'stabilizing_powder';
-const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'stabilizingPowders', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
+export const CLEANSING_PILL_RECIPE_ID = 'cleansing_pill';
+const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'stabilizingPowders', 'cleansingPills', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
 
 export function createInitialAlchemyState(): AlchemyState {
   return {
@@ -110,6 +111,9 @@ export function brewRecipe(
           has_stabilizing_powder: recipe.outputResource === 'stabilizingPowders'
             ? true
             : state.choices.flags.has_stabilizing_powder,
+          has_cleansing_pill: recipe.outputResource === 'cleansingPills'
+            ? true
+            : state.choices.flags.has_cleansing_pill,
         },
         qualities: {
           ...state.choices.qualities,
@@ -155,6 +159,7 @@ export function consumePill(state: GameState, recipeId: string): { state: GameSt
 
   const isQiPill = recipe.outputResource === 'qiPills';
   const isStabilizingPowder = recipe.outputResource === 'stabilizingPowders';
+  const isCleansingPill = recipe.outputResource === 'cleansingPills';
   const affinityBonus = state.cultivation.rootKnown && state.cultivation.phaseAffinities[recipe.phase] > 0 ? 1 : 0;
   const toxicityPenalty = state.resources.dantoxin >= 30 ? 2 : state.resources.dantoxin >= 10 ? 1 : 0;
   const qiDelta = isQiPill
@@ -162,6 +167,7 @@ export function consumePill(state: GameState, recipeId: string): { state: GameSt
     : recipe.effect.qi ?? 0;
   const consumedCount = state.alchemy.consumedPillCounts[recipeId] ?? 0;
   const nextResources = { ...state.resources };
+  const previousDantoxin = state.resources.dantoxin;
 
   for (const key of RESOURCE_KEYS) {
     nextResources[key] += recipe.effect[key] ?? 0;
@@ -197,16 +203,34 @@ export function consumePill(state: GameState, recipeId: string): { state: GameSt
         ...state.choices.flags,
         tasted_qi_pill: isQiPill ? true : state.choices.flags.tasted_qi_pill,
         tasted_stabilizing_powder: isStabilizingPowder ? true : state.choices.flags.tasted_stabilizing_powder,
+        tasted_cleansing_pill: isCleansingPill ? true : state.choices.flags.tasted_cleansing_pill,
         guarded_breakthrough: isStabilizingPowder ? true : state.choices.flags.guarded_breakthrough,
+        relieved_dantoxin_meridians: isCleansingPill && previousDantoxin >= 60 && nextResources.dantoxin < 60
+          ? true
+          : state.choices.flags.relieved_dantoxin_meridians,
       },
       qualities: {
         ...state.choices.qualities,
         ...(isStabilizingPowder
           ? { breakthrough_guard: (state.choices.qualities.breakthrough_guard ?? 0) + 1 }
           : {}),
+        ...(isCleansingPill
+          ? {
+              quiet_cultivation: (state.choices.qualities.quiet_cultivation ?? 0) + 1,
+              reckless_breakthrough: Math.max(0, (state.choices.qualities.reckless_breakthrough ?? 0) - 1),
+            }
+          : {}),
       },
     },
   };
+
+  if (isCleansingPill) {
+    const cleared = Math.max(0, previousDantoxin - nextState.resources.dantoxin);
+    return {
+      state: nextState,
+      log: `你服下一粒${recipe.name}。苦意下行，丹毒退了${cleared}分。`,
+    };
+  }
 
   if (isStabilizingPowder) {
     return {
@@ -251,6 +275,7 @@ export function getAlchemySummary(state: GameState): string[] {
     state.alchemy.knownRecipeIds.length === 0 &&
     state.resources.qiPills <= 0 &&
     state.resources.stabilizingPowders <= 0 &&
+    state.resources.cleansingPills <= 0 &&
     state.resources.dantoxin <= 0
   ) {
     return [];
@@ -272,6 +297,10 @@ export function getAlchemySummary(state: GameState): string[] {
 
   if (state.resources.stabilizingPowders > 0 || state.choices.flags.has_stabilizing_powder) {
     lines.push(`丹药：稳息散 ${state.resources.stabilizingPowders.toFixed(0)} 份`);
+  }
+
+  if (state.resources.cleansingPills > 0 || state.choices.flags.has_cleansing_pill) {
+    lines.push(`丹药：清躁丸 ${state.resources.cleansingPills.toFixed(0)} 粒`);
   }
 
   if (state.choices.flags.guarded_breakthrough) {

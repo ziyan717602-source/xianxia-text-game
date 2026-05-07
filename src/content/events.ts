@@ -470,6 +470,73 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'dantoxin_in_meridians',
+    text: '夜里行气，药滞不散。气机过腕时有细刺，丹毒已经入脉。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm === Realm.QiCondensation &&
+      state.resources.dantoxin >= 60 &&
+      !state.choices.flags['dantoxin_in_meridians_seen'],
+    weight: (state) => 36 + Math.min(24, Math.max(0, state.resources.dantoxin - 60)),
+    choices: [
+      {
+        text: '静坐逼毒',
+        effect: (state) => {
+          let newState = setFlag(state, 'dantoxin_in_meridians_seen');
+
+          if (newState.resources.essence < 40) {
+            newState.resources = {
+              ...newState.resources,
+              dantoxin: newState.resources.dantoxin + 2,
+              wounds: newState.resources.wounds + 1,
+            };
+            return { state: newState, log: '精元不足，药气反冲。丹毒更浊，伤添一处。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            essence: newState.resources.essence - 40,
+            qi: Math.max(0, newState.resources.qi - 4),
+            dantoxin: Math.max(0, newState.resources.dantoxin - 10),
+            lifespan: Math.max(0, newState.resources.lifespan - 30),
+          };
+          newState = setFlag(newState, 'forced_out_dantoxin');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你闭门一夜，逼出些许药滞。真气折了四缕，寿元少了三十刻。' };
+        },
+      },
+      {
+        text: '翻检清躁方',
+        effect: (state) => {
+          let newState = setFlag(state, 'dantoxin_in_meridians_seen');
+          newState = setFlag(newState, 'sought_cleansing_formula');
+          newState.resources = {
+            ...newState.resources,
+            insight: newState.resources.insight + (newState.resources.herbs > 0 ? 2 : 1),
+            herbs: Math.max(0, newState.resources.herbs - 1),
+          };
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          return { state: newState, log: '你拆了几味旧药，翻出一条清躁的路数。方还不全，但可辨。' };
+        },
+      },
+      {
+        text: '强行压下',
+        effect: (state) => {
+          let newState = setFlag(state, 'dantoxin_in_meridians_seen');
+          newState = setFlag(newState, 'suppressed_dantoxin_heat');
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 2,
+            dantoxin: newState.resources.dantoxin + 5,
+            wounds: newState.resources.wounds + 1,
+          };
+          newState = adjustQuality(newState, 'reckless_breakthrough', 2);
+          return { state: newState, log: '你把药气硬压入丹田。真气浮起两缕，脉里多了一处暗伤。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'winter_stillness',
     text: '冬夜很长。屋外无声，炉灰白了一层。',
     condition: (state) =>

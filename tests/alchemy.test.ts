@@ -3,6 +3,7 @@ import { PILL_RECIPES } from '../src/content/alchemy';
 import { performAction } from '../src/game/actions';
 import {
   getAlchemySummary,
+  CLEANSING_PILL_RECIPE_ID,
   getDantoxinStageLabel,
   SMALL_QI_PILL_RECIPE_ID,
   STABILIZING_POWDER_RECIPE_ID,
@@ -101,6 +102,59 @@ describe('Alchemy system', () => {
     expect(state.resources.dantoxin).toBe(11);
     expect(state.choices.flags.guarded_breakthrough).toBe(true);
     expect(getAlchemySummary(state).join(' / ')).toContain(PILL_RECIPES.stabilizing_powder.name);
+  });
+
+  it('should learn, brew, and take cleansing pills to handle heavy dantoxin', () => {
+    let state = createQiAlchemyState();
+    state.resources.essence = 220;
+    state.resources.herbs = 24;
+    state.resources.insight = 18;
+    state.resources.dantoxin = 35;
+    state.resources.wounds = 2;
+    state.choices.qualities.reckless_breakthrough = 2;
+    state = checkUnlocks(performAction(state, 'study_qi_formula').state);
+    state = checkUnlocks(state);
+
+    expect(getAvailableActionsAtLocation(state)).toContain('study_cleansing_formula');
+
+    state = checkUnlocks(performAction(state, 'study_cleansing_formula').state);
+    expect(state.alchemy.knownRecipeIds).toContain(CLEANSING_PILL_RECIPE_ID);
+    expect(state.unlockedActions).toContain('brew_cleansing_pill');
+
+    const brew = performAction(state, 'brew_cleansing_pill', () => 0.1);
+    expect(brew.success).toBe(true);
+    state = checkUnlocks(brew.state);
+
+    expect(state.resources.cleansingPills).toBe(1);
+    expect(state.unlockedActions).toContain('take_cleansing_pill');
+
+    const take = performAction(state, 'take_cleansing_pill');
+    expect(take.success).toBe(true);
+    state = take.state;
+
+    expect(state.resources.cleansingPills).toBe(0);
+    expect(state.resources.dantoxin).toBe(20);
+    expect(state.resources.wounds).toBe(1);
+    expect(state.choices.qualities.reckless_breakthrough).toBe(1);
+    expect(state.choices.flags.tasted_cleansing_pill).toBe(true);
+    expect(getAlchemySummary(state).join(' / ')).toContain(PILL_RECIPES.cleansing_pill.name);
+  });
+
+  it('should mark meridian dantoxin as relieved when cleansing drops it below the threshold', () => {
+    let state = createQiAlchemyState();
+    state.resources.essence = 180;
+    state.resources.herbs = 20;
+    state.resources.insight = 14;
+    state.resources.dantoxin = 62;
+    state = checkUnlocks(performAction(state, 'study_qi_formula').state);
+    state = checkUnlocks(performAction(state, 'study_cleansing_formula').state);
+    state = checkUnlocks(performAction(state, 'brew_cleansing_pill', () => 0.1).state);
+
+    state = performAction(state, 'take_cleansing_pill').state;
+
+    expect(state.resources.dantoxin).toBe(47);
+    expect(state.choices.flags.relieved_dantoxin_meridians).toBe(true);
+    expect(getDantoxinStageLabel(state.resources.dantoxin)).toBe('药气冲突');
   });
 
   it('should leave residue and slight dantoxin on failed brewing', () => {

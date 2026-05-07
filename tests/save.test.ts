@@ -96,6 +96,7 @@ describe('Save and Migration System', () => {
     expect(migrated.state.cultivation.activeTechniqueId).toBe('small_breathing');
     expect(migrated.state.resources.qiPills).toBe(0);
     expect(migrated.state.resources.stabilizingPowders).toBe(0);
+    expect(migrated.state.resources.cleansingPills).toBe(0);
     expect(migrated.state.resources.dantoxin).toBe(0);
     expect(migrated.state.alchemy.knownRecipeIds).toEqual([]);
   });
@@ -155,5 +156,24 @@ describe('Save and Migration System', () => {
 
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.resources.stabilizingPowders).toBe(0);
+    expect(migrated.state.resources.cleansingPills).toBe(0);
+  });
+
+  it('should migrate V8 saves by adding cleansing pill resource', () => {
+    const state = createInitialState(864);
+    const { cleansingPills, ...resourcesWithoutCleansingPills } = state.resources;
+    const migrated = migrateSaveData({
+      version: 8,
+      state: {
+        ...state,
+        resources: resourcesWithoutCleansingPills,
+      },
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 864,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.resources.cleansingPills).toBe(0);
   });
 });

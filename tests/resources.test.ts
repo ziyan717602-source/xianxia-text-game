@@ -16,6 +16,7 @@ describe('Resource reveal', () => {
     state.resources.herbs = 1;
     state.resources.qiPills = 1;
     state.resources.stabilizingPowders = 1;
+    state.resources.cleansingPills = 1;
     state.resources.coins = 1;
     state.resources.dantoxin = 1;
     state.resources.wounds = 1;
@@ -27,6 +28,7 @@ describe('Resource reveal', () => {
       'herbs',
       'qiPills',
       'stabilizingPowders',
+      'cleansingPills',
       'coins',
       'dantoxin',
       'wounds',

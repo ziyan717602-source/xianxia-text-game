@@ -40,6 +40,7 @@ export function createInitialState(seed?: number): GameState {
       herbs: 0,
       qiPills: 0,
       stabilizingPowders: 0,
+      cleansingPills: 0,
       coins: 0,
       insight: 0,
       dantoxin: 0,

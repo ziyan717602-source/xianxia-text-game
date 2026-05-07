@@ -6,7 +6,7 @@ import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
 
-export const CURRENT_SAVE_VERSION = 8;
+export const CURRENT_SAVE_VERSION = 9;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -89,6 +89,17 @@ export function migrateSaveData(data: any): SaveData {
       },
     };
     migratedData.version = 8;
+  }
+
+  if (migratedData.version === 8) {
+    migratedData.state = {
+      ...migratedData.state,
+      resources: {
+        ...migratedData.state.resources,
+        cleansingPills: migratedData.state.resources?.cleansingPills ?? 0,
+      },
+    };
+    migratedData.version = 9;
   }
 
   return migratedData as SaveData;
