@@ -136,4 +136,16 @@ describe('Action System', () => {
     expect(result.state.resources.lifespan).toBe(initialLifespan - 50);
     expect(result.log).toContain('日课');
   });
+
+  it('should record route qualities for repeated actions', () => {
+    let state = createInitialState();
+    state.resources.herbs = 2;
+
+    state = performAction(state, 'caiyao', () => 0.9).state;
+    state = performAction(state, 'bianyao').state;
+    state = performAction(state, 'xunshan', () => 0.9).state;
+
+    expect(state.choices.qualities.alchemy_affinity).toBe(2);
+    expect(state.choices.qualities.combat_edge).toBe(1);
+  });
 });

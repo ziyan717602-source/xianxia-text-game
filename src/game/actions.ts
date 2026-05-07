@@ -2,6 +2,7 @@ import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
 import { RESOURCE_LABELS } from './resources';
+import { recordActionInWorld } from './world';
 
 export { ACTIONS };
 
@@ -12,6 +13,16 @@ export interface ActionResult {
 }
 
 const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'coins', 'insight', 'lifespan', 'wounds'] as const;
+const ACTION_ROUTE_QUALITIES: Record<string, string> = {
+  kuzuo: 'quiet_cultivation',
+  tuna: 'quiet_cultivation',
+  tiaoxi: 'quiet_cultivation',
+  rike_tuna: 'quiet_cultivation',
+  caiyao: 'alchemy_affinity',
+  bianyao: 'alchemy_affinity',
+  xunshan: 'combat_edge',
+  yinqi: 'quiet_cultivation',
+};
 
 function firstMissingCost(resources: Resources, cost: Partial<Resources>): keyof Resources | null {
   for (const key of RESOURCE_KEYS) {
@@ -52,7 +63,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   }
 
   // Deduct costs
-  const newState = { ...state };
+  let newState = { ...state };
   newState.resources = { ...state.resources };
 
   for (const key of RESOURCE_KEYS) {
@@ -98,13 +109,18 @@ export function performAction(state: GameState, actionId: string, random?: () =>
 
   // Record action count
   const countKey = `action_${actionId}_count`;
+  const routeQuality = ACTION_ROUTE_QUALITIES[actionId];
   newState.choices = {
     ...newState.choices,
     qualities: {
       ...newState.choices.qualities,
-      [countKey]: (newState.choices.qualities[countKey] || 0) + 1
+      [countKey]: (newState.choices.qualities[countKey] || 0) + 1,
+      ...(routeQuality
+        ? { [routeQuality]: (newState.choices.qualities[routeQuality] || 0) + 1 }
+        : {}),
     }
   };
+  newState = recordActionInWorld(newState, actionId);
 
   return {
     state: newState,

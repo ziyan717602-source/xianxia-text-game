@@ -7,6 +7,7 @@ export const LOCATIONS: Record<string, Location> = {
     availableActions: ['kuzuo', 'tuna', 'tiaoxi', 'bianyao', 'yinqi', 'rike_tuna'],
     eventWeights: {
       'find_jade_slip': 1.5,
+      'winter_stillness': 1.2,
     },
     qiDensity: 1,
     danger: 0,
@@ -18,6 +19,9 @@ export const LOCATIONS: Record<string, Location> = {
     availableActions: ['caiyao', 'xunshan'],
     eventWeights: {
       'wounded_cultivator': 1.4,
+      'rain_after_sprouts': 1.3,
+      'wounded_cultivator_return': 1.2,
+      'wounded_cultivator_grudge': 1.3,
     },
     qiDensity: 1.2,
     danger: 2,
@@ -30,6 +34,8 @@ export const LOCATIONS: Record<string, Location> = {
     availableActions: ['trade', 'gossip'],
     eventWeights: {
       'market_rumor': 1.2,
+      'market_price_rise': 1.2,
+      'outer_gate_rules': 1.2,
     },
     qiDensity: 0.8,
     danger: 1,

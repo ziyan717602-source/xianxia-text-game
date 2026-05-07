@@ -34,6 +34,8 @@ describe('Game State Initialization', () => {
     expect(state.choices.flags).toEqual({});
     expect(state.choices.tags).toEqual({});
     expect(state.choices.qualities).toEqual({});
+    expect(state.world.logs[0]).toContain('立春');
+    expect(state.world.recentActions).toEqual({});
   });
 
   it('should generate a random seed if none is provided', () => {

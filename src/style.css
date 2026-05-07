@@ -79,6 +79,13 @@ h2 {
   margin-bottom: 14px;
 }
 
+h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 .subtitle,
 .muted,
 .location-line {
@@ -183,6 +190,30 @@ h2 {
   border-radius: 5px;
   font-family: "SimSun", "Songti SC", serif;
   line-height: 1.65;
+}
+
+.summary-block,
+.world-block {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.summary-block {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.summary-block p,
+.world-block p {
+  color: var(--muted);
+}
+
+.summary-block p + p,
+.world-block p + p {
+  margin-top: 4px;
 }
 
 .log-scroll p + p {

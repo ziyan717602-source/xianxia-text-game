@@ -45,4 +45,20 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.realmLayer).toBe(0);
   });
+
+  it('should migrate V2 saves by adding the world ledger', () => {
+    const state = createInitialState(789);
+    const { world, ...stateWithoutWorld } = state;
+    const migrated = migrateSaveData({
+      version: 2,
+      state: stateWithoutWorld,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 789,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.world.logs[0]).toContain('立春');
+    expect(migrated.state.world.recentActions).toEqual({});
+  });
 });

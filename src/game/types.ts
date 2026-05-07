@@ -98,6 +98,16 @@ export interface ChoiceState {
 }
 
 /**
+ * 世界账本
+ */
+export interface WorldState {
+  recentActions: Record<string, number>;
+  logs: string[];
+  lastSummaryTick: number;
+  lastSolarTermKey: string;
+}
+
+/**
  * 行动定义 (静态配置)
  */
 export interface Action {
@@ -149,6 +159,7 @@ export interface GameState {
   unlockedActions: string[];
   relationships: Record<string, Relationship>;
   choices: ChoiceState;
+  world: WorldState;
   activeEventId: string | null;
   seed: number;
 }

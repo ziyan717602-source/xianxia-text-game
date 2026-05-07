@@ -6,6 +6,7 @@ import { getAvailableActionsAtLocation } from '../game/location';
 import { getVisibleResourceIds, RESOURCE_LABELS, ResourceId } from '../game/resources';
 import { DAYS_PER_YEAR, TICKS_PER_DAY } from '../game/state';
 import { Realm, Season } from '../game/types';
+import { getRecentSummary } from '../game/world';
 import { useGameLoop } from './useGameLoop';
 
 const SEASON_LABELS: Record<Season, string> = {
@@ -44,6 +45,8 @@ export function App() {
   const currentLocation = LOCATIONS[gameState.currentLocationId];
   const visibleResourceIds = getVisibleResourceIds(gameState);
   const availableActionIds = getAvailableActionsAtLocation(gameState);
+  const recentSummary = getRecentSummary(gameState);
+  const worldLogs = gameState.world.logs;
 
   return (
     <div className="app-shell">
@@ -144,6 +147,18 @@ export function App() {
 
         <section className="panel log-panel">
           <h2>仙途记录</h2>
+          <div className="summary-block" aria-label="近日摘要">
+            <h3>近日摘要</h3>
+            {recentSummary.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+          <div className="world-block" aria-label="世界日志">
+            <h3>世界日志</h3>
+            {worldLogs.map((log) => (
+              <p key={log}>{log}</p>
+            ))}
+          </div>
           <div className="log-scroll" aria-live="polite">
             {logs.map((log, index) => (
               <p key={`${index}-${log}`}>{log}</p>

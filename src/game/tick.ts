@@ -1,5 +1,6 @@
 import { GameState } from './types';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
+import { advanceWorld } from './world';
 
 export const TICK_INTERVAL_MS = 1000; // 1 real second = 1 tick
 export const STAMINA_RECOVERY_PER_TICK = 1;
@@ -9,7 +10,7 @@ function processTicks(state: GameState, ticks: number): GameState {
 
   const nextTick = state.time.tick + ticks;
 
-  return {
+  const nextState = {
     ...state,
     resources: {
       ...state.resources,
@@ -18,6 +19,8 @@ function processTicks(state: GameState, ticks: number): GameState {
     },
     time: deriveGameTime(nextTick),
   };
+
+  return advanceWorld(nextState);
 }
 
 /**

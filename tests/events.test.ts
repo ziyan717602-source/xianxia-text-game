@@ -81,4 +81,68 @@ describe('Event System', () => {
     expect(relationship.grudges).toBe(2);
     expect(relationship.tags).toContain('被你搜掠');
   });
+
+  it('should roll the spring herb event when mountain state and season match', () => {
+    const state = createInitialState();
+    state.currentLocationId = 'mountain_path';
+    state.resources.herbs = 1;
+    state.choices.flags['met_wounded_cultivator'] = true;
+
+    const event = rollEvent(state, () => 0);
+
+    expect(event?.id).toBe('rain_after_sprouts');
+  });
+
+  it('should mark an herb patch and strengthen alchemy affinity', () => {
+    const state = createInitialState();
+    state.resources.herbs = 1;
+
+    const event = EVENTS.find(e => e.id === 'rain_after_sprouts');
+    const result = event!.choices[1].effect(state);
+
+    expect(result.state.choices.flags.found_rain_after_sprouts).toBe(true);
+    expect(result.state.choices.flags.marked_herb_patch).toBe(true);
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(2);
+    expect(result.state.resources.herbs).toBe(2);
+  });
+
+  it('should let the wounded cultivator repay a favor with a route hint', () => {
+    let state = createInitialState();
+    state.resources.herbs = 5;
+
+    const woundedEvent = EVENTS.find(e => e.id === 'wounded_cultivator')!;
+    state = woundedEvent.choices[0].effect(state).state;
+
+    const returnEvent = EVENTS.find(e => e.id === 'wounded_cultivator_return')!;
+    const result = returnEvent.choices[1].effect(state);
+
+    expect(result.state.choices.flags.wounded_cultivator_returned).toBe(true);
+    expect(result.state.choices.flags.heard_herb_slope_hint).toBe(true);
+    expect(result.state.resources.insight).toBe(2);
+    expect(result.state.relationships.wounded_cultivator.favors).toBe(0);
+  });
+
+  it('should record market debt when buying herbs on credit', () => {
+    const state = createInitialState();
+
+    const event = EVENTS.find(e => e.id === 'market_price_rise');
+    const result = event!.choices[2].effect(state);
+    const relationship = result.state.relationships.market_keeper;
+
+    expect(result.state.resources.herbs).toBe(2);
+    expect(result.state.choices.qualities.market_ties).toBe(2);
+    expect(relationship.debts).toBe(1);
+    expect(relationship.tags).toContain('赊账');
+  });
+
+  it('should record outer gate rules as a sect trace', () => {
+    const state = createInitialState();
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_rules');
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.choices.flags.heard_outer_gate_rules).toBe(true);
+    expect(result.state.choices.tags.sect_trace).toBe('heard_rules');
+    expect(result.state.choices.qualities.sect_trace).toBe(1);
+  });
 });

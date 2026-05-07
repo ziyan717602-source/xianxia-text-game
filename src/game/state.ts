@@ -1,4 +1,5 @@
 import { GameState, GameTime, Realm, SpiritualRoot, Season } from './types';
+import { createInitialWorldState } from './world';
 
 export const INITIAL_MAX_STAMINA = 100;
 export const INITIAL_LIFESPAN = 100 * 360 * 10; // Assume 1 tick is a fraction of a day, or roughly 10 ticks per day. Let's say lifespan is abstract ticks.
@@ -26,6 +27,8 @@ export function deriveGameTime(tick: number): GameTime {
 }
 
 export function createInitialState(seed?: number): GameState {
+  const time = deriveGameTime(0);
+
   return {
     resources: {
       qi: 0,
@@ -39,7 +42,7 @@ export function createInitialState(seed?: number): GameState {
     realm: Realm.Mortal,
     realmLayer: 0,
     spiritualRoot: SpiritualRoot.Mortal,
-    time: deriveGameTime(0),
+    time,
     currentLocationId: 'home', // '居处'
     unlockedActions: ['kuzuo'], // Basic actions to start the game
     relationships: {},
@@ -48,6 +51,7 @@ export function createInitialState(seed?: number): GameState {
       tags: {},
       qualities: {},
     },
+    world: createInitialWorldState(time),
     activeEventId: null,
     seed: seed ?? Math.floor(Math.random() * 1000000),
   };
