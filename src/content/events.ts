@@ -422,7 +422,7 @@ export const EVENTS: ActiveEvent[] = [
     id: 'outer_gate_rules',
     text: '坊市角落有人议论外门规矩。名册、贡献、巡山时辰，几句话说得很碎。',
     condition: (state) =>
-      state.currentLocationId === 'market' &&
+      (state.currentLocationId === 'market' || state.currentLocationId === 'outer_gate') &&
       (state.choices.flags['heard_rumor_1'] || state.realm === Realm.QiCondensation) &&
       !state.choices.flags['heard_outer_gate_rules'],
     weight: (state) => 8 + (state.choices.qualities['market_ties'] ?? 0) * 2,

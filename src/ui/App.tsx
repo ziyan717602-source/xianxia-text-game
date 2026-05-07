@@ -2,7 +2,9 @@ import React from 'react';
 import { ACTIONS } from '../content/actions';
 import { EVENTS } from '../content/events';
 import { LOCATIONS } from '../content/locations';
+import { SELECTABLE_ORIGINS } from '../content/origins';
 import { getAvailableActionsAtLocation } from '../game/location';
+import { getOriginName, hasSelectedOrigin } from '../game/origins';
 import { getVisibleResourceIds, RESOURCE_LABELS, ResourceId } from '../game/resources';
 import { DAYS_PER_YEAR, TICKS_PER_DAY } from '../game/state';
 import { Realm, Season } from '../game/types';
@@ -39,14 +41,50 @@ function formatRealm(state: { realm: Realm; realmLayer: number }) {
 }
 
 export function App() {
-  const { gameState, logs, doAction, moveLocation, handleEventChoice, saveGame, resetGame } = useGameLoop();
+  const { gameState, logs, chooseOrigin, doAction, moveLocation, handleEventChoice, saveGame, resetGame } = useGameLoop();
   const { activeEventId, resources, time } = gameState;
+  const selectedOrigin = hasSelectedOrigin(gameState);
   const activeEvent = activeEventId ? EVENTS.find((event) => event.id === activeEventId) : null;
   const currentLocation = LOCATIONS[gameState.currentLocationId];
   const visibleResourceIds = getVisibleResourceIds(gameState);
   const availableActionIds = getAvailableActionsAtLocation(gameState);
   const recentSummary = getRecentSummary(gameState);
   const worldLogs = gameState.world.logs;
+
+  if (!selectedOrigin) {
+    return (
+      <div className="app-shell">
+        <header className="topbar">
+          <div>
+            <h1>文字修仙</h1>
+            <p className="subtitle">第 {time.year} 年 {SEASON_LABELS[time.season]} 第 {time.day} 日 / 出身未定</p>
+          </div>
+        </header>
+
+        <main className="origin-shell">
+          <section className="origin-intro">
+            <h2>选择出身</h2>
+            <p>出身只改变早期接触面。修什么道，仍看后来的行动与错过。</p>
+          </section>
+
+          <div className="origin-grid">
+            {SELECTABLE_ORIGINS.map((origin) => (
+              <button
+                className="origin-option"
+                data-origin-id={origin.id}
+                key={origin.id}
+                onClick={() => chooseOrigin(origin.id)}
+              >
+                <strong>{origin.name}</strong>
+                <span>{origin.summary}</span>
+                <small>{origin.description}</small>
+              </button>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -79,6 +117,8 @@ export function App() {
             第 {time.year} 年 {SEASON_LABELS[time.season]} 第 {time.day} 日
             <span aria-hidden="true"> / </span>
             {formatRealm(gameState)}
+            <span aria-hidden="true"> / </span>
+            {getOriginName(gameState)}
           </p>
         </div>
         <div className="save-actions">

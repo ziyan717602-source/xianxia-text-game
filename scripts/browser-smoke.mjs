@@ -211,6 +211,16 @@ async function run() {
 
     let bodyText = await evaluate(cdp, 'document.body.innerText');
     assertIncludes(bodyText, '文字修仙');
+    assertIncludes(bodyText, '选择出身');
+    assertIncludes(bodyText, '山居采药人');
+    assertIncludes(bodyText, '乡塾读书人');
+
+    await evaluate(cdp, `
+      document.querySelector('[data-origin-id="village_scholar"]').click()
+    `);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    bodyText = await evaluate(cdp, 'document.body.innerText');
     assertIncludes(bodyText, '状态');
     assertIncludes(bodyText, '行动');
     assertIncludes(bodyText, '仙途记录');

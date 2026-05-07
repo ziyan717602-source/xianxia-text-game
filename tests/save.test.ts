@@ -60,5 +60,21 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.world.logs[0]).toContain('立春');
     expect(migrated.state.world.recentActions).toEqual({});
+    expect(migrated.state.choices.tags.origin).toBe('legacy_path');
+  });
+
+  it('should migrate V3 saves by marking them as legacy origin', () => {
+    const state = createInitialState(321);
+    const migrated = migrateSaveData({
+      version: 3,
+      state,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 321,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.choices.flags.selected_origin).toBe(true);
+    expect(migrated.state.choices.tags.origin).toBe('legacy_path');
   });
 });

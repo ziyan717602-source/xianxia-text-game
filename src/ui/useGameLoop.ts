@@ -5,9 +5,11 @@ import { processTick, TICK_INTERVAL_MS } from '../game/tick';
 import { checkUnlocks } from '../game/unlock';
 import { performAction } from '../game/actions';
 import { moveToLocation } from '../game/location';
+import { applyOrigin, hasSelectedOrigin } from '../game/origins';
 import { serializeSave, deserializeSave } from '../storage/save';
 import { rollEvent } from '../game/events';
 import { EVENTS } from '../content/events';
+import { ORIGINS, OriginId } from '../content/origins';
 
 const SAVE_KEY = 'xianxia_save_v1';
 const AUTO_SAVE_INTERVAL_MS = 5000;
@@ -22,7 +24,7 @@ function loadInitialState(): GameState {
 
 export function useGameLoop() {
   const [gameState, setGameState] = useState<GameState>(() => loadInitialState());
-  const [logs, setLogs] = useState<string[]>(['某年春，你在檐下枯坐。']);
+  const [logs, setLogs] = useState<string[]>(['请选择出身。']);
 
   const addLog = useCallback((msg: string) => {
     if (msg) {
@@ -43,7 +45,15 @@ export function useGameLoop() {
   const resetGame = useCallback(() => {
     localStorage.removeItem(SAVE_KEY);
     setGameState(createInitialState());
-    setLogs(['旧档已去。某年春，你在檐下枯坐。']);
+    setLogs(['旧档已去。请选择出身。']);
+  }, []);
+
+  const chooseOrigin = useCallback((originId: OriginId) => {
+    const origin = ORIGINS[originId];
+    if (!origin || !origin.selectable) return;
+
+    setGameState((prev) => hasSelectedOrigin(prev) ? prev : applyOrigin(prev, originId));
+    setLogs([origin.log]);
   }, []);
 
   // Auto-save loop
@@ -56,7 +66,7 @@ export function useGameLoop() {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setGameState((prev) => {
-        if (prev.activeEventId) return prev; // Pause game while event is active
+        if (!hasSelectedOrigin(prev) || prev.activeEventId) return prev; // Pause game while event is active
 
         let next = processTick(prev, TICK_INTERVAL_MS);
         next = checkUnlocks(next);
@@ -80,7 +90,7 @@ export function useGameLoop() {
 
   const doAction = useCallback((actionId: string) => {
     setGameState((prev) => {
-      if (prev.activeEventId) return prev; // Prevent actions during events
+      if (!hasSelectedOrigin(prev) || prev.activeEventId) return prev; // Prevent actions during events
       const result = performAction(prev, actionId);
       addLog(result.log);
       let nextState = checkUnlocks(result.state);
@@ -115,7 +125,7 @@ export function useGameLoop() {
 
   const moveLocation = useCallback((locationId: string) => {
     setGameState((prev) => {
-      if (prev.activeEventId) return prev;
+      if (!hasSelectedOrigin(prev) || prev.activeEventId) return prev;
 
       const result = moveToLocation(prev, locationId);
       addLog(result.log);
@@ -126,6 +136,7 @@ export function useGameLoop() {
   return {
     gameState,
     logs,
+    chooseOrigin,
     doAction,
     moveLocation,
     handleEventChoice,

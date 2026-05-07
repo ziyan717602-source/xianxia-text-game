@@ -21,6 +21,10 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   caiyao: 'alchemy_affinity',
   bianyao: 'alchemy_affinity',
   xunshan: 'combat_edge',
+  trade: 'market_ties',
+  gossip: 'market_ties',
+  sect_chore: 'sect_trace',
+  listen_lesson: 'sect_trace',
   yinqi: 'quiet_cultivation',
 };
 

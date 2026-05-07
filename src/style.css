@@ -125,6 +125,58 @@ h3 {
   margin-top: 22px;
 }
 
+.origin-shell {
+  margin-top: 22px;
+}
+
+.origin-intro {
+  max-width: 700px;
+  margin-bottom: 18px;
+}
+
+.origin-intro p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.origin-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.origin-option {
+  min-height: 176px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  text-align: left;
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+
+.origin-option:hover,
+.origin-option:focus-visible {
+  border-color: var(--line-strong);
+}
+
+.origin-option strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.origin-option span,
+.origin-option small {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.origin-option small {
+  font-size: 12px;
+}
+
 .panel {
   min-width: 0;
   background: var(--surface);
@@ -268,6 +320,10 @@ h3 {
   }
 
   .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .origin-grid {
     grid-template-columns: 1fr;
   }
 

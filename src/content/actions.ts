@@ -46,6 +46,50 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0.3,
     conditions: {},
   },
+  trade: {
+    id: 'trade',
+    name: '小买卖',
+    cost: { essence: 10 },
+    output: { coins: 2 },
+    cooldown: 10,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'market',
+    },
+  },
+  gossip: {
+    id: 'gossip',
+    name: '听闻',
+    cost: { essence: 10 },
+    output: { insight: 1 },
+    cooldown: 10,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'market',
+    },
+  },
+  sect_chore: {
+    id: 'sect_chore',
+    name: '外门杂务',
+    cost: { essence: 20 },
+    output: { coins: 1, insight: 1 },
+    cooldown: 15,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'outer_gate',
+    },
+  },
+  listen_lesson: {
+    id: 'listen_lesson',
+    name: '听课',
+    cost: { essence: 15 },
+    output: { insight: 1 },
+    cooldown: 15,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'outer_gate',
+    },
+  },
   tiaoxi: {
     id: 'tiaoxi',
     name: '调息',

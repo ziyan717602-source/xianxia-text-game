@@ -30,7 +30,6 @@ export const LOCATIONS: Record<string, Location> = {
   'market': {
     id: 'market',
     name: '坊市',
-    // We haven't implemented trade/gossip actions yet, but we list them
     availableActions: ['trade', 'gossip'],
     eventWeights: {
       'market_rumor': 1.2,
@@ -40,5 +39,17 @@ export const LOCATIONS: Record<string, Location> = {
     qiDensity: 0.8,
     danger: 1,
     priceModifier: 1.0,
+  },
+  'outer_gate': {
+    id: 'outer_gate',
+    name: '外门',
+    availableActions: ['sect_chore', 'listen_lesson', 'gossip'],
+    eventWeights: {
+      'outer_gate_rules': 1.4,
+      'market_rumor': 0.5,
+    },
+    qiDensity: 0.9,
+    danger: 1,
+    priceModifier: 1.05,
   }
 };

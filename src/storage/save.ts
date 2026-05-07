@@ -1,8 +1,9 @@
 import { GameState, Realm, SaveData } from '../game/types';
 import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
+import { markLegacyOrigin } from '../game/origins';
 
-export const CURRENT_SAVE_VERSION = 3;
+export const CURRENT_SAVE_VERSION = 4;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -39,6 +40,11 @@ export function migrateSaveData(data: any): SaveData {
       world: migratedData.state.world ?? createInitialWorldState(migratedData.state.time),
     };
     migratedData.version = 3;
+  }
+
+  if (migratedData.version === 3) {
+    migratedData.state = markLegacyOrigin(migratedData.state);
+    migratedData.version = 4;
   }
 
   return migratedData as SaveData;
