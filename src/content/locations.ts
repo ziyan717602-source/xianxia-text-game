@@ -4,7 +4,7 @@ export const LOCATIONS: Record<string, Location> = {
   'home': {
     id: 'home',
     name: '居处',
-    availableActions: ['kuzuo', 'tuna', 'tiaoxi', 'bianyao', 'yinqi', 'rike_tuna'],
+    availableActions: ['kuzuo', 'tuna', 'tiaoxi', 'bianyao', 'yinqi', 'inspect_root', 'attune_technique', 'rike_tuna'],
     eventWeights: {
       'find_jade_slip': 1.5,
       'winter_stillness': 1.2,

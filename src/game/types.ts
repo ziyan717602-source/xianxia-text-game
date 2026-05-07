@@ -108,6 +108,18 @@ export interface WorldState {
 }
 
 /**
+ * 修行账本
+ */
+export interface CultivationState {
+  rootKnown: boolean;
+  latentRoot: SpiritualRoot;
+  phaseAffinities: Record<Element, number>;
+  dominantElement: Element;
+  knownTechniqueIds: string[];
+  activeTechniqueId: string;
+}
+
+/**
  * 行动定义 (静态配置)
  */
 export interface Action {
@@ -160,6 +172,7 @@ export interface GameState {
   relationships: Record<string, Relationship>;
   choices: ChoiceState;
   world: WorldState;
+  cultivation: CultivationState;
   activeEventId: string | null;
   seed: number;
 }

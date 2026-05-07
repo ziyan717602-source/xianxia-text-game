@@ -76,5 +76,22 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.choices.flags.selected_origin).toBe(true);
     expect(migrated.state.choices.tags.origin).toBe('legacy_path');
+    expect(migrated.state.cultivation.rootKnown).toBe(false);
+  });
+
+  it('should migrate V4 saves by adding cultivation state', () => {
+    const state = createInitialState(654);
+    const { cultivation, ...stateWithoutCultivation } = state;
+    const migrated = migrateSaveData({
+      version: 4,
+      state: stateWithoutCultivation,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 654,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.cultivation.rootKnown).toBe(false);
+    expect(migrated.state.cultivation.activeTechniqueId).toBe('small_breathing');
   });
 });

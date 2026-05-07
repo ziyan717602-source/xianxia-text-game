@@ -1,5 +1,6 @@
 import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
+import { applyCultivationOutputModifiers, attuneTechnique, revealRoot } from './cultivation';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
 import { RESOURCE_LABELS } from './resources';
 import { advanceWorld, recordActionInWorld } from './world';
@@ -18,6 +19,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   tuna: 'quiet_cultivation',
   tiaoxi: 'quiet_cultivation',
   rike_tuna: 'quiet_cultivation',
+  inspect_root: 'quiet_cultivation',
+  attune_technique: 'quiet_cultivation',
   caiyao: 'alchemy_affinity',
   bianyao: 'alchemy_affinity',
   xunshan: 'combat_edge',
@@ -116,9 +119,25 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     };
   }
 
+  let customLog: string | null = null;
+
+  if (actionId === 'inspect_root') {
+    const result = revealRoot(newState);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'attune_technique') {
+    const result = attuneTechnique(newState);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  const adjustedOutput = applyCultivationOutputModifiers(newState, actionId, action.output);
+
   // Add outputs
   for (const key of RESOURCE_KEYS) {
-    newState.resources[key] += action.output[key] ?? 0;
+    newState.resources[key] += adjustedOutput[key] ?? 0;
   }
   newState.resources.essence = Math.min(INITIAL_MAX_STAMINA, newState.resources.essence);
   newState.resources.lifespan = Math.max(0, newState.resources.lifespan);
@@ -147,6 +166,8 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     state: newState,
     log: actionId === 'yinqi'
       ? '气入丹田，周身微鸣。你踏入炼气一层。'
+      : customLog
+        ? customLog
       : actionId === 'rike_tuna'
         ? '一段日课毕，气息在周身往复数回。'
         : `进行了${action.name}。`,

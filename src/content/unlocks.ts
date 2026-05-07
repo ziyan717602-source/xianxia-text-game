@@ -117,5 +117,43 @@ export const UNLOCKS: UnlockRule[] = [
       }
       return state;
     }
+  },
+  {
+    id: 'unlock_inspect_root',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      !state.choices.flags['root_known'],
+    effect: (state) => {
+      if (!state.unlockedActions.includes('inspect_root')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'inspect_root'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, 'unlocked_inspect_root': true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_attune_technique',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['root_known']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('attune_technique')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'attune_technique'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, 'unlocked_attune_technique': true }
+          }
+        };
+      }
+      return state;
+    }
   }
 ];

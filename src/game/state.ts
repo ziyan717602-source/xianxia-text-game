@@ -1,4 +1,5 @@
 import { GameState, GameTime, Realm, SpiritualRoot, Season } from './types';
+import { createInitialCultivationState } from './cultivation';
 import { createInitialWorldState } from './world';
 
 export const INITIAL_MAX_STAMINA = 100;
@@ -27,6 +28,7 @@ export function deriveGameTime(tick: number): GameTime {
 }
 
 export function createInitialState(seed?: number): GameState {
+  const stateSeed = seed ?? Math.floor(Math.random() * 1000000);
   const time = deriveGameTime(0);
 
   return {
@@ -52,7 +54,8 @@ export function createInitialState(seed?: number): GameState {
       qualities: {},
     },
     world: createInitialWorldState(time),
+    cultivation: createInitialCultivationState(stateSeed),
     activeEventId: null,
-    seed: seed ?? Math.floor(Math.random() * 1000000),
+    seed: stateSeed,
   };
 }

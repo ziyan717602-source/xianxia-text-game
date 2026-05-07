@@ -108,6 +108,7 @@ describe('Opening flow', () => {
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
     expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    expect(getAvailableActionsAtLocation(state)).toContain('inspect_root');
     expect(state.choices.qualities.action_tuna_count).toBe(10);
     expect(state.choices.qualities.action_rike_tuna_count).toBe(1);
     expect(actionCount).toBeLessThanOrEqual(20);

@@ -112,6 +112,31 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.Mortal,
     },
   },
+  inspect_root: {
+    id: 'inspect_root',
+    name: '内视灵根',
+    cost: { essence: 20, insight: 1 },
+    output: {},
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  attune_technique: {
+    id: 'attune_technique',
+    name: '按相修订',
+    cost: { essence: 20, insight: 2 },
+    output: {},
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['root_known'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   rike_tuna: {
     id: 'rike_tuna',
     name: '日课吐纳',

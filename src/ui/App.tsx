@@ -3,6 +3,7 @@ import { ACTIONS } from '../content/actions';
 import { EVENTS } from '../content/events';
 import { LOCATIONS } from '../content/locations';
 import { SELECTABLE_ORIGINS } from '../content/origins';
+import { getCultivationSummary } from '../game/cultivation';
 import { getAvailableActionsAtLocation } from '../game/location';
 import { getOriginName, hasSelectedOrigin } from '../game/origins';
 import { getVisibleResourceIds, RESOURCE_LABELS, ResourceId } from '../game/resources';
@@ -48,6 +49,7 @@ export function App() {
   const currentLocation = LOCATIONS[gameState.currentLocationId];
   const visibleResourceIds = getVisibleResourceIds(gameState);
   const availableActionIds = getAvailableActionsAtLocation(gameState);
+  const cultivationSummary = getCultivationSummary(gameState);
   const recentSummary = getRecentSummary(gameState);
   const worldLogs = gameState.world.logs;
 
@@ -145,6 +147,14 @@ export function App() {
               </React.Fragment>
             ))}
           </dl>
+          {cultivationSummary.length > 0 && (
+            <div className="cultivation-block" aria-label="修行">
+              <h3>修行</h3>
+              {cultivationSummary.map((line, index) => (
+                <p key={`${index}-${line}`}>{line}</p>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="panel action-panel">

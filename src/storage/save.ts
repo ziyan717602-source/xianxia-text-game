@@ -1,9 +1,10 @@
 import { GameState, Realm, SaveData } from '../game/types';
+import { createInitialCultivationState } from '../game/cultivation';
 import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
 
-export const CURRENT_SAVE_VERSION = 4;
+export const CURRENT_SAVE_VERSION = 5;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -45,6 +46,15 @@ export function migrateSaveData(data: any): SaveData {
   if (migratedData.version === 3) {
     migratedData.state = markLegacyOrigin(migratedData.state);
     migratedData.version = 4;
+  }
+
+  if (migratedData.version === 4) {
+    const stateSeed = migratedData.state.seed ?? migratedData.seed ?? Math.floor(Math.random() * 1000000);
+    migratedData.state = {
+      ...migratedData.state,
+      cultivation: migratedData.state.cultivation ?? createInitialCultivationState(stateSeed),
+    };
+    migratedData.version = 5;
   }
 
   return migratedData as SaveData;

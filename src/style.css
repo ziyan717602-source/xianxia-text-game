@@ -203,6 +203,22 @@ h3 {
   margin: 0;
 }
 
+.cultivation-block {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.cultivation-block p {
+  color: var(--muted);
+}
+
+.cultivation-block p + p {
+  margin-top: 4px;
+}
+
 .location-line {
   font-size: 13px;
   margin-bottom: 10px;

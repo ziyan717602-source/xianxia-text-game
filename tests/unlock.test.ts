@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../src/game/state';
 import { checkUnlocks } from '../src/game/unlock';
 import { performAction } from '../src/game/actions';
+import { Realm } from '../src/game/types';
 
 describe('Unlock System', () => {
   it('should unlock tuna when qi >= 10', () => {
@@ -62,5 +63,28 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('caiyao');
     expect(state.unlockedActions).toContain('xunshan');
     expect(state.choices.flags.unlocked_mountain_actions).toBe(true);
+  });
+
+  it('should unlock root inspection after entering qi condensation', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('inspect_root');
+    expect(state.choices.flags.unlocked_inspect_root).toBe(true);
+  });
+
+  it('should unlock technique attunement after root is known', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.root_known = true;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('attune_technique');
+    expect(state.choices.flags.unlocked_attune_technique).toBe(true);
   });
 });

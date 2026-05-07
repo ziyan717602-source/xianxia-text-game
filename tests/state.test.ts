@@ -36,6 +36,8 @@ describe('Game State Initialization', () => {
     expect(state.choices.qualities).toEqual({});
     expect(state.world.logs[0]).toContain('立春');
     expect(state.world.recentActions).toEqual({});
+    expect(state.cultivation.rootKnown).toBe(false);
+    expect(state.cultivation.activeTechniqueId).toBe('small_breathing');
   });
 
   it('should generate a random seed if none is provided', () => {

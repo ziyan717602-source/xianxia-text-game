@@ -56,7 +56,8 @@
 ## 阶段 2：修仙系统扩展
 
 - [x] 普通开局路线：山居、乡塾、坊市、外门、游方。
-- [ ] 灵根、五行、功法相性和丹药药性；素材见 `docs/content-bank/cultivation-system-seeds.md`。
+- [x] 灵根、五行和功法相性；素材见 `docs/content-bank/cultivation-system-seeds.md`。
+- [ ] 丹药药性。
 - [ ] 丹药、丹毒和配方；素材见 `docs/content-bank/alchemy-herb-seeds.md`。
 - [ ] 境界突破、瓶颈、失败后果。
 - [ ] 行为形成道途，而非开局职业锁定。
