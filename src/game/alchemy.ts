@@ -3,6 +3,8 @@ import { ELEMENT_LABELS } from '../content/cultivation';
 import { AlchemyState, GameState, Resources } from './types';
 
 export const SMALL_QI_PILL_RECIPE_ID = 'small_qi_pill';
+export const STABILIZING_POWDER_RECIPE_ID = 'stabilizing_powder';
+const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'stabilizingPowders', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
 
 export function createInitialAlchemyState(): AlchemyState {
   return {
@@ -105,6 +107,9 @@ export function brewRecipe(
           ...state.choices.flags,
           [`brewed_${recipeId}`]: true,
           has_qi_pill: recipe.outputResource === 'qiPills' ? true : state.choices.flags.has_qi_pill,
+          has_stabilizing_powder: recipe.outputResource === 'stabilizingPowders'
+            ? true
+            : state.choices.flags.has_stabilizing_powder,
         },
         qualities: {
           ...state.choices.qualities,
@@ -148,18 +153,37 @@ export function consumePill(state: GameState, recipeId: string): { state: GameSt
     return { state, log: '丹药无名，不宜入口。' };
   }
 
+  const isQiPill = recipe.outputResource === 'qiPills';
+  const isStabilizingPowder = recipe.outputResource === 'stabilizingPowders';
   const affinityBonus = state.cultivation.rootKnown && state.cultivation.phaseAffinities[recipe.phase] > 0 ? 1 : 0;
   const toxicityPenalty = state.resources.dantoxin >= 30 ? 2 : state.resources.dantoxin >= 10 ? 1 : 0;
-  const qiGain = Math.max(1, (recipe.effect.qi ?? 0) + affinityBonus - toxicityPenalty);
+  const qiDelta = isQiPill
+    ? Math.max(1, (recipe.effect.qi ?? 0) + affinityBonus - toxicityPenalty)
+    : recipe.effect.qi ?? 0;
   const consumedCount = state.alchemy.consumedPillCounts[recipeId] ?? 0;
+  const nextResources = { ...state.resources };
+
+  for (const key of RESOURCE_KEYS) {
+    nextResources[key] += recipe.effect[key] ?? 0;
+  }
+
+  if (isQiPill) {
+    nextResources.qi = state.resources.qi + qiDelta;
+  }
+
+  nextResources.dantoxin += recipe.dantoxin;
+  nextResources.qi = Math.max(0, nextResources.qi);
+  nextResources.essence = Math.max(0, nextResources.essence);
+  nextResources.herbs = Math.max(0, nextResources.herbs);
+  nextResources.coins = Math.max(0, nextResources.coins);
+  nextResources.insight = Math.max(0, nextResources.insight);
+  nextResources.dantoxin = Math.max(0, nextResources.dantoxin);
+  nextResources.lifespan = Math.max(0, nextResources.lifespan);
+  nextResources.wounds = Math.max(0, nextResources.wounds);
 
   const nextState: GameState = {
     ...state,
-    resources: {
-      ...state.resources,
-      qi: state.resources.qi + qiGain,
-      dantoxin: state.resources.dantoxin + recipe.dantoxin,
-    },
+    resources: nextResources,
     alchemy: {
       ...state.alchemy,
       consumedPillCounts: {
@@ -171,14 +195,29 @@ export function consumePill(state: GameState, recipeId: string): { state: GameSt
       ...state.choices,
       flags: {
         ...state.choices.flags,
-        tasted_qi_pill: recipe.outputResource === 'qiPills' ? true : state.choices.flags.tasted_qi_pill,
+        tasted_qi_pill: isQiPill ? true : state.choices.flags.tasted_qi_pill,
+        tasted_stabilizing_powder: isStabilizingPowder ? true : state.choices.flags.tasted_stabilizing_powder,
+        guarded_breakthrough: isStabilizingPowder ? true : state.choices.flags.guarded_breakthrough,
+      },
+      qualities: {
+        ...state.choices.qualities,
+        ...(isStabilizingPowder
+          ? { breakthrough_guard: (state.choices.qualities.breakthrough_guard ?? 0) + 1 }
+          : {}),
       },
     },
   };
 
+  if (isStabilizingPowder) {
+    return {
+      state: nextState,
+      log: `你服下一份${recipe.name}。药性沉下，气机慢了一分。`,
+    };
+  }
+
   return {
     state: nextState,
-    log: `你服下一粒${recipe.name}。药气浮起，真气添了${qiGain}缕。`,
+    log: `你服下一粒${recipe.name}。药气浮起，真气添了${qiDelta}缕。`,
   };
 }
 
@@ -211,6 +250,7 @@ export function getAlchemySummary(state: GameState): string[] {
   if (
     state.alchemy.knownRecipeIds.length === 0 &&
     state.resources.qiPills <= 0 &&
+    state.resources.stabilizingPowders <= 0 &&
     state.resources.dantoxin <= 0
   ) {
     return [];
@@ -230,16 +270,28 @@ export function getAlchemySummary(state: GameState): string[] {
     lines.push(`丹药：小聚气丸 ${state.resources.qiPills.toFixed(0)} 粒`);
   }
 
+  if (state.resources.stabilizingPowders > 0 || state.choices.flags.has_stabilizing_powder) {
+    lines.push(`丹药：稳息散 ${state.resources.stabilizingPowders.toFixed(0)} 份`);
+  }
+
+  if (state.choices.flags.guarded_breakthrough) {
+    lines.push('护持：稳息散');
+  }
+
   if (state.resources.dantoxin > 0 || state.choices.flags.tasted_qi_pill) {
     lines.push(`丹毒：${state.resources.dantoxin.toFixed(0)}，${getDantoxinStageLabel(state.resources.dantoxin)}`);
   }
 
-  const recipe = PILL_RECIPES[SMALL_QI_PILL_RECIPE_ID];
-  if (knowsRecipe(state, SMALL_QI_PILL_RECIPE_ID)) {
-    const mainHerb = HERB_PROFILES[recipe.mainHerbId];
-    lines.push(
-      `药性：${HERB_NATURE_LABELS[recipe.nature]}${HERB_FLAVOR_LABELS[mainHerb.flavor]}，${ELEMENT_LABELS[recipe.phase]}相，${HERB_DIRECTION_LABELS[recipe.direction]}`
-    );
+  const recipeLines = state.alchemy.knownRecipeIds
+    .map((recipeId) => PILL_RECIPES[recipeId])
+    .filter(Boolean)
+    .map((recipe) => {
+      const mainHerb = HERB_PROFILES[recipe.mainHerbId];
+      return `${recipe.name}${HERB_NATURE_LABELS[recipe.nature]}${HERB_FLAVOR_LABELS[mainHerb.flavor]}/${ELEMENT_LABELS[recipe.phase]}相/${HERB_DIRECTION_LABELS[recipe.direction]}`;
+    });
+
+  if (recipeLines.length > 0) {
+    lines.push(`药性：${recipeLines.join('；')}`);
   }
 
   return lines;

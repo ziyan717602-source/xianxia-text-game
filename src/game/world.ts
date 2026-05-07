@@ -101,8 +101,8 @@ export function getRecentSummary(state: GameState): string[] {
   const relationshipLine = woundedCultivator
     ? `受伤散修：人情${woundedCultivator.favors}，仇怨${woundedCultivator.grudges}。`
     : '旧识：暂无。';
-  const alchemyLine = state.resources.qiPills > 0 || state.resources.dantoxin > 0
-    ? `丹药${Math.floor(state.resources.qiPills)}，丹毒${Math.floor(state.resources.dantoxin)}。`
+  const alchemyLine = state.resources.qiPills > 0 || state.resources.stabilizingPowders > 0 || state.resources.dantoxin > 0
+    ? `丹药${Math.floor(state.resources.qiPills)}，稳息${Math.floor(state.resources.stabilizingPowders)}，丹毒${Math.floor(state.resources.dantoxin)}。`
     : null;
 
   const lines = [

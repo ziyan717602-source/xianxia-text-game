@@ -39,6 +39,7 @@ export function createInitialState(seed?: number): GameState {
       essence: INITIAL_MAX_STAMINA,
       herbs: 0,
       qiPills: 0,
+      stabilizingPowders: 0,
       coins: 0,
       insight: 0,
       dantoxin: 0,

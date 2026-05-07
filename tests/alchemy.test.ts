@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { PILL_RECIPES } from '../src/content/alchemy';
 import { performAction } from '../src/game/actions';
-import { getAlchemySummary, getDantoxinStageLabel, SMALL_QI_PILL_RECIPE_ID } from '../src/game/alchemy';
+import {
+  getAlchemySummary,
+  getDantoxinStageLabel,
+  SMALL_QI_PILL_RECIPE_ID,
+  STABILIZING_POWDER_RECIPE_ID,
+} from '../src/game/alchemy';
 import { getAvailableActionsAtLocation } from '../src/game/location';
 import { createInitialState } from '../src/game/state';
 import { Realm } from '../src/game/types';
@@ -63,6 +68,39 @@ describe('Alchemy system', () => {
     expect(state.resources.qi).toBeGreaterThan(beforeQi);
     expect(state.resources.dantoxin).toBe(3);
     expect(state.choices.flags.tasted_qi_pill).toBe(true);
+  });
+
+  it('should learn, brew, and take stabilizing powder as breakthrough support', () => {
+    let state = createQiAlchemyState();
+    state.resources.insight = 12;
+    state.resources.qi = 20;
+    state.resources.dantoxin = 12;
+    state = checkUnlocks(performAction(state, 'study_qi_formula').state);
+    state.choices.flags.bottleneck_qi_layer_2 = true;
+    state = checkUnlocks(state);
+
+    expect(getAvailableActionsAtLocation(state)).toContain('study_steady_formula');
+
+    state = checkUnlocks(performAction(state, 'study_steady_formula').state);
+    expect(state.alchemy.knownRecipeIds).toContain(STABILIZING_POWDER_RECIPE_ID);
+    expect(state.unlockedActions).toContain('brew_stabilizing_powder');
+
+    const brew = performAction(state, 'brew_stabilizing_powder', () => 0.1);
+    expect(brew.success).toBe(true);
+    state = checkUnlocks(brew.state);
+
+    expect(state.resources.stabilizingPowders).toBe(1);
+    expect(state.unlockedActions).toContain('take_stabilizing_powder');
+
+    const take = performAction(state, 'take_stabilizing_powder');
+    expect(take.success).toBe(true);
+    state = take.state;
+
+    expect(state.resources.stabilizingPowders).toBe(0);
+    expect(state.resources.qi).toBe(18);
+    expect(state.resources.dantoxin).toBe(11);
+    expect(state.choices.flags.guarded_breakthrough).toBe(true);
+    expect(getAlchemySummary(state).join(' / ')).toContain(PILL_RECIPES.stabilizing_powder.name);
   });
 
   it('should leave residue and slight dantoxin on failed brewing', () => {

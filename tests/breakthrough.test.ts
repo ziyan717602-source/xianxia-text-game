@@ -70,7 +70,7 @@ describe('Breakthrough system', () => {
     state.resources.essence = 100;
     const beforeLifespan = state.resources.lifespan;
 
-    const result = performAction(state, 'breakthrough_qi_2', () => 0.99);
+    const result = performAction(state, 'breakthrough_qi_2', () => 1);
 
     expect(result.state.realmLayer).toBe(1);
     expect(result.state.choices.flags.failed_qi_layer_2).toBe(true);
@@ -89,6 +89,31 @@ describe('Breakthrough system', () => {
     const toxicChance = getBreakthroughSuccessChance(toxicState, BREAKTHROUGH_RULES.qi_layer_2);
 
     expect(toxicChance).toBeLessThan(cleanChance);
+  });
+
+  it('should let stabilizing powder raise breakthrough chance', () => {
+    const cleanState = createReadyQiState();
+    const guardedState = createReadyQiState();
+    guardedState.choices.flags.guarded_breakthrough = true;
+
+    const cleanChance = getBreakthroughSuccessChance(cleanState, BREAKTHROUGH_RULES.qi_layer_2);
+    const guardedChance = getBreakthroughSuccessChance(guardedState, BREAKTHROUGH_RULES.qi_layer_2);
+
+    expect(guardedChance).toBeGreaterThan(cleanChance);
+  });
+
+  it('should consume stabilizing powder guard and reduce failed breakthrough wounds', () => {
+    let state = createReadyQiState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 100;
+    state.resources.dantoxin = 30;
+    state.choices.flags.guarded_breakthrough = true;
+
+    const result = performAction(state, 'breakthrough_qi_2', () => 0.99);
+
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.choices.flags.guarded_breakthrough).toBe(false);
+    expect(result.state.breakthrough.failures.qi_layer_2).toBe(1);
   });
 
   it('should prepare layer three after reaching qi layer two', () => {

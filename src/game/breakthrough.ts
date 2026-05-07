@@ -79,6 +79,7 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
   const preparationBonus = preparation * 0.08;
   const quietBonus = Math.min(0.1, quietCultivation * 0.01);
   const alchemyBonus = state.resources.qiPills > 0 ? Math.min(0.04, alchemyAffinity * 0.008) : 0;
+  const guardBonus = state.choices.flags.guarded_breakthrough ? 0.08 : 0;
   const woundPenalty = Math.min(0.18, state.resources.wounds * 0.06);
   const dantoxinPenalty = state.resources.dantoxin >= 60
     ? 0.22
@@ -90,7 +91,7 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
 
   return Math.max(
     0.2,
-    Math.min(0.92, rule.baseSuccess + preparationBonus + quietBonus + rootBonus + alchemyBonus - woundPenalty - dantoxinPenalty)
+    Math.min(0.92, rule.baseSuccess + preparationBonus + quietBonus + rootBonus + alchemyBonus + guardBonus - woundPenalty - dantoxinPenalty)
   );
 }
 
@@ -143,6 +144,7 @@ export function resolveBreakthrough(
           ...state.choices.flags,
           [rule.successFlag]: true,
           [`broke_${rule.id}`]: true,
+          guarded_breakthrough: false,
         },
         qualities: {
           ...state.choices.qualities,
@@ -175,6 +177,7 @@ export function resolveBreakthrough(
           ...state.choices.flags,
           [`half_broke_${rule.id}`]: true,
           [`prepared_${rule.id}`]: true,
+          guarded_breakthrough: false,
         },
       },
     };
@@ -187,7 +190,8 @@ export function resolveBreakthrough(
   }
 
   const failures = (state.breakthrough.failures[rule.id] ?? 0) + 1;
-  const woundGain = state.resources.dantoxin >= 30 ? 2 : 1;
+  const rawWoundGain = state.resources.dantoxin >= 30 ? 2 : 1;
+  const woundGain = state.choices.flags.guarded_breakthrough ? Math.max(0, rawWoundGain - 1) : rawWoundGain;
   const nextState: GameState = {
     ...state,
     resources: {
@@ -207,6 +211,7 @@ export function resolveBreakthrough(
       flags: {
         ...state.choices.flags,
         [`failed_${rule.id}`]: true,
+        guarded_breakthrough: false,
       },
       qualities: {
         ...state.choices.qualities,
@@ -215,9 +220,13 @@ export function resolveBreakthrough(
     },
   };
 
+  const woundText = woundGain > 0 ? `伤添${woundGain}处` : '未添新伤';
+
   return {
     state: nextState,
-    log: `气散了三成。${rule.name}未成，伤添${woundGain}处。隔日，坊市照开。`,
+    log: state.choices.flags.guarded_breakthrough
+      ? `气散了三成。稳息散压住乱气。${rule.name}未成，${woundText}。`
+      : `气散了三成。${rule.name}未成，${woundText}。隔日，坊市照开。`,
     outcome: 'failure',
   };
 }
@@ -246,6 +255,10 @@ export function getBreakthroughSummary(state: GameState): string[] {
 
   if (state.cultivation.rootKnown && rule) {
     lines.push(`主相：${ELEMENT_LABELS[state.cultivation.dominantElement]}`);
+  }
+
+  if (state.choices.flags.guarded_breakthrough) {
+    lines.push('护持：稳息散');
   }
 
   if (attempts > 0 || failures > 0) {

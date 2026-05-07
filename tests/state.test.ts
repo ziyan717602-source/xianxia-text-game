@@ -25,6 +25,7 @@ describe('Game State Initialization', () => {
     expect(state.resources.wounds).toBe(0);
     expect(state.resources.herbs).toBe(0);
     expect(state.resources.qiPills).toBe(0);
+    expect(state.resources.stabilizingPowders).toBe(0);
     expect(state.resources.coins).toBe(0);
     expect(state.resources.insight).toBe(0);
     expect(state.resources.dantoxin).toBe(0);

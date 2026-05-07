@@ -107,6 +107,26 @@ describe('Unlock System', () => {
     expect(state.choices.flags.has_qi_pill).toBe(true);
   });
 
+  it('should unlock steady formula after a bottleneck and then powder use', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.known_recipe_small_qi_pill = true;
+    state.choices.flags.bottleneck_qi_layer_2 = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_steady_formula');
+
+    state.choices.flags.known_recipe_stabilizing_powder = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('brew_stabilizing_powder');
+
+    state.resources.stabilizingPowders = 1;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('take_stabilizing_powder');
+    expect(state.choices.flags.has_stabilizing_powder).toBe(true);
+  });
+
   it('should unlock bottleneck preparation and qi breakthrough actions in sequence', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

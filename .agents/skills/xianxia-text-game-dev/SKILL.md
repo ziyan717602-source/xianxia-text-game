@@ -41,7 +41,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Random systems should accept a seed or random provider for testing.
 - UI should render current state from game state; avoid storing authoritative state only in UI components.
 - Default to Vite + TypeScript + React for the browser shell, but keep `src/game` framework-independent.
-- The current repository has completed phase 1C and is in phase 2. Ordinary origins, root affinity, technique attunement, the first alchemy/dantoxin slice, and the first qi-layer breakthrough slice are implemented. Before implementing new features, check `docs/project-status.md` and `PLAN.md`; use `docs/reviews/2026-05-07-current-project-review.md` as historical context for why the cleanup exists.
+- The current repository has completed phase 1C and is in phase 2. Ordinary origins, root affinity, technique attunement, the first alchemy/dantoxin slice, stabilizing powder breakthrough support, and the first qi-layer breakthrough slice are implemented. Before implementing new features, check `docs/project-status.md` and `PLAN.md`; use `docs/reviews/2026-05-07-current-project-review.md` as historical context for why the cleanup exists.
 
 ## Testing Checklist
 

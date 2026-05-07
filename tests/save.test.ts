@@ -95,6 +95,7 @@ describe('Save and Migration System', () => {
     expect(migrated.state.cultivation.rootKnown).toBe(false);
     expect(migrated.state.cultivation.activeTechniqueId).toBe('small_breathing');
     expect(migrated.state.resources.qiPills).toBe(0);
+    expect(migrated.state.resources.stabilizingPowders).toBe(0);
     expect(migrated.state.resources.dantoxin).toBe(0);
     expect(migrated.state.alchemy.knownRecipeIds).toEqual([]);
   });
@@ -102,7 +103,7 @@ describe('Save and Migration System', () => {
   it('should migrate V5 saves by adding alchemy resources and ledger', () => {
     const state = createInitialState(987);
     const { alchemy, ...stateWithoutAlchemy } = state;
-    const { qiPills, dantoxin, ...resourcesWithoutAlchemy } = state.resources;
+    const { qiPills, stabilizingPowders, dantoxin, ...resourcesWithoutAlchemy } = state.resources;
     const migrated = migrateSaveData({
       version: 5,
       state: {
@@ -116,6 +117,7 @@ describe('Save and Migration System', () => {
 
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.resources.qiPills).toBe(0);
+    expect(migrated.state.resources.stabilizingPowders).toBe(0);
     expect(migrated.state.resources.dantoxin).toBe(0);
     expect(migrated.state.alchemy.brewedRecipeCounts).toEqual({});
     expect(migrated.state.breakthrough.preparation).toEqual({});
@@ -135,5 +137,23 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.breakthrough.attempts).toEqual({});
     expect(migrated.state.breakthrough.lastTargetId).toBeNull();
+  });
+
+  it('should migrate V7 saves by adding stabilizing powder resource', () => {
+    const state = createInitialState(135);
+    const { stabilizingPowders, ...resourcesWithoutStabilizingPowders } = state.resources;
+    const migrated = migrateSaveData({
+      version: 7,
+      state: {
+        ...state,
+        resources: resourcesWithoutStabilizingPowders,
+      },
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 135,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.resources.stabilizingPowders).toBe(0);
   });
 });

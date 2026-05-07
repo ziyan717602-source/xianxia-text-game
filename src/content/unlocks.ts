@@ -197,6 +197,52 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_study_steady_formula',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['known_recipe_small_qi_pill']) &&
+      (
+        state.resources.dantoxin >= 10 ||
+        state.resources.wounds > 0 ||
+        Boolean(state.choices.flags['bottleneck_qi_layer_2']) ||
+        Boolean(state.choices.flags['failed_qi_layer_2']) ||
+        Boolean(state.choices.flags['half_broke_qi_layer_2'])
+      ) &&
+      !state.choices.flags['known_recipe_stabilizing_powder'],
+    effect: (state) => {
+      if (!state.unlockedActions.includes('study_steady_formula')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'study_steady_formula'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_study_steady_formula: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_brew_stabilizing_powder',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['known_recipe_stabilizing_powder']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('brew_stabilizing_powder')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'brew_stabilizing_powder'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_brew_stabilizing_powder: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_take_qi_pill',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&
@@ -209,6 +255,29 @@ export const UNLOCKS: UnlockRule[] = [
           choices: {
             ...state.choices,
             flags: { ...state.choices.flags, 'unlocked_take_qi_pill': true, has_qi_pill: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_take_stabilizing_powder',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.resources.stabilizingPowders > 0,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('take_stabilizing_powder')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'take_stabilizing_powder'],
+          choices: {
+            ...state.choices,
+            flags: {
+              ...state.choices.flags,
+              unlocked_take_stabilizing_powder: true,
+              has_stabilizing_powder: true
+            }
           }
         };
       }

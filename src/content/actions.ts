@@ -3,6 +3,7 @@ import { PILL_RECIPES } from './alchemy';
 import { BREAKTHROUGH_RULES } from './breakthroughs';
 
 const SMALL_QI_PILL_COST = PILL_RECIPES.small_qi_pill.requiredResources;
+const STABILIZING_POWDER_COST = PILL_RECIPES.stabilizing_powder.requiredResources;
 const QI_LAYER_2_COST = BREAKTHROUGH_RULES.qi_layer_2.requiredResources;
 const QI_LAYER_3_COST = BREAKTHROUGH_RULES.qi_layer_3.requiredResources;
 
@@ -157,6 +158,20 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  study_steady_formula: {
+    id: 'study_steady_formula',
+    name: '辨稳息方',
+    cost: { essence: 15, herbs: 3, insight: 3 },
+    output: {},
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['known_recipe_small_qi_pill'],
+      forbiddenFlags: ['known_recipe_stabilizing_powder'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   brew_qi_pill: {
     id: 'brew_qi_pill',
     name: '炼小聚气丸',
@@ -170,6 +185,19 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  brew_stabilizing_powder: {
+    id: 'brew_stabilizing_powder',
+    name: '炼稳息散',
+    cost: STABILIZING_POWDER_COST,
+    output: {},
+    cooldown: 35,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['known_recipe_stabilizing_powder'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   take_qi_pill: {
     id: 'take_qi_pill',
     name: '服小聚气丸',
@@ -179,6 +207,19 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['has_qi_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  take_stabilizing_powder: {
+    id: 'take_stabilizing_powder',
+    name: '服稳息散',
+    cost: { stabilizingPowders: 1 },
+    output: {},
+    cooldown: 10,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['has_stabilizing_powder'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },

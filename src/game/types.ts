@@ -43,6 +43,7 @@ export interface Resources {
   essence: number;   // 精元
   herbs: number;     // 药
   qiPills: number;   // 小聚气丸
+  stabilizingPowders: number; // 稳息散
   coins: number;     // 钱 (银两)
   insight: number; // 见闻
   dantoxin: number;  // 丹毒

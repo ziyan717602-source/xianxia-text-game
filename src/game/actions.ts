@@ -1,6 +1,13 @@
 import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
-import { applyAlchemyOutputModifiers, brewRecipe, consumePill, learnRecipe, SMALL_QI_PILL_RECIPE_ID } from './alchemy';
+import {
+  applyAlchemyOutputModifiers,
+  brewRecipe,
+  consumePill,
+  learnRecipe,
+  SMALL_QI_PILL_RECIPE_ID,
+  STABILIZING_POWDER_RECIPE_ID,
+} from './alchemy';
 import { resolveBreakthrough, stabilizeBreakthrough } from './breakthrough';
 import { applyCultivationOutputModifiers, attuneTechnique, revealRoot } from './cultivation';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
@@ -15,7 +22,7 @@ export interface ActionResult {
   success: boolean;
 }
 
-const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
+const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'stabilizingPowders', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
 const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   kuzuo: 'quiet_cultivation',
   tuna: 'quiet_cultivation',
@@ -24,8 +31,11 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   inspect_root: 'quiet_cultivation',
   attune_technique: 'quiet_cultivation',
   study_qi_formula: 'alchemy_affinity',
+  study_steady_formula: 'alchemy_affinity',
   brew_qi_pill: 'alchemy_affinity',
+  brew_stabilizing_powder: 'alchemy_affinity',
   take_qi_pill: 'alchemy_affinity',
+  take_stabilizing_powder: 'alchemy_affinity',
   stabilize_bottleneck: 'quiet_cultivation',
   breakthrough_qi_2: 'quiet_cultivation',
   breakthrough_qi_3: 'quiet_cultivation',
@@ -151,14 +161,32 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     customLog = result.log;
   }
 
+  if (actionId === 'study_steady_formula') {
+    const result = learnRecipe(newState, STABILIZING_POWDER_RECIPE_ID);
+    newState = result.state;
+    customLog = result.log;
+  }
+
   if (actionId === 'brew_qi_pill') {
     const result = brewRecipe(newState, SMALL_QI_PILL_RECIPE_ID, random);
     newState = result.state;
     customLog = result.log;
   }
 
+  if (actionId === 'brew_stabilizing_powder') {
+    const result = brewRecipe(newState, STABILIZING_POWDER_RECIPE_ID, random);
+    newState = result.state;
+    customLog = result.log;
+  }
+
   if (actionId === 'take_qi_pill') {
     const result = consumePill(newState, SMALL_QI_PILL_RECIPE_ID);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'take_stabilizing_powder') {
+    const result = consumePill(newState, STABILIZING_POWDER_RECIPE_ID);
     newState = result.state;
     customLog = result.log;
   }
