@@ -80,9 +80,6 @@ export const UNLOCKS: UnlockRule[] = [
   },
   {
     id: 'unlock_rike_tuna',
-    // 假设用 flags 来记录某个动作被执行了多少次，或者简单起见目前如果没有累计次数，我们先判断 qi > 20
-    // 为了真实反映 "累计吐纳 10 次"，需要在 performAction 里记录。这里我们先简化，或者去改 performAction。
-    // 我们去改 actions.ts 加上 quality 记录。这里先根据 resources 或者 quality 检查。
     condition: (state) => (state.choices.qualities['action_tuna_count'] || 0) >= 10,
     effect: (state) => {
       if (!state.choices.flags['unlocked_rike_tuna']) {
@@ -104,8 +101,9 @@ export const UNLOCKS: UnlockRule[] = [
     id: 'unlock_yinqi',
     condition: (state) =>
       state.realm === Realm.Mortal &&
-      state.resources.qi >= 10 &&
-      state.resources.insight >= 3,
+      state.resources.qi >= 15 &&
+      state.resources.insight >= 3 &&
+      Boolean(state.choices.flags['completed_rike_tuna']),
     effect: (state) => {
       if (!state.unlockedActions.includes('yinqi')) {
         return {

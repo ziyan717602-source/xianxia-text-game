@@ -2,7 +2,7 @@ import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
 import { RESOURCE_LABELS } from './resources';
-import { recordActionInWorld } from './world';
+import { advanceWorld, recordActionInWorld } from './world';
 
 export { ACTIONS };
 
@@ -32,15 +32,25 @@ function firstMissingCost(resources: Resources, cost: Partial<Resources>): keyof
   return null;
 }
 
+function firstMissingMinResource(resources: Resources, minResources: Partial<Resources> = {}): keyof Resources | null {
+  for (const key of RESOURCE_KEYS) {
+    const amount = minResources[key] ?? 0;
+    if (amount > 0 && resources[key] < amount) return key;
+  }
+  return null;
+}
+
 function spendTicks(state: GameState, ticks: number): GameState {
-  return {
+  if (ticks <= 0) return state;
+
+  return advanceWorld({
     ...state,
     resources: {
       ...state.resources,
       lifespan: Math.max(0, state.resources.lifespan - ticks),
     },
     time: deriveGameTime(state.time.tick + ticks),
-  };
+  });
 }
 
 export function performAction(state: GameState, actionId: string, random?: () => number): ActionResult {
@@ -54,7 +64,16 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     return { state, log: `${RESOURCE_LABELS[missingCost]}不足，无法进行${action.name}`, success: false };
   }
 
+  const missingMinResource = firstMissingMinResource(state.resources, action.conditions.minResources);
+  if (missingMinResource) {
+    return { state, log: `${RESOURCE_LABELS[missingMinResource]}不足，无法进行${action.name}`, success: false };
+  }
+
   // Check conditions
+  const missingFlag = action.conditions.requiredFlags?.find((flag) => !state.choices.flags[flag]);
+  if (missingFlag) {
+    return { state, log: `尚未满足${action.name}的条件。`, success: false };
+  }
   if (action.conditions.requiredLocation && state.currentLocationId !== action.conditions.requiredLocation) {
     return { state, log: `此地无法进行${action.name}`, success: false };
   }
@@ -69,13 +88,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   for (const key of RESOURCE_KEYS) {
     newState.resources[key] -= action.cost[key] ?? 0;
   }
-  // 调息消耗一日光阴，换取精元平复。
-  if (actionId === 'tiaoxi') {
-    Object.assign(newState, spendTicks(newState, 10));
-  }
-  if (actionId === 'rike_tuna') {
-    Object.assign(newState, spendTicks(newState, 50));
-  }
+  Object.assign(newState, spendTicks(newState, action.cooldown));
 
   // Risk check
   const rand = random ? random() : Math.random();
@@ -112,6 +125,10 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   const routeQuality = ACTION_ROUTE_QUALITIES[actionId];
   newState.choices = {
     ...newState.choices,
+    flags: {
+      ...newState.choices.flags,
+      [`completed_${actionId}`]: true,
+    },
     qualities: {
       ...newState.choices.qualities,
       [countKey]: (newState.choices.qualities[countKey] || 0) + 1,

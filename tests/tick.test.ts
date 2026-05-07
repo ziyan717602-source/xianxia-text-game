@@ -109,9 +109,10 @@ describe('Action System', () => {
 
   it('should enter qi condensation layer one through yinqi', () => {
     const state = createInitialState();
-    state.resources.qi = 10;
+    state.resources.qi = 15;
     state.resources.insight = 3;
     state.resources.essence = 100;
+    state.choices.flags.completed_rike_tuna = true;
 
     const result = performAction(state, 'yinqi');
     expect(result.success).toBe(true);
@@ -131,10 +132,21 @@ describe('Action System', () => {
 
     expect(result.success).toBe(true);
     expect(result.state.resources.essence).toBe(40);
-    expect(result.state.resources.qi).toBe(6);
+    expect(result.state.resources.qi).toBe(8);
     expect(result.state.time.tick).toBe(50);
     expect(result.state.resources.lifespan).toBe(initialLifespan - 50);
     expect(result.log).toContain('日课');
+  });
+
+  it('should spend game time for ordinary actions', () => {
+    const state = createInitialState();
+    const initialLifespan = state.resources.lifespan;
+
+    const result = performAction(state, 'kuzuo');
+
+    expect(result.state.time.tick).toBe(5);
+    expect(result.state.resources.lifespan).toBe(initialLifespan - 5);
+    expect(result.state.choices.flags.completed_kuzuo).toBe(true);
   });
 
   it('should record route qualities for repeated actions', () => {

@@ -7,6 +7,7 @@ import { getVisibleResourceIds } from '../src/game/resources';
 import { createInitialState } from '../src/game/state';
 import { checkUnlocks } from '../src/game/unlock';
 import { Realm } from '../src/game/types';
+import { ACTIONS } from '../src/content/actions';
 
 describe('Opening flow', () => {
   it('should progress from sitting to jade slip to breath work without exposing the whole system', () => {
@@ -43,8 +44,9 @@ describe('Opening flow', () => {
     state = checkUnlocks(state);
     expect(getAvailableActionsAtLocation(state)).toContain('rike_tuna');
 
-    state.resources.qi = 10;
+    state.resources.qi = 15;
     state.resources.insight = 3;
+    state.choices.flags.completed_rike_tuna = true;
     state = checkUnlocks(state);
 
     const availableActions = getAvailableActionsAtLocation(state);
@@ -56,5 +58,58 @@ describe('Opening flow', () => {
 
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
+  });
+
+  it('should reach qi condensation through daily practice without manual resource injection', () => {
+    let state = createInitialState();
+    let actionCount = 0;
+
+    const doAction = (actionId: string) => {
+      const result = performAction(state, actionId, () => 0.9);
+      expect(result.success).toBe(true);
+      state = checkUnlocks(result.state);
+      actionCount += 1;
+    };
+
+    const ensureEssence = (actionId: string) => {
+      const neededEssence = ACTIONS[actionId].cost.essence ?? 0;
+      while (state.resources.essence < neededEssence) {
+        doAction('tiaoxi');
+      }
+    };
+
+    doAction('kuzuo');
+    doAction('kuzuo');
+
+    const jadeSlip = EVENTS.find((item) => item.id === 'find_jade_slip')!;
+    state = checkUnlocks(jadeSlip.choices[0].effect(state).state);
+
+    doAction('kuzuo');
+
+    expect(getAvailableActionsAtLocation(state)).toContain('tuna');
+
+    for (let index = 0; index < 10; index += 1) {
+      ensureEssence('tuna');
+      doAction('tuna');
+    }
+
+    expect(getAvailableActionsAtLocation(state)).toContain('rike_tuna');
+    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+
+    ensureEssence('rike_tuna');
+    doAction('rike_tuna');
+
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
+
+    ensureEssence('yinqi');
+    doAction('yinqi');
+
+    expect(state.realm).toBe(Realm.QiCondensation);
+    expect(state.realmLayer).toBe(1);
+    expect(state.choices.qualities.action_tuna_count).toBe(10);
+    expect(state.choices.qualities.action_rike_tuna_count).toBe(1);
+    expect(actionCount).toBeLessThanOrEqual(20);
+    expect(state.time.tick).toBeGreaterThanOrEqual(180);
+    expect(state.time.tick).toBeLessThanOrEqual(220);
   });
 });

@@ -39,12 +39,17 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('rike_tuna');
   });
 
-  it('should unlock yinqi when qi and insight are sufficient', () => {
+  it('should unlock yinqi only after daily practice has been completed', () => {
     let state = createInitialState();
-    state.resources.qi = 10;
+    state.resources.qi = 15;
     state.resources.insight = 3;
 
     state = checkUnlocks(state);
+    expect(state.unlockedActions).not.toContain('yinqi');
+
+    state.choices.flags.completed_rike_tuna = true;
+    state = checkUnlocks(state);
+
     expect(state.unlockedActions).toContain('yinqi');
     expect(state.choices.flags['unlocked_yinqi']).toBe(true);
   });
