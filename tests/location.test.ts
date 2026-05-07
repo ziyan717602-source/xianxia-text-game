@@ -60,7 +60,7 @@ describe('Location System', () => {
   it('should hide actions whose flags or realm conditions are not met', () => {
     let state = createInitialState();
     state.currentLocationId = 'home';
-    state.unlockedActions = ['yinqi'];
+    state.unlockedActions = ['yinqi', 'inspect_root'];
 
     expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
 
@@ -74,6 +74,10 @@ describe('Location System', () => {
     state.realmLayer = 1;
 
     expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    expect(getAvailableActionsAtLocation(state)).toContain('inspect_root');
+
+    state.choices.flags.root_known = true;
+    expect(getAvailableActionsAtLocation(state)).not.toContain('inspect_root');
   });
 
   it('should expose outer gate actions when unlocked at the outer gate', () => {

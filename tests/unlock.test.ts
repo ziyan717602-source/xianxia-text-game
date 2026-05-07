@@ -87,4 +87,23 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('attune_technique');
     expect(state.choices.flags.unlocked_attune_technique).toBe(true);
   });
+
+  it('should unlock formula study, brewing, and pill taking in sequence', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.qualities.action_bianyao_count = 2;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_qi_formula');
+
+    state.choices.flags.known_recipe_small_qi_pill = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('brew_qi_pill');
+
+    state.resources.qiPills = 1;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('take_qi_pill');
+    expect(state.choices.flags.has_qi_pill).toBe(true);
+  });
 });

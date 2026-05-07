@@ -9,12 +9,14 @@ describe('Resource reveal', () => {
     expect(getVisibleResourceIds(state)).toEqual(['essence']);
   });
 
-  it('should reveal insight, qi, herbs, coins, wounds, and lifespan from state context', () => {
+  it('should reveal insight, qi, herbs, pills, coins, dantoxin, wounds, and lifespan from state context', () => {
     const state = createInitialState();
     state.resources.insight = 1;
     state.resources.qi = 1;
     state.resources.herbs = 1;
+    state.resources.qiPills = 1;
     state.resources.coins = 1;
+    state.resources.dantoxin = 1;
     state.resources.wounds = 1;
 
     expect(getVisibleResourceIds(state)).toEqual([
@@ -22,7 +24,9 @@ describe('Resource reveal', () => {
       'insight',
       'qi',
       'herbs',
+      'qiPills',
       'coins',
+      'dantoxin',
       'wounds',
       'lifespan',
     ]);

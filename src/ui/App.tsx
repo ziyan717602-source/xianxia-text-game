@@ -3,6 +3,7 @@ import { ACTIONS } from '../content/actions';
 import { EVENTS } from '../content/events';
 import { LOCATIONS } from '../content/locations';
 import { SELECTABLE_ORIGINS } from '../content/origins';
+import { getAlchemySummary } from '../game/alchemy';
 import { getCultivationSummary } from '../game/cultivation';
 import { getAvailableActionsAtLocation } from '../game/location';
 import { getOriginName, hasSelectedOrigin } from '../game/origins';
@@ -49,6 +50,7 @@ export function App() {
   const currentLocation = LOCATIONS[gameState.currentLocationId];
   const visibleResourceIds = getVisibleResourceIds(gameState);
   const availableActionIds = getAvailableActionsAtLocation(gameState);
+  const alchemySummary = getAlchemySummary(gameState);
   const cultivationSummary = getCultivationSummary(gameState);
   const recentSummary = getRecentSummary(gameState);
   const worldLogs = gameState.world.logs;
@@ -151,6 +153,14 @@ export function App() {
             <div className="cultivation-block" aria-label="修行">
               <h3>修行</h3>
               {cultivationSummary.map((line, index) => (
+                <p key={`${index}-${line}`}>{line}</p>
+              ))}
+            </div>
+          )}
+          {alchemySummary.length > 0 && (
+            <div className="ledger-block" aria-label="炼丹">
+              <h3>炼丹</h3>
+              {alchemySummary.map((line, index) => (
                 <p key={`${index}-${line}`}>{line}</p>
               ))}
             </div>

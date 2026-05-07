@@ -62,6 +62,10 @@ export function getAvailableActionsAtLocation(state: GameState): string[] {
       return false;
     }
 
+    if (action.conditions.forbiddenFlags?.some((flag) => state.choices.flags[flag])) {
+      return false;
+    }
+
     return true;
   });
 }

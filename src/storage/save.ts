@@ -1,10 +1,11 @@
 import { GameState, Realm, SaveData } from '../game/types';
+import { createInitialAlchemyState } from '../game/alchemy';
 import { createInitialCultivationState } from '../game/cultivation';
 import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
 
-export const CURRENT_SAVE_VERSION = 5;
+export const CURRENT_SAVE_VERSION = 6;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -55,6 +56,19 @@ export function migrateSaveData(data: any): SaveData {
       cultivation: migratedData.state.cultivation ?? createInitialCultivationState(stateSeed),
     };
     migratedData.version = 5;
+  }
+
+  if (migratedData.version === 5) {
+    migratedData.state = {
+      ...migratedData.state,
+      resources: {
+        ...migratedData.state.resources,
+        qiPills: migratedData.state.resources?.qiPills ?? 0,
+        dantoxin: migratedData.state.resources?.dantoxin ?? 0,
+      },
+      alchemy: migratedData.state.alchemy ?? createInitialAlchemyState(),
+    };
+    migratedData.version = 6;
   }
 
   return migratedData as SaveData;

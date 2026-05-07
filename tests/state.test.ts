@@ -24,8 +24,10 @@ describe('Game State Initialization', () => {
     expect(state.resources.lifespan).toBeGreaterThan(0);
     expect(state.resources.wounds).toBe(0);
     expect(state.resources.herbs).toBe(0);
+    expect(state.resources.qiPills).toBe(0);
     expect(state.resources.coins).toBe(0);
     expect(state.resources.insight).toBe(0);
+    expect(state.resources.dantoxin).toBe(0);
 
     // Check empty structures
     // Check empty structures
@@ -38,6 +40,8 @@ describe('Game State Initialization', () => {
     expect(state.world.recentActions).toEqual({});
     expect(state.cultivation.rootKnown).toBe(false);
     expect(state.cultivation.activeTechniqueId).toBe('small_breathing');
+    expect(state.alchemy.knownRecipeIds).toEqual([]);
+    expect(state.alchemy.brewedRecipeCounts).toEqual({});
   });
 
   it('should generate a random seed if none is provided', () => {

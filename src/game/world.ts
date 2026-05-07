@@ -101,18 +101,22 @@ export function getRecentSummary(state: GameState): string[] {
   const relationshipLine = woundedCultivator
     ? `受伤散修：人情${woundedCultivator.favors}，仇怨${woundedCultivator.grudges}。`
     : '旧识：暂无。';
+  const alchemyLine = state.resources.qiPills > 0 || state.resources.dantoxin > 0
+    ? `丹药${Math.floor(state.resources.qiPills)}，丹毒${Math.floor(state.resources.dantoxin)}。`
+    : null;
 
-  return [
+  const lines = [
     `${term}，所在：${currentLocation}。`,
     formatActionSummary(recentActions),
     `真气${Math.floor(state.resources.qi)}，草药${Math.floor(state.resources.herbs)}，钱币${Math.floor(state.resources.coins)}。`,
     relationshipLine,
   ];
+
+  return alchemyLine ? [...lines, alchemyLine] : lines;
 }
 
 function createSummaryLog(state: GameState): string {
-  const [termLine, actionLine, resourceLine, relationshipLine] = getRecentSummary(state);
-  return `${termLine} ${actionLine} ${resourceLine} ${relationshipLine}`;
+  return getRecentSummary(state).join(' ');
 }
 
 export function advanceWorld(next: GameState): GameState {

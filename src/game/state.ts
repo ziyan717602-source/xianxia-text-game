@@ -1,4 +1,5 @@
 import { GameState, GameTime, Realm, SpiritualRoot, Season } from './types';
+import { createInitialAlchemyState } from './alchemy';
 import { createInitialCultivationState } from './cultivation';
 import { createInitialWorldState } from './world';
 
@@ -36,8 +37,10 @@ export function createInitialState(seed?: number): GameState {
       qi: 0,
       essence: INITIAL_MAX_STAMINA,
       herbs: 0,
+      qiPills: 0,
       coins: 0,
       insight: 0,
+      dantoxin: 0,
       lifespan: MORTAL_LIFESPAN_YEARS * DAYS_PER_YEAR * TICKS_PER_DAY,
       wounds: 0,
     },
@@ -55,6 +58,7 @@ export function createInitialState(seed?: number): GameState {
     },
     world: createInitialWorldState(time),
     cultivation: createInitialCultivationState(stateSeed),
+    alchemy: createInitialAlchemyState(),
     activeEventId: null,
     seed: stateSeed,
   };

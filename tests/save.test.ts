@@ -77,6 +77,7 @@ describe('Save and Migration System', () => {
     expect(migrated.state.choices.flags.selected_origin).toBe(true);
     expect(migrated.state.choices.tags.origin).toBe('legacy_path');
     expect(migrated.state.cultivation.rootKnown).toBe(false);
+    expect(migrated.state.alchemy.knownRecipeIds).toEqual([]);
   });
 
   it('should migrate V4 saves by adding cultivation state', () => {
@@ -93,5 +94,29 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.cultivation.rootKnown).toBe(false);
     expect(migrated.state.cultivation.activeTechniqueId).toBe('small_breathing');
+    expect(migrated.state.resources.qiPills).toBe(0);
+    expect(migrated.state.resources.dantoxin).toBe(0);
+    expect(migrated.state.alchemy.knownRecipeIds).toEqual([]);
+  });
+
+  it('should migrate V5 saves by adding alchemy resources and ledger', () => {
+    const state = createInitialState(987);
+    const { alchemy, ...stateWithoutAlchemy } = state;
+    const { qiPills, dantoxin, ...resourcesWithoutAlchemy } = state.resources;
+    const migrated = migrateSaveData({
+      version: 5,
+      state: {
+        ...stateWithoutAlchemy,
+        resources: resourcesWithoutAlchemy,
+      },
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 987,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.resources.qiPills).toBe(0);
+    expect(migrated.state.resources.dantoxin).toBe(0);
+    expect(migrated.state.alchemy.brewedRecipeCounts).toEqual({});
   });
 });

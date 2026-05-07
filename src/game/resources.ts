@@ -6,8 +6,10 @@ export const RESOURCE_LABELS: Record<ResourceId, string> = {
   essence: '精元',
   qi: '真气',
   herbs: '草药',
+  qiPills: '小聚气丸',
   coins: '钱币',
   insight: '神识',
+  dantoxin: '丹毒',
   lifespan: '寿元',
   wounds: '伤势',
 };
@@ -27,8 +29,16 @@ export function getVisibleResourceIds(state: GameState): ResourceId[] {
     visible.push('herbs');
   }
 
+  if (state.resources.qiPills > 0 || Boolean(state.choices.flags.has_qi_pill)) {
+    visible.push('qiPills');
+  }
+
   if (state.resources.coins > 0 || state.currentLocationId === 'market') {
     visible.push('coins');
+  }
+
+  if (state.resources.dantoxin > 0 || Boolean(state.choices.flags.tasted_qi_pill)) {
+    visible.push('dantoxin');
   }
 
   if (state.resources.wounds > 0) {

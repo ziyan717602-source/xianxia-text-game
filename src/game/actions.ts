@@ -1,5 +1,6 @@
 import { GameState, Resources, Realm } from './types';
 import { ACTIONS } from '../content/actions';
+import { applyAlchemyOutputModifiers, brewRecipe, consumePill, learnRecipe, SMALL_QI_PILL_RECIPE_ID } from './alchemy';
 import { applyCultivationOutputModifiers, attuneTechnique, revealRoot } from './cultivation';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
 import { RESOURCE_LABELS } from './resources';
@@ -13,7 +14,7 @@ export interface ActionResult {
   success: boolean;
 }
 
-const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'coins', 'insight', 'lifespan', 'wounds'] as const;
+const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
 const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   kuzuo: 'quiet_cultivation',
   tuna: 'quiet_cultivation',
@@ -21,6 +22,9 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   rike_tuna: 'quiet_cultivation',
   inspect_root: 'quiet_cultivation',
   attune_technique: 'quiet_cultivation',
+  study_qi_formula: 'alchemy_affinity',
+  brew_qi_pill: 'alchemy_affinity',
+  take_qi_pill: 'alchemy_affinity',
   caiyao: 'alchemy_affinity',
   bianyao: 'alchemy_affinity',
   xunshan: 'combat_edge',
@@ -81,6 +85,10 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   if (missingFlag) {
     return { state, log: `尚未满足${action.name}的条件。`, success: false };
   }
+  const forbiddenFlag = action.conditions.forbiddenFlags?.find((flag) => state.choices.flags[flag]);
+  if (forbiddenFlag) {
+    return { state, log: `${action.name}已无须重复。`, success: false };
+  }
   if (action.conditions.requiredLocation && state.currentLocationId !== action.conditions.requiredLocation) {
     return { state, log: `此地无法进行${action.name}`, success: false };
   }
@@ -96,7 +104,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     newState.resources[key] -= action.cost[key] ?? 0;
   }
   // Risk check
-  const rand = random ? random() : Math.random();
+  const rand = action.riskProbability > 0 ? (random ? random() : Math.random()) : 1;
   if (rand < action.riskProbability) {
     // Basic risk consequence for now: action fails, maybe essence lost
     newState = spendTicks(newState, action.cooldown);
@@ -133,7 +141,29 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     customLog = result.log;
   }
 
-  const adjustedOutput = applyCultivationOutputModifiers(newState, actionId, action.output);
+  if (actionId === 'study_qi_formula') {
+    const result = learnRecipe(newState, SMALL_QI_PILL_RECIPE_ID);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'brew_qi_pill') {
+    const result = brewRecipe(newState, SMALL_QI_PILL_RECIPE_ID, random);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  if (actionId === 'take_qi_pill') {
+    const result = consumePill(newState, SMALL_QI_PILL_RECIPE_ID);
+    newState = result.state;
+    customLog = result.log;
+  }
+
+  const adjustedOutput = applyAlchemyOutputModifiers(
+    newState,
+    actionId,
+    applyCultivationOutputModifiers(newState, actionId, action.output)
+  );
 
   // Add outputs
   for (const key of RESOURCE_KEYS) {

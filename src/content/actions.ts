@@ -1,4 +1,7 @@
 import { Action, Realm } from '../game/types';
+import { PILL_RECIPES } from './alchemy';
+
+const SMALL_QI_PILL_COST = PILL_RECIPES.small_qi_pill.requiredResources;
 
 export const ACTIONS: Record<string, Action> = {
   kuzuo: {
@@ -120,6 +123,7 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 20,
     riskProbability: 0,
     conditions: {
+      forbiddenFlags: ['root_known'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
@@ -133,6 +137,45 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['root_known'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  study_qi_formula: {
+    id: 'study_qi_formula',
+    name: '辨小丹方',
+    cost: { essence: 10, herbs: 2, insight: 2 },
+    output: {},
+    cooldown: 15,
+    riskProbability: 0,
+    conditions: {
+      forbiddenFlags: ['known_recipe_small_qi_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  brew_qi_pill: {
+    id: 'brew_qi_pill',
+    name: '炼小聚气丸',
+    cost: SMALL_QI_PILL_COST,
+    output: {},
+    cooldown: 30,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['known_recipe_small_qi_pill'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  take_qi_pill: {
+    id: 'take_qi_pill',
+    name: '服小聚气丸',
+    cost: { qiPills: 1 },
+    output: {},
+    cooldown: 5,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['has_qi_pill'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },

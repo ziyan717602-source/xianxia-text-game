@@ -155,5 +155,63 @@ export const UNLOCKS: UnlockRule[] = [
       }
       return state;
     }
+  },
+  {
+    id: 'unlock_study_qi_formula',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      (state.choices.qualities['action_bianyao_count'] || 0) >= 2 &&
+      !state.choices.flags['known_recipe_small_qi_pill'],
+    effect: (state) => {
+      if (!state.unlockedActions.includes('study_qi_formula')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'study_qi_formula'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, 'unlocked_study_qi_formula': true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_brew_qi_pill',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['known_recipe_small_qi_pill']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('brew_qi_pill')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'brew_qi_pill'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, 'unlocked_brew_qi_pill': true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_take_qi_pill',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.resources.qiPills > 0,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('take_qi_pill')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'take_qi_pill'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, 'unlocked_take_qi_pill': true, has_qi_pill: true }
+          }
+        };
+      }
+      return state;
+    }
   }
 ];

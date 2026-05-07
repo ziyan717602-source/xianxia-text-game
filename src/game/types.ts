@@ -42,8 +42,10 @@ export interface Resources {
   qi: number;        // 气 (修为/灵气)
   essence: number;   // 精元
   herbs: number;     // 药
+  qiPills: number;   // 小聚气丸
   coins: number;     // 钱 (银两)
   insight: number; // 见闻
+  dantoxin: number;  // 丹毒
   lifespan: number;  // 寿元 (剩余可用时间/tick)
   wounds: number;    // 伤
 }
@@ -120,6 +122,15 @@ export interface CultivationState {
 }
 
 /**
+ * 炼丹账本
+ */
+export interface AlchemyState {
+  knownRecipeIds: string[];
+  brewedRecipeCounts: Record<string, number>;
+  consumedPillCounts: Record<string, number>;
+}
+
+/**
  * 行动定义 (静态配置)
  */
 export interface Action {
@@ -132,6 +143,7 @@ export interface Action {
   conditions: {
     minResources?: Partial<Resources>;
     requiredFlags?: string[];
+    forbiddenFlags?: string[];
     requiredLocation?: string;
     requiredRealm?: Realm;
   };
@@ -173,6 +185,7 @@ export interface GameState {
   choices: ChoiceState;
   world: WorldState;
   cultivation: CultivationState;
+  alchemy: AlchemyState;
   activeEventId: string | null;
   seed: number;
 }
