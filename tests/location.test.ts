@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../src/game/state';
 import { moveToLocation, getAvailableActionsAtLocation } from '../src/game/location';
+import { Realm } from '../src/game/types';
 
 describe('Location System', () => {
   it('should move to a new location if essence is sufficient', () => {
@@ -54,5 +55,24 @@ describe('Location System', () => {
     const state = createInitialState();
 
     expect(getAvailableActionsAtLocation(state)).toEqual(['kuzuo']);
+  });
+
+  it('should hide actions whose flags or realm conditions are not met', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'home';
+    state.unlockedActions = ['yinqi'];
+
+    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+
+    state.resources.qi = 15;
+    state.resources.insight = 3;
+    state.choices.flags.completed_rike_tuna = true;
+
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
+
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+
+    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
   });
 });

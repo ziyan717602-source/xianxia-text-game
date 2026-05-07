@@ -1,4 +1,5 @@
 import { GameState } from './types';
+import { ACTIONS } from '../content/actions';
 import { LOCATIONS } from '../content/locations';
 
 export interface MoveResult {
@@ -43,5 +44,24 @@ export function getAvailableActionsAtLocation(state: GameState): string[] {
   const loc = LOCATIONS[state.currentLocationId];
   if (!loc) return [];
 
-  return loc.availableActions.filter(actionId => state.unlockedActions.includes(actionId));
+  return loc.availableActions.filter((actionId) => {
+    if (!state.unlockedActions.includes(actionId)) return false;
+
+    const action = ACTIONS[actionId];
+    if (!action) return false;
+
+    if (action.conditions.requiredLocation && action.conditions.requiredLocation !== state.currentLocationId) {
+      return false;
+    }
+
+    if (action.conditions.requiredRealm && action.conditions.requiredRealm !== state.realm) {
+      return false;
+    }
+
+    if (action.conditions.requiredFlags?.some((flag) => !state.choices.flags[flag])) {
+      return false;
+    }
+
+    return true;
+  });
 }

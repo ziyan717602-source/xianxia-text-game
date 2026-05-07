@@ -33,6 +33,18 @@ describe('World ledger', () => {
     expect(state.world.recentActions).toEqual({});
   });
 
+  it('should include an action that crosses the summary boundary', () => {
+    let state = createInitialState();
+    state.time.tick = 95;
+    state.world.lastSummaryTick = 0;
+
+    state = performAction(state, 'kuzuo').state;
+
+    expect(state.time.tick).toBe(100);
+    expect(state.world.logs.some((log) => log.includes('近十日') && log.includes('枯坐1次'))).toBe(true);
+    expect(state.world.recentActions).toEqual({});
+  });
+
   it('should append solar term logs when time crosses a term boundary', () => {
     let state = createInitialState();
 

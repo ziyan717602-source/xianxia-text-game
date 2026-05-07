@@ -58,6 +58,7 @@ describe('Opening flow', () => {
 
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
+    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
   });
 
   it('should reach qi condensation through daily practice without manual resource injection', () => {
@@ -106,6 +107,7 @@ describe('Opening flow', () => {
 
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
+    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
     expect(state.choices.qualities.action_tuna_count).toBe(10);
     expect(state.choices.qualities.action_rike_tuna_count).toBe(1);
     expect(actionCount).toBeLessThanOrEqual(20);

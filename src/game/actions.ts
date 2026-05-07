@@ -88,12 +88,11 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   for (const key of RESOURCE_KEYS) {
     newState.resources[key] -= action.cost[key] ?? 0;
   }
-  Object.assign(newState, spendTicks(newState, action.cooldown));
-
   // Risk check
   const rand = random ? random() : Math.random();
   if (rand < action.riskProbability) {
     // Basic risk consequence for now: action fails, maybe essence lost
+    newState = spendTicks(newState, action.cooldown);
     return { 
       state: newState, 
       log: `进行${action.name}时遭遇意外，未能获得收益。`, 
@@ -138,6 +137,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     }
   };
   newState = recordActionInWorld(newState, actionId);
+  newState = spendTicks(newState, action.cooldown);
 
   return {
     state: newState,

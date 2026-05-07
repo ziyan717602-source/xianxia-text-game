@@ -149,14 +149,14 @@ export function App() {
           <h2>仙途记录</h2>
           <div className="summary-block" aria-label="近日摘要">
             <h3>近日摘要</h3>
-            {recentSummary.map((line) => (
-              <p key={line}>{line}</p>
+            {recentSummary.map((line, index) => (
+              <p key={`${index}-${line}`}>{line}</p>
             ))}
           </div>
           <div className="world-block" aria-label="世界日志">
             <h3>世界日志</h3>
-            {worldLogs.map((log) => (
-              <p key={log}>{log}</p>
+            {worldLogs.map((log, index) => (
+              <p key={`${index}-${log}`}>{log}</p>
             ))}
           </div>
           <div className="log-scroll" aria-live="polite">
