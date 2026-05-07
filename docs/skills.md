@@ -37,6 +37,8 @@ Codex 需要重启后才能在技能列表里自动出现新安装的全局 skil
 
 2026-05-07 补充：后续实现任务应优先检查 `docs/project-status.md`、`PLAN.md` 和 `docs/reviews/2026-05-07-current-project-review.md`，避免重复实现阶段 1A 已完成内容。
 
+2026-05-07 补充：根据“地图而非手册”的 AGENTS.md 维护方式，项目 skill 已收敛为薄入口：触发后读取 `AGENTS.md`、状态/计划/设计文档和相关内容库，不再复制整套产品原则，避免多份规则漂移。
+
 ## 第三方 skill 策略
 
 - 只安装来源明确、内容可审计、与当前任务直接相关的 skills。
