@@ -1,85 +1,138 @@
 import React from 'react';
-import { useGameLoop } from './useGameLoop';
-import { ACTIONS } from '../game/actions';
+import { ACTIONS } from '../content/actions';
 import { EVENTS } from '../content/events';
+import { LOCATIONS } from '../content/locations';
+import { getAvailableActionsAtLocation } from '../game/location';
+import { getVisibleResourceIds, RESOURCE_LABELS, ResourceId } from '../game/resources';
+import { DAYS_PER_YEAR, TICKS_PER_DAY } from '../game/state';
+import { Realm, Season } from '../game/types';
+import { useGameLoop } from './useGameLoop';
+
+const SEASON_LABELS: Record<Season, string> = {
+  [Season.Spring]: '春',
+  [Season.Summer]: '夏',
+  [Season.Autumn]: '秋',
+  [Season.Winter]: '冬',
+};
+
+const REALM_LABELS: Record<Realm, string> = {
+  [Realm.Mortal]: '凡人',
+  [Realm.QiCondensation]: '炼气',
+  [Realm.FoundationEstablishment]: '筑基',
+  [Realm.GoldenCore]: '金丹',
+  [Realm.NascentSoul]: '元婴',
+};
+
+function formatResourceValue(resourceId: ResourceId, value: number) {
+  if (resourceId === 'lifespan') {
+    return `${Math.floor(value / (DAYS_PER_YEAR * TICKS_PER_DAY))} 年`;
+  }
+  return Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
+}
+
+function formatRealm(state: { realm: Realm; realmLayer: number }) {
+  if (state.realm === Realm.QiCondensation && state.realmLayer > 0) {
+    return `${REALM_LABELS[state.realm]}${state.realmLayer}层`;
+  }
+  return REALM_LABELS[state.realm];
+}
 
 export function App() {
-  const { gameState, logs, doAction, handleEventChoice, saveGame, resetGame } = useGameLoop();
-  const { resources, time, unlockedActions, activeEventId } = gameState;
-
-  const activeEvent = activeEventId ? EVENTS.find(e => e.id === activeEventId) : null;
+  const { gameState, logs, doAction, moveLocation, handleEventChoice, saveGame, resetGame } = useGameLoop();
+  const { activeEventId, resources, time } = gameState;
+  const activeEvent = activeEventId ? EVENTS.find((event) => event.id === activeEventId) : null;
+  const currentLocation = LOCATIONS[gameState.currentLocationId];
+  const visibleResourceIds = getVisibleResourceIds(gameState);
+  const availableActionIds = getAvailableActionsAtLocation(gameState);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'monospace', maxWidth: '800px', margin: '0 auto', color: '#333', backgroundColor: '#fafafa', minHeight: '100vh', position: 'relative' }}>
-      
-      {/* 活跃事件弹窗 */}
+    <div className="app-shell">
       {activeEvent && (
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10
-        }}>
-          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', maxWidth: '500px', width: '100%' }}>
-            <h2>机缘/变故</h2>
-            <p>{typeof activeEvent.text === 'function' ? activeEvent.text(gameState) : activeEvent.text}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-              {activeEvent.choices.map((choice, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => handleEventChoice(idx)}
-                  style={{ padding: '10px', cursor: 'pointer' }}
+        <div className="event-backdrop" role="presentation">
+          <section className="event-dialog" role="dialog" aria-modal="true" aria-labelledby="event-title">
+            <p className="eyebrow" id="event-title">机缘 / 变故</p>
+            <p className="event-text">
+              {typeof activeEvent.text === 'function' ? activeEvent.text(gameState) : activeEvent.text}
+            </p>
+            <div className="event-actions">
+              {activeEvent.choices.map((choice, index) => (
+                <button
+                  className="choice-button"
+                  key={`${activeEvent.id}-${choice.text}`}
+                  onClick={() => handleEventChoice(index)}
                 >
                   {choice.text}
                 </button>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       )}
 
-      <header style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header className="topbar">
         <div>
-          <h1 style={{ margin: 0 }}>文字修仙 (测试版)</h1>
-          <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: '#666' }}>
-            Tick: {time.tick} | 境界: {gameState.realm}
+          <h1>文字修仙</h1>
+          <p className="subtitle">
+            第 {time.year} 年 {SEASON_LABELS[time.season]} 第 {time.day} 日
+            <span aria-hidden="true"> / </span>
+            {formatRealm(gameState)}
           </p>
         </div>
-        <div>
-          <button onClick={saveGame} style={{ padding: '4px 8px', marginRight: '10px', cursor: 'pointer' }}>保存进度</button>
-          <button onClick={() => { if(window.confirm('重置将丢失所有进度，确认？')) resetGame(); }} style={{ padding: '4px 8px', cursor: 'pointer', color: 'red' }}>重置游戏</button>
+        <div className="save-actions">
+          <button className="quiet-button" onClick={saveGame}>保存</button>
+          <button
+            className="danger-button"
+            onClick={() => {
+              if (window.confirm('重置将丢失所有进度，确认？')) resetGame();
+            }}
+          >
+            重置
+          </button>
         </div>
       </header>
 
-      <div style={{ display: 'flex', gap: '20px' }}>
-        {/* 左侧：资源与状态 */}
-        <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px' }}>
-          <h3>状态</h3>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            <li>精元: {resources.essence.toFixed(0)}</li>
-            <li>真气: {resources.qi.toFixed(0)}</li>
-            <li>寿元: {Math.floor(resources.lifespan / (360 * 10))} 年 (剩余 tick: {resources.lifespan})</li>
-            <li>草药: {resources.herbs}</li>
-            <li>钱币: {resources.coins}</li>
-            <li>神识: {resources.insight}</li>
-            <li>伤势: {resources.wounds}</li>
-          </ul>
-        </div>
+      <main className="game-grid">
+        <section className="panel">
+          <h2>状态</h2>
+          <dl className="resource-list">
+            {visibleResourceIds.map((resourceId) => (
+              <React.Fragment key={resourceId}>
+                <dt>{RESOURCE_LABELS[resourceId]}</dt>
+                <dd>{formatResourceValue(resourceId, resources[resourceId])}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
+        </section>
 
-        {/* 中间：行动 */}
-        <div style={{ flex: 1, borderRight: '1px solid #eee', paddingRight: '20px' }}>
-          <h3>行动</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {unlockedActions.length === 0 ? (
-              <p style={{ color: '#999' }}>暂时无事可做，等待机缘...</p>
+        <section className="panel action-panel">
+          <h2>行动</h2>
+          <p className="location-line">所在：{currentLocation?.name ?? '未知'}</p>
+          <div className="location-strip" aria-label="地点">
+            {Object.values(LOCATIONS).map((location) => (
+              <button
+                className="location-button"
+                key={location.id}
+                onClick={() => moveLocation(location.id)}
+                disabled={!!activeEventId || location.id === gameState.currentLocationId}
+              >
+                {location.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="action-list">
+            {availableActionIds.length === 0 ? (
+              <p className="muted">此地暂时无事可做。</p>
             ) : (
-              unlockedActions.map((actionId) => {
+              availableActionIds.map((actionId) => {
                 const action = ACTIONS[actionId];
                 if (!action) return null;
                 return (
-                  <button 
-                    key={actionId} 
+                  <button
+                    className="action-button"
+                    key={actionId}
                     onClick={() => doAction(actionId)}
                     disabled={!!activeEventId}
-                    style={{ padding: '8px 16px', cursor: 'pointer', background: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
                   >
                     {action.name}
                   </button>
@@ -87,18 +140,17 @@ export function App() {
               })
             )}
           </div>
-        </div>
+        </section>
 
-        {/* 右侧：日志 */}
-        <div style={{ flex: 1.5 }}>
-          <h3>仙途记录</h3>
-          <div style={{ background: '#000', color: '#0f0', padding: '10px', height: '300px', overflowY: 'auto', borderRadius: '4px', fontSize: '12px' }}>
-            {logs.map((log, i) => (
-              <div key={i} style={{ marginBottom: '5px' }}>&gt; {log}</div>
+        <section className="panel log-panel">
+          <h2>仙途记录</h2>
+          <div className="log-scroll" aria-live="polite">
+            {logs.map((log, index) => (
+              <p key={`${index}-${log}`}>{log}</p>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

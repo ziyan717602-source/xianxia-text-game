@@ -1,5 +1,6 @@
 import { GameState } from './types';
 import { EVENTS, ActiveEvent } from '../content/events';
+import { LOCATIONS } from '../content/locations';
 
 /**
  * 根据权重从事件池中抽取一个事件
@@ -16,8 +17,10 @@ export function rollEvent(state: GameState, random: () => number = Math.random):
 
   // Calculate total weight
   let totalWeight = 0;
+  const location = LOCATIONS[state.currentLocationId];
   const weightedEvents = possibleEvents.map(event => {
-    const w = event.weight(state);
+    const locationModifier = location?.eventWeights[event.id] ?? 1;
+    const w = event.weight(state) * locationModifier;
     totalWeight += w;
     return { event, weight: w };
   });

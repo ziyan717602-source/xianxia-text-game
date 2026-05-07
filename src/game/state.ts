@@ -1,4 +1,4 @@
-import { GameState, Realm, SpiritualRoot, Season } from './types';
+import { GameState, GameTime, Realm, SpiritualRoot, Season } from './types';
 
 export const INITIAL_MAX_STAMINA = 100;
 export const INITIAL_LIFESPAN = 100 * 360 * 10; // Assume 1 tick is a fraction of a day, or roughly 10 ticks per day. Let's say lifespan is abstract ticks.
@@ -7,7 +7,23 @@ export const INITIAL_LIFESPAN = 100 * 360 * 10; // Assume 1 tick is a fraction o
 // 60 years of mortal life = 216,000 ticks.
 export const TICKS_PER_DAY = 10;
 export const DAYS_PER_YEAR = 360;
+export const DAYS_PER_SEASON = DAYS_PER_YEAR / 4;
 export const MORTAL_LIFESPAN_YEARS = 60;
+
+const SEASONS = [Season.Spring, Season.Summer, Season.Autumn, Season.Winter];
+
+export function deriveGameTime(tick: number): GameTime {
+  const elapsedDays = Math.floor(tick / TICKS_PER_DAY);
+  const dayOfYear = (elapsedDays % DAYS_PER_YEAR) + 1;
+  const seasonIndex = Math.min(SEASONS.length - 1, Math.floor((dayOfYear - 1) / DAYS_PER_SEASON));
+
+  return {
+    tick,
+    year: Math.floor(elapsedDays / DAYS_PER_YEAR) + 1,
+    season: SEASONS[seasonIndex],
+    day: dayOfYear,
+  };
+}
 
 export function createInitialState(seed?: number): GameState {
   return {
@@ -21,13 +37,9 @@ export function createInitialState(seed?: number): GameState {
       wounds: 0,
     },
     realm: Realm.Mortal,
+    realmLayer: 0,
     spiritualRoot: SpiritualRoot.Mortal,
-    time: {
-      tick: 0,
-      year: 1,
-      season: Season.Spring,
-      day: 1,
-    },
+    time: deriveGameTime(0),
     currentLocationId: 'home', // '居处'
     unlockedActions: ['kuzuo'], // Basic actions to start the game
     relationships: {},

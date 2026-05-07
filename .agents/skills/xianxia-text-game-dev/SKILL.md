@@ -40,7 +40,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Random systems should accept a seed or random provider for testing.
 - UI should render current state from game state; avoid storing authoritative state only in UI components.
 - Default to Vite + TypeScript + React for the browser shell, but keep `src/game` framework-independent.
-- The current repository has completed the phase 1A skeleton. Before implementing new features, check `docs/reviews/2026-05-07-current-project-review.md` so you do not duplicate work and so you address known consistency gaps first.
+- The current repository has completed phase 1B consistency cleanup. Before implementing new features, check `docs/project-status.md` and `PLAN.md`; use `docs/reviews/2026-05-07-current-project-review.md` as historical context for why the cleanup exists.
 
 ## Testing Checklist
 
@@ -49,6 +49,7 @@ Use this workflow for this repository's original cultivation-themed text increme
 - Save/load survives refresh and future version migration.
 - Breakthrough and risk systems have tests for success, failure, and edge thresholds.
 - Browser smoke test covers first-run start, several actions, save refresh, and reset.
+- Basic browser smoke is available through `npm run smoke`; extend it when UI flows grow.
 - World/event tests cover seeded event generation, route weighting, missed-event expiry, and automation unlock thresholds.
 
 ## Documentation

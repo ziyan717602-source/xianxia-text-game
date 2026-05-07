@@ -21,7 +21,7 @@ export function moveToLocation(state: GameState, locationId: string): MoveResult
   // For simplicity, let's say moving takes 5 essence.
   const costStamina = 5;
   if (state.resources.essence < costStamina) {
-    return { state, log: '体力不足，无法赶路。', success: false };
+    return { state, log: '精元不足，无法赶路。', success: false };
   }
 
   const newState = { ...state };

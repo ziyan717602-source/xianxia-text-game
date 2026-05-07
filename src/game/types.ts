@@ -40,7 +40,7 @@ export enum Season {
  */
 export interface Resources {
   qi: number;        // 气 (修为/灵气)
-  essence: number;   // 体力
+  essence: number;   // 精元
   herbs: number;     // 药
   coins: number;     // 钱 (银两)
   insight: number; // 见闻
@@ -142,6 +142,7 @@ export interface GameEvent {
 export interface GameState {
   resources: Resources;
   realm: Realm;
+  realmLayer: number;
   spiritualRoot: SpiritualRoot;
   time: GameTime;
   currentLocationId: string;

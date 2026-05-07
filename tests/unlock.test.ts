@@ -10,6 +10,7 @@ describe('Unlock System', () => {
 
     const nextState = checkUnlocks(state);
     expect(nextState.unlockedActions).toContain('tuna');
+    expect(nextState.unlockedActions).toContain('tiaoxi');
     expect(nextState.choices.flags['unlocked_tuna']).toBe(true);
   });
 
@@ -35,5 +36,26 @@ describe('Unlock System', () => {
     
     state = checkUnlocks(state);
     expect(state.choices.flags['unlocked_rike_tuna']).toBe(true);
+    expect(state.unlockedActions).toContain('rike_tuna');
+  });
+
+  it('should unlock yinqi when qi and insight are sufficient', () => {
+    let state = createInitialState();
+    state.resources.qi = 10;
+    state.resources.insight = 3;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('yinqi');
+    expect(state.choices.flags['unlocked_yinqi']).toBe(true);
+  });
+
+  it('should unlock mountain actions after the jade slip is found', () => {
+    let state = createInitialState();
+    state.choices.flags.found_jade_slip = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('caiyao');
+    expect(state.unlockedActions).toContain('xunshan');
+    expect(state.choices.flags.unlocked_mountain_actions).toBe(true);
   });
 });

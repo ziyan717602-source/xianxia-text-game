@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { createInitialState, INITIAL_MAX_STAMINA } from '../src/game/state';
+import { createInitialState, INITIAL_MAX_STAMINA, TICKS_PER_DAY, DAYS_PER_YEAR, DAYS_PER_SEASON } from '../src/game/state';
 import { processTick, TICK_INTERVAL_MS } from '../src/game/tick';
 import { performAction } from '../src/game/actions';
+import { Realm, Season } from '../src/game/types';
 
 describe('Tick Engine', () => {
   it('should decrease lifespan and increase tick over time', () => {
@@ -35,6 +36,25 @@ describe('Tick Engine', () => {
     expect(state.time.tick).toBe(10);
     expect(state.resources.essence).toBe(60);
   });
+
+  it('should advance day, season, and year from total ticks', () => {
+    let state = createInitialState();
+
+    state = processTick(state, TICK_INTERVAL_MS * TICKS_PER_DAY);
+    expect(state.time.day).toBe(2);
+    expect(state.time.season).toBe(Season.Spring);
+
+    state = createInitialState();
+    state = processTick(state, TICK_INTERVAL_MS * TICKS_PER_DAY * DAYS_PER_SEASON);
+    expect(state.time.day).toBe(DAYS_PER_SEASON + 1);
+    expect(state.time.season).toBe(Season.Summer);
+
+    state = createInitialState();
+    state = processTick(state, TICK_INTERVAL_MS * TICKS_PER_DAY * DAYS_PER_YEAR);
+    expect(state.time.year).toBe(2);
+    expect(state.time.day).toBe(1);
+    expect(state.time.season).toBe(Season.Spring);
+  });
 });
 
 describe('Action System', () => {
@@ -56,7 +76,7 @@ describe('Action System', () => {
     expect(result.success).toBe(false);
     expect(result.state.resources.essence).toBe(5);
     expect(result.state.resources.qi).toBe(0);
-    expect(result.log).toContain('体力不足');
+    expect(result.log).toContain('精元不足');
   });
 
   it('should handle action risk via injected random', () => {
@@ -75,5 +95,45 @@ describe('Action System', () => {
     // no herbs gained
     expect(failResult.state.resources.herbs).toBe(0);
     expect(failResult.log).toContain('遭遇意外');
+  });
+
+  it('should perform "bianyao" by consuming herbs for insight', () => {
+    const state = createInitialState();
+    state.resources.herbs = 5;
+
+    const result = performAction(state, 'bianyao');
+    expect(result.success).toBe(true);
+    expect(result.state.resources.herbs).toBe(4);
+    expect(result.state.resources.insight).toBe(1);
+  });
+
+  it('should enter qi condensation layer one through yinqi', () => {
+    const state = createInitialState();
+    state.resources.qi = 10;
+    state.resources.insight = 3;
+    state.resources.essence = 100;
+
+    const result = performAction(state, 'yinqi');
+    expect(result.success).toBe(true);
+    expect(result.state.realm).toBe(Realm.QiCondensation);
+    expect(result.state.realmLayer).toBe(1);
+    expect(result.state.resources.qi).toBe(0);
+    expect(result.state.resources.insight).toBe(0);
+    expect(result.log).toContain('炼气一层');
+  });
+
+  it('should perform rike_tuna as a batch breath work routine', () => {
+    const state = createInitialState();
+    state.resources.essence = 100;
+    const initialLifespan = state.resources.lifespan;
+
+    const result = performAction(state, 'rike_tuna');
+
+    expect(result.success).toBe(true);
+    expect(result.state.resources.essence).toBe(40);
+    expect(result.state.resources.qi).toBe(6);
+    expect(result.state.time.tick).toBe(50);
+    expect(result.state.resources.lifespan).toBe(initialLifespan - 50);
+    expect(result.log).toContain('日课');
   });
 });

@@ -45,4 +45,40 @@ describe('Event System', () => {
     const event = rollEvent(state, () => 0.5);
     expect(event?.id).toBe('wounded_cultivator');
   });
+
+  it('should apply location event weight modifiers', () => {
+    const state = createInitialState();
+    state.currentLocationId = 'mountain_path';
+    state.choices.flags['found_jade_slip'] = true;
+
+    const event = rollEvent(state, () => 0.99);
+    expect(event?.id).toBe('wounded_cultivator');
+  });
+
+  it('should record a relationship when helping the wounded cultivator', () => {
+    const state = createInitialState();
+    state.resources.herbs = 5;
+
+    const event = EVENTS.find(e => e.id === 'wounded_cultivator');
+    const result = event!.choices[0].effect(state);
+    const relationship = result.state.relationships['wounded_cultivator'];
+
+    expect(relationship).toBeDefined();
+    expect(relationship.favors).toBe(1);
+    expect(relationship.grudges).toBe(0);
+    expect(relationship.tags).toContain('欠人情');
+    expect(relationship.state).toBe('Departed');
+  });
+
+  it('should record a grudge when robbing the wounded cultivator', () => {
+    const state = createInitialState();
+
+    const event = EVENTS.find(e => e.id === 'wounded_cultivator');
+    const result = event!.choices[2].effect(state);
+    const relationship = result.state.relationships['wounded_cultivator'];
+
+    expect(result.state.resources.coins).toBe(20);
+    expect(relationship.grudges).toBe(2);
+    expect(relationship.tags).toContain('被你搜掠');
+  });
 });

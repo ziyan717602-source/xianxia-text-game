@@ -30,6 +30,15 @@ npm --version
 
 2026-05-07 验证：在当前 Codex shell 中直接执行 `npm` 会提示命令不存在；将 `C:\Program Files\nodejs` 前置到 PATH 后，`npm test` 与 `npm run build` 均可通过。
 
+浏览器烟测：
+
+```powershell
+$env:Path = 'C:\Program Files\nodejs;' + $env:Path
+npm run smoke
+```
+
+该脚本会启动 Vite，并通过本机 Edge 的 Chrome DevTools Protocol 做基础首屏和点击验证。
+
 ## 后续建议
 
 - Web 原型可使用 Vite/TypeScript 工具链。

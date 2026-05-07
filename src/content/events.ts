@@ -1,4 +1,39 @@
 import { GameState, GameEvent } from '../game/types';
+import { addRelationship, updateRelationship } from '../game/relationships';
+import { LOCATIONS } from './locations';
+
+const WOUNDED_CULTIVATOR_ID = 'wounded_cultivator';
+
+function recordWoundedCultivator(
+  state: GameState,
+  changes: {
+    tags: string[];
+    debts?: number;
+    favors?: number;
+    grudges?: number;
+  }
+): GameState {
+  const baseState = addRelationship(state, {
+    id: WOUNDED_CULTIVATOR_ID,
+    identity: '受伤散修',
+    tags: [],
+    lastInteractionTick: state.time.tick,
+    debts: 0,
+    favors: 0,
+    grudges: 0,
+    state: 'Alive',
+  });
+  const existing = baseState.relationships[WOUNDED_CULTIVATOR_ID];
+
+  return updateRelationship(baseState, WOUNDED_CULTIVATOR_ID, {
+    tags: Array.from(new Set([...existing.tags, ...changes.tags])),
+    lastInteractionTick: state.time.tick,
+    debts: changes.debts ?? existing.debts,
+    favors: changes.favors ?? existing.favors,
+    grudges: changes.grudges ?? existing.grudges,
+    state: 'Departed',
+  });
+}
 
 /**
  * GameEvent 需要支持更动态的条件和效果，扩展 types.ts 里的静态定义。
@@ -40,19 +75,24 @@ export const EVENTS: ActiveEvent[] = [
     id: 'wounded_cultivator',
     text: '山路两旁药香异常，你闻到一丝血腥味，发现一名受伤的散修倒在草丛中。',
     condition: (state) => state.currentLocationId === 'mountain_path' && !state.choices.flags['met_wounded_cultivator'],
-    weight: () => 20,
+    weight: (state) => 20 + (LOCATIONS[state.currentLocationId]?.danger ?? 0) * 4,
     choices: [
       {
         text: '施以援手 (消耗 5 药)',
         effect: (state) => {
           if (state.resources.herbs < 5) {
-            return { state, log: '你身上没有足够的草药，散修叹息一声，拖着残躯离开了。' };
+            let newState = { ...state };
+            newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true } };
+            newState = recordWoundedCultivator(newState, { tags: ['错过援手'], grudges: 1 });
+            return { state: newState, log: '你身上没有足够的草药。散修看了你一眼，拖着残躯离开。' };
           }
           const newState = { ...state };
           newState.resources = { ...state.resources, herbs: state.resources.herbs - 5 };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true } };
-          // TODO: add relationship
-          return { state: newState, log: '你用草药为其止血。散修深深看了你一眼，留下一句“日后必有厚报”，便匆匆离去。' };
+          return {
+            state: recordWoundedCultivator(newState, { tags: ['受你援手', '欠人情'], favors: 1 }),
+            log: '你用草药为其止血。散修记下你的住处，随后离去。'
+          };
         }
       },
       {
@@ -60,7 +100,10 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state) => {
           const newState = { ...state };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true } };
-          return { state: newState, log: '你选择冷眼旁观。散修最终自行离去，眼神中带着警惕。' };
+          return {
+            state: recordWoundedCultivator(newState, { tags: ['旁观'], grudges: 1 }),
+            log: '你站在路旁。散修最终自行离去，眼神平静。'
+          };
         }
       },
       {
@@ -69,7 +112,10 @@ export const EVENTS: ActiveEvent[] = [
           const newState = { ...state };
           newState.resources = { ...state.resources, coins: state.resources.coins + 20 };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true, 'robbed_cultivator': true } };
-          return { state: newState, log: '你趁人之危，搜刮了散修的钱袋。这笔因果算是结下了。' };
+          return {
+            state: recordWoundedCultivator(newState, { tags: ['被你搜掠'], grudges: 2 }),
+            log: '你取走了散修的钱袋。这笔因果记在山路上。'
+          };
         }
       }
     ]

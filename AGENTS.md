@@ -32,8 +32,8 @@
 
 ## 当前实现状态
 
-- 阶段 1A 原型骨架已完成：Vite/React/TypeScript、核心 `src/game` 逻辑、事件弹窗、localStorage 存档、Vitest 测试已存在。
-- 当前优先级是阶段 1B 一致性清洗，详见 `PLAN.md` 和 `docs/reviews/2026-05-07-current-project-review.md`。
+- 阶段 1B 一致性清洗已完成：地点行动过滤、资源渐进揭示、日历推进、关系事件接入、浏览器烟测已存在。
+- 当前优先级是阶段 1C 第一阶段可玩链路，详见 `PLAN.md` 和 `docs/project-status.md`。
 - 每次切换开发机后先运行 `npm ci`；当前工作机如遇 WindowsApps `node.exe` 权限问题，先将 `C:\Program Files\nodejs` 前置到 PATH。
 
 ## 开发流程
@@ -51,7 +51,7 @@
 - UI 行动列表必须通过地点可用行动和解锁状态共同过滤，不能只读 `unlockedActions`。
 - UI 资源面板必须遵循渐进揭示，不能开局展示所有资源。
 - tick 离线结算不能长期依赖逐 tick while 循环，涉及离线收益时要做批量结算。
-- UI 改动要做至少一次浏览器烟测；复杂交互使用 Playwright 或 Codex in-app browser。
+- UI 改动要做至少一次浏览器烟测；当前可运行 `npm run smoke` 做基础 Edge/CDP 烟测，复杂交互再使用 Playwright 或 Codex in-app browser。
 - 数值变更要说明目的：延长节奏、减少等待、提高决策密度、降低惩罚等。
 - 不引入大框架或复杂服务端，除非它能明显降低长期维护成本。
 - 禁止把 API key、私有 token、登录态、个人路径写进仓库。

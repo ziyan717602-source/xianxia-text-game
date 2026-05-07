@@ -41,7 +41,6 @@ describe('Location System', () => {
     state.currentLocationId = 'home';
     state.unlockedActions = ['tuna']; // Only tuna is unlocked
 
-    // home has ['tuna', 'guanxiang', 'tiaoxi']
     const actions = getAvailableActionsAtLocation(state);
     expect(actions).toEqual(['tuna']);
 
@@ -49,5 +48,11 @@ describe('Location System', () => {
     state.unlockedActions = ['tuna', 'tiaoxi'];
     const actions2 = getAvailableActionsAtLocation(state);
     expect(actions2).toEqual(['tuna', 'tiaoxi']);
+  });
+
+  it('should expose the initial action at home', () => {
+    const state = createInitialState();
+
+    expect(getAvailableActionsAtLocation(state)).toEqual(['kuzuo']);
   });
 });

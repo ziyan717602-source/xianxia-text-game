@@ -1,7 +1,7 @@
-import { GameState, SaveData } from '../game/types';
+import { GameState, Realm, SaveData } from '../game/types';
 import { createInitialState } from '../game/state';
 
-export const CURRENT_SAVE_VERSION = 1;
+export const CURRENT_SAVE_VERSION = 2;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -24,11 +24,13 @@ export function migrateSaveData(data: any): SaveData {
     }
   }
 
-  // Future migrations:
-  // if (migratedData.version === 1) {
-  //   migratedData.state.newFeature = {};
-  //   migratedData.version = 2;
-  // }
+  if (migratedData.version === 1) {
+    migratedData.state = {
+      ...migratedData.state,
+      realmLayer: migratedData.state.realm === Realm.QiCondensation ? 1 : 0,
+    };
+    migratedData.version = 2;
+  }
 
   return migratedData as SaveData;
 }

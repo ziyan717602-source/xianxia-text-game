@@ -4,6 +4,7 @@ import { createInitialState } from '../game/state';
 import { processTick, TICK_INTERVAL_MS } from '../game/tick';
 import { checkUnlocks } from '../game/unlock';
 import { performAction } from '../game/actions';
+import { moveToLocation } from '../game/location';
 import { serializeSave, deserializeSave } from '../storage/save';
 import { rollEvent } from '../game/events';
 import { EVENTS } from '../content/events';
@@ -21,7 +22,7 @@ function loadInitialState(): GameState {
 
 export function useGameLoop() {
   const [gameState, setGameState] = useState<GameState>(() => loadInitialState());
-  const [logs, setLogs] = useState<string[]>(['你降生于世，凡人庸庸碌碌，而你心向长生。']);
+  const [logs, setLogs] = useState<string[]>(['某年春，你在檐下枯坐。']);
 
   const addLog = useCallback((msg: string) => {
     if (msg) {
@@ -42,7 +43,7 @@ export function useGameLoop() {
   const resetGame = useCallback(() => {
     localStorage.removeItem(SAVE_KEY);
     setGameState(createInitialState());
-    setLogs(['前尘往事如烟消散，你重新降生于世。']);
+    setLogs(['旧档已去。某年春，你在檐下枯坐。']);
   }, []);
 
   // Auto-save loop
@@ -112,10 +113,21 @@ export function useGameLoop() {
     });
   }, [addLog]);
 
+  const moveLocation = useCallback((locationId: string) => {
+    setGameState((prev) => {
+      if (prev.activeEventId) return prev;
+
+      const result = moveToLocation(prev, locationId);
+      addLog(result.log);
+      return result.state;
+    });
+  }, [addLog]);
+
   return {
     gameState,
     logs,
     doAction,
+    moveLocation,
     handleEventChoice,
     saveGame,
     resetGame,

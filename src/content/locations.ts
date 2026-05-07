@@ -4,9 +4,9 @@ export const LOCATIONS: Record<string, Location> = {
   'home': {
     id: 'home',
     name: '居处',
-    availableActions: ['tuna', 'guanxiang', 'tiaoxi'],
+    availableActions: ['kuzuo', 'tuna', 'tiaoxi', 'bianyao', 'yinqi', 'rike_tuna'],
     eventWeights: {
-      'safe_event': 10,
+      'find_jade_slip': 1.5,
     },
     qiDensity: 1,
     danger: 0,
@@ -17,8 +17,7 @@ export const LOCATIONS: Record<string, Location> = {
     name: '山路',
     availableActions: ['caiyao', 'xunshan'],
     eventWeights: {
-      'encounter_event': 20,
-      'discovery_event': 10,
+      'wounded_cultivator': 1.4,
     },
     qiDensity: 1.2,
     danger: 2,
@@ -30,8 +29,7 @@ export const LOCATIONS: Record<string, Location> = {
     // We haven't implemented trade/gossip actions yet, but we list them
     availableActions: ['trade', 'gossip'],
     eventWeights: {
-      'rumor_event': 30,
-      'merchant_event': 20,
+      'market_rumor': 1.2,
     },
     qiDensity: 0.8,
     danger: 1,

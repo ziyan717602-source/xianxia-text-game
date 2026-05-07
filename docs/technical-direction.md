@@ -41,14 +41,13 @@ UI 不保存权威状态。所有关键状态都来自 `src/game`。
 - `src/storage/save.ts` localStorage 存档和迁移入口。
 - `src/ui` 主界面和 game loop hook。
 - Vitest 基础测试。
+- Edge/CDP 无依赖浏览器烟测脚本 `npm run smoke`。
 
 当前架构缺口：
 
-- 行动仍硬编码在 `src/game/actions.ts`，后续应迁到 `src/content/actions.ts`。
-- UI 尚未使用地点行动过滤。
-- UI 尚未实现资源渐进揭示。
-- 时间模型尚未推进 day/season/year。
-- 离线 tick 尚未批量结算。
+- 事件仍只保存 `activeEventId`，后续动态 NPC/敌人/地点参数需要 `activeEventContext`。
+- UI 已统一到单份 CSS，但还未拆分 `ResourcePanel`、`ActionPanel`、`LogPanel`、`EventModal`。
+- 离线收益已做基础批量 tick，后续事件抽样、日课、闭关仍需要更细的批量结算规则。
 
 ## 状态模型
 

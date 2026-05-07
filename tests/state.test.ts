@@ -8,6 +8,7 @@ describe('Game State Initialization', () => {
 
     expect(state.seed).toBe(12345);
     expect(state.realm).toBe(Realm.Mortal);
+    expect(state.realmLayer).toBe(0);
     expect(state.spiritualRoot).toBe(SpiritualRoot.Mortal);
     expect(state.currentLocationId).toBe('home');
     

@@ -28,6 +28,21 @@ describe('Save and Migration System', () => {
     const migrated = migrateSaveData(rawState);
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.resources.qi).toBe(10);
+    expect(migrated.state.realmLayer).toBe(0);
     expect(migrated.seed).toBe(123);
+  });
+
+  it('should migrate V1 wrapped saves by adding realmLayer', () => {
+    const state = createInitialState(456);
+    const migrated = migrateSaveData({
+      version: 1,
+      state,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 456,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.realmLayer).toBe(0);
   });
 });
