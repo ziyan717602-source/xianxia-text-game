@@ -24,6 +24,7 @@ export const LOCATIONS: Record<string, Location> = {
       'stabilize_bottleneck',
       'breakthrough_qi_2',
       'breakthrough_qi_3',
+      'breakthrough_foundation',
       'rike_tuna',
       'short_retreat',
     ],
@@ -53,7 +54,7 @@ export const LOCATIONS: Record<string, Location> = {
   'market': {
     id: 'market',
     name: '坊市',
-    availableActions: ['trade', 'gossip'],
+    availableActions: ['trade', 'gossip', 'borrow_foundation_pill'],
     eventWeights: {
       'market_rumor': 1.2,
       'market_price_rise': 1.2,
@@ -66,7 +67,7 @@ export const LOCATIONS: Record<string, Location> = {
   'outer_gate': {
     id: 'outer_gate',
     name: '外门',
-    availableActions: ['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson', 'gossip'],
+    availableActions: ['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson', 'gossip', 'seek_foundation_guardian'],
     eventWeights: {
       'outer_gate_rules': 1.4,
       'outer_gate_register': 1.5,

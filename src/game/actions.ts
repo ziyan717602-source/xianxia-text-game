@@ -44,6 +44,9 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   stabilize_bottleneck: 'quiet_cultivation',
   breakthrough_qi_2: 'quiet_cultivation',
   breakthrough_qi_3: 'quiet_cultivation',
+  breakthrough_foundation: 'quiet_cultivation',
+  seek_foundation_guardian: 'sect_trace',
+  borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
   bianyao: 'alchemy_affinity',
   xunshan: 'combat_edge',
@@ -222,10 +225,56 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     customLog = result.log;
   }
 
-  if (actionId === 'breakthrough_qi_2' || actionId === 'breakthrough_qi_3') {
+  if (actionId === 'breakthrough_qi_2' || actionId === 'breakthrough_qi_3' || actionId === 'breakthrough_foundation') {
     const result = resolveBreakthrough(newState, actionId, random);
     newState = result.state;
     customLog = result.log;
+  }
+
+  if (actionId === 'seek_foundation_guardian') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          foundation_guardian: true,
+          sought_foundation_guardian: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          sect_trace: 'guardian',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          sect_trace: (newState.choices.qualities.sect_trace ?? 0) + 1,
+        },
+      },
+    };
+    customLog = '外门有人应下护法。话不多，价钱记在前头。';
+  }
+
+  if (actionId === 'borrow_foundation_pill') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          borrowed_foundation_aid: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          market_debt: 'foundation_pill',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          market_ties: (newState.choices.qualities.market_ties ?? 0) + 1,
+          reckless_breakthrough: (newState.choices.qualities.reckless_breakthrough ?? 0) + 1,
+        },
+      },
+    };
+    customLog = '坊市有人借你一枚筑基用丹。药气重，账也重。';
   }
 
   if (actionId === 'short_retreat') {

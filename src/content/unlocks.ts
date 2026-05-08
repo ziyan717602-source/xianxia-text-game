@@ -419,7 +419,10 @@ export const UNLOCKS: UnlockRule[] = [
     id: 'unlock_stabilize_bottleneck',
     condition: (state) => {
       const rule = getNextBreakthroughRule(state);
-      return Boolean(rule) && state.resources.qi >= 20 && state.resources.insight >= 3;
+      if (!rule) return false;
+      const minQi = rule.id === 'foundation' ? 70 : 20;
+      const minInsight = rule.id === 'foundation' ? 8 : 3;
+      return state.resources.qi >= minQi && state.resources.insight >= minInsight;
     },
     effect: (state) => {
       if (!state.unlockedActions.includes('stabilize_bottleneck')) {
@@ -429,6 +432,35 @@ export const UNLOCKS: UnlockRule[] = [
           choices: {
             ...state.choices,
             flags: { ...state.choices.flags, unlocked_stabilize_bottleneck: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_foundation_support',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.realmLayer === 3 &&
+      Boolean(state.choices.flags.bottleneck_foundation),
+    effect: (state) => {
+      const supportActions = [
+        ...(state.choices.flags.completed_sect_errand || state.choices.flags.outer_gate_registered
+          ? ['seek_foundation_guardian']
+          : []),
+        ...(state.choices.flags.known_recipe_small_qi_pill || (state.choices.qualities.market_ties || 0) >= 2
+          ? ['borrow_foundation_pill']
+          : []),
+      ].filter((actionId) => !state.unlockedActions.includes(actionId));
+
+      if (supportActions.length > 0) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, ...supportActions],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_foundation_support: true }
           }
         };
       }
@@ -471,6 +503,27 @@ export const UNLOCKS: UnlockRule[] = [
           choices: {
             ...state.choices,
             flags: { ...state.choices.flags, unlocked_breakthrough_qi_3: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_breakthrough_foundation',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.realmLayer === 3 &&
+      Boolean(state.choices.flags.prepared_foundation) &&
+      !state.choices.flags.reached_foundation,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('breakthrough_foundation')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'breakthrough_foundation'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_breakthrough_foundation: true }
           }
         };
       }

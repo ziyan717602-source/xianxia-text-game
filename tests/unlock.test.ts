@@ -198,4 +198,25 @@ describe('Unlock System', () => {
     state = checkUnlocks(state);
     expect(state.unlockedActions).toContain('breakthrough_qi_3');
   });
+
+  it('should unlock foundation support and foundation breakthrough around the third qi layer', () => {
+    let state = createInitialState(20260508);
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 3;
+    state.resources.qi = 80;
+    state.resources.insight = 10;
+    state.choices.flags.bottleneck_foundation = true;
+    state.choices.flags.completed_sect_errand = true;
+    state.choices.qualities.market_ties = 2;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('stabilize_bottleneck');
+    expect(state.unlockedActions).toContain('seek_foundation_guardian');
+    expect(state.unlockedActions).toContain('borrow_foundation_pill');
+
+    state.choices.flags.prepared_foundation = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('breakthrough_foundation');
+    expect(state.choices.flags.unlocked_breakthrough_foundation).toBe(true);
+  });
 });

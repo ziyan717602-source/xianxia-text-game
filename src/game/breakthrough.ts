@@ -80,6 +80,11 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
   const quietBonus = Math.min(0.1, quietCultivation * 0.01);
   const alchemyBonus = state.resources.qiPills > 0 ? Math.min(0.04, alchemyAffinity * 0.008) : 0;
   const guardBonus = state.choices.flags.guarded_breakthrough ? 0.08 : 0;
+  const foundationGuardianBonus = rule.id === 'foundation' && state.choices.flags.foundation_guardian ? 0.1 : 0;
+  const borrowedAidBonus = rule.id === 'foundation' && state.choices.flags.borrowed_foundation_aid ? 0.12 : 0;
+  const sectTraceBonus = rule.id === 'foundation'
+    ? Math.min(0.06, (state.choices.qualities.sect_trace ?? 0) * 0.008)
+    : 0;
   const woundPenalty = Math.min(0.18, state.resources.wounds * 0.06);
   const dantoxinPenalty = state.resources.dantoxin >= 60
     ? 0.22
@@ -91,7 +96,20 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
 
   return Math.max(
     0.2,
-    Math.min(0.92, rule.baseSuccess + preparationBonus + quietBonus + rootBonus + alchemyBonus + guardBonus - woundPenalty - dantoxinPenalty)
+    Math.min(
+      0.92,
+      rule.baseSuccess +
+      preparationBonus +
+      quietBonus +
+      rootBonus +
+      alchemyBonus +
+      guardBonus +
+      foundationGuardianBonus +
+      borrowedAidBonus +
+      sectTraceBonus -
+      woundPenalty -
+      dantoxinPenalty
+    )
   );
 }
 
@@ -115,6 +133,7 @@ export function resolveBreakthrough(
 
   const chance = getBreakthroughSuccessChance(state, rule);
   const roll = random();
+  const isFoundation = rule.id === 'foundation';
   const attempts = (state.breakthrough.attempts[rule.id] ?? 0) + 1;
   const baseBreakthrough = {
     ...state.breakthrough,
@@ -145,6 +164,12 @@ export function resolveBreakthrough(
           [rule.successFlag]: true,
           [`broke_${rule.id}`]: true,
           guarded_breakthrough: false,
+          ...(isFoundation
+            ? {
+                foundation_guardian: false,
+                borrowed_foundation_aid: false,
+              }
+            : {}),
         },
         qualities: {
           ...state.choices.qualities,
@@ -155,7 +180,9 @@ export function resolveBreakthrough(
 
     return {
       state: nextState,
-      log: `夜半，气行至关。你守住一线，入${rule.name}。`,
+      log: isFoundation
+        ? '晨前，气沉入骨。筑基已成，旧日周天不再照旧。'
+        : `夜半，气行至关。你守住一线，入${rule.name}。`,
       outcome: 'success',
     };
   }
@@ -178,26 +205,37 @@ export function resolveBreakthrough(
           [`half_broke_${rule.id}`]: true,
           [`prepared_${rule.id}`]: true,
           guarded_breakthrough: false,
+          ...(isFoundation
+            ? {
+                foundation_guardian: false,
+                borrowed_foundation_aid: false,
+              }
+            : {}),
         },
       },
     };
 
     return {
       state: nextState,
-      log: `气行至关，又退回丹田。${rule.name}未成，关口倒清楚了些。`,
+      log: isFoundation
+        ? '气入骨又退。筑基未成，根基倒比先前清楚。'
+        : `气行至关，又退回丹田。${rule.name}未成，关口倒清楚了些。`,
       outcome: 'partial',
     };
   }
 
   const failures = (state.breakthrough.failures[rule.id] ?? 0) + 1;
-  const rawWoundGain = state.resources.dantoxin >= 30 ? 2 : 1;
+  const rawWoundGain = isFoundation
+    ? state.resources.dantoxin >= 30 ? 3 : 2
+    : state.resources.dantoxin >= 30 ? 2 : 1;
   const woundGain = state.choices.flags.guarded_breakthrough ? Math.max(0, rawWoundGain - 1) : rawWoundGain;
+  const lifespanLoss = isFoundation ? 180 : 20;
   const nextState: GameState = {
     ...state,
     resources: {
       ...state.resources,
       wounds: state.resources.wounds + woundGain,
-      lifespan: Math.max(0, state.resources.lifespan - 20),
+      lifespan: Math.max(0, state.resources.lifespan - lifespanLoss),
     },
     breakthrough: {
       ...baseBreakthrough,
@@ -212,6 +250,13 @@ export function resolveBreakthrough(
         ...state.choices.flags,
         [`failed_${rule.id}`]: true,
         guarded_breakthrough: false,
+        ...(isFoundation
+          ? {
+              foundation_scar: true,
+              foundation_guardian: false,
+              borrowed_foundation_aid: false,
+            }
+          : {}),
       },
       qualities: {
         ...state.choices.qualities,
@@ -224,7 +269,9 @@ export function resolveBreakthrough(
 
   return {
     state: nextState,
-    log: state.choices.flags.guarded_breakthrough
+    log: isFoundation
+      ? `筑基未成。气散入骨，${woundText}。外门照旧点卯。`
+      : state.choices.flags.guarded_breakthrough
       ? `气散了三成。稳息散压住乱气。${rule.name}未成，${woundText}。`
       : `气散了三成。${rule.name}未成，${woundText}。隔日，坊市照开。`,
     outcome: 'failure',
@@ -259,6 +306,14 @@ export function getBreakthroughSummary(state: GameState): string[] {
 
   if (state.choices.flags.guarded_breakthrough) {
     lines.push('护持：稳息散');
+  }
+
+  if (state.choices.flags.foundation_guardian) {
+    lines.push('护法：外门');
+  }
+
+  if (state.choices.flags.borrowed_foundation_aid) {
+    lines.push('借丹：在身');
   }
 
   if (attempts > 0 || failures > 0) {

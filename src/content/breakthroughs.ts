@@ -44,6 +44,20 @@ export const BREAKTHROUGH_RULES: Record<string, BreakthroughRule> = {
     preparationCap: 3,
     successFlag: 'reached_qi_layer_3',
   },
+  foundation: {
+    id: 'foundation',
+    actionId: 'breakthrough_foundation',
+    name: '筑基',
+    fromRealm: Realm.QiCondensation,
+    fromLayer: 3,
+    toRealm: Realm.FoundationEstablishment,
+    toLayer: 1,
+    requiredResources: { essence: 90, qi: 95, insight: 12 },
+    baseSuccess: 0.38,
+    partialWindow: 0.18,
+    preparationCap: 5,
+    successFlag: 'reached_foundation',
+  },
 };
 
 export const BREAKTHROUGH_BY_ACTION = Object.fromEntries(

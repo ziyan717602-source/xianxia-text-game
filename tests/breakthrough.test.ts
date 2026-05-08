@@ -20,6 +20,23 @@ function createReadyQiState() {
   return state;
 }
 
+function createReadyFoundationState() {
+  let state = createInitialState(20260508);
+  state.realm = Realm.QiCondensation;
+  state.realmLayer = 3;
+  state.currentLocationId = 'home';
+  state.resources.essence = 140;
+  state.resources.qi = 120;
+  state.resources.insight = 18;
+  state.resources.coins = 30;
+  state.choices.flags.reached_qi_layer_2 = true;
+  state.choices.flags.reached_qi_layer_3 = true;
+  state.choices.qualities.quiet_cultivation = 8;
+  state.choices.qualities.sect_trace = 4;
+  state = checkUnlocks(state);
+  return state;
+}
+
 describe('Breakthrough system', () => {
   it('should prepare the next qi bottleneck before breakthrough', () => {
     let state = createReadyQiState();
@@ -132,7 +149,7 @@ describe('Breakthrough system', () => {
     expect(state.unlockedActions).toContain('breakthrough_qi_3');
   });
 
-  it('should hide bottleneck preparation after the current implemented qi cap', () => {
+  it('should expose the foundation bottleneck after reaching qi layer three', () => {
     let state = createReadyQiState();
     state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
     state.resources.essence = 100;
@@ -145,6 +162,117 @@ describe('Breakthrough system', () => {
     state = checkUnlocks(performAction(state, 'breakthrough_qi_3', () => 0).state);
 
     expect(state.realmLayer).toBe(3);
-    expect(getAvailableActionsAtLocation(state)).not.toContain('stabilize_bottleneck');
+    expect(getAvailableActionsAtLocation(state)).toContain('stabilize_bottleneck');
+    expect(getBreakthroughSummary(state).join(' / ')).toContain('筑基');
+  });
+
+  it('should prepare and unlock foundation breakthrough', () => {
+    let state = createReadyFoundationState();
+
+    expect(getAvailableActionsAtLocation(state)).toContain('stabilize_bottleneck');
+
+    const result = performAction(state, 'stabilize_bottleneck');
+    expect(result.success).toBe(true);
+    state = checkUnlocks(result.state);
+
+    expect(state.breakthrough.preparation.foundation).toBe(1);
+    expect(state.choices.flags.bottleneck_foundation).toBe(true);
+    expect(state.choices.flags.prepared_foundation).toBe(true);
+    expect(state.unlockedActions).toContain('breakthrough_foundation');
+    expect(getAvailableActionsAtLocation(state)).toContain('breakthrough_foundation');
+  });
+
+  it('should make guardian and borrowed aid improve foundation odds', () => {
+    const plainState = createReadyFoundationState();
+    const supportedState = createReadyFoundationState();
+    supportedState.choices.flags.foundation_guardian = true;
+    supportedState.choices.flags.borrowed_foundation_aid = true;
+
+    const plainChance = getBreakthroughSuccessChance(plainState, BREAKTHROUGH_RULES.foundation);
+    const supportedChance = getBreakthroughSuccessChance(supportedState, BREAKTHROUGH_RULES.foundation);
+
+    expect(supportedChance).toBeGreaterThan(plainChance);
+  });
+
+  it('should record guardian support as a sect ledger choice', () => {
+    let state = createReadyFoundationState();
+    state.choices.flags.bottleneck_foundation = true;
+    state.choices.flags.completed_sect_errand = true;
+    state.currentLocationId = 'outer_gate';
+    state = checkUnlocks(state);
+
+    expect(getAvailableActionsAtLocation(state)).toContain('seek_foundation_guardian');
+
+    const result = performAction(state, 'seek_foundation_guardian');
+
+    expect(result.success).toBe(true);
+    expect(result.log).toContain('护法');
+    expect(result.state.choices.flags.foundation_guardian).toBe(true);
+    expect(result.state.choices.tags.sect_trace).toBe('guardian');
+    expect(result.state.choices.qualities.sect_trace).toBeGreaterThan(state.choices.qualities.sect_trace);
+    expect(getAvailableActionsAtLocation(result.state)).not.toContain('seek_foundation_guardian');
+  });
+
+  it('should record borrowed foundation aid with dantoxin and market debt', () => {
+    let state = createReadyFoundationState();
+    state.choices.flags.bottleneck_foundation = true;
+    state.choices.flags.known_recipe_small_qi_pill = true;
+    state.currentLocationId = 'market';
+    state = checkUnlocks(state);
+
+    expect(getAvailableActionsAtLocation(state)).toContain('borrow_foundation_pill');
+
+    const result = performAction(state, 'borrow_foundation_pill');
+
+    expect(result.success).toBe(true);
+    expect(result.log).toContain('借你一枚筑基用丹');
+    expect(result.state.choices.flags.borrowed_foundation_aid).toBe(true);
+    expect(result.state.choices.tags.market_debt).toBe('foundation_pill');
+    expect(result.state.resources.dantoxin).toBe(state.resources.dantoxin + 12);
+    expect(getAvailableActionsAtLocation(result.state)).not.toContain('borrow_foundation_pill');
+  });
+
+  it('should enter foundation establishment on a successful foundation breakthrough', () => {
+    let state = createReadyFoundationState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 140;
+    state.resources.qi = 120;
+    state.resources.insight = 18;
+    state.choices.flags.foundation_guardian = true;
+    state.choices.flags.borrowed_foundation_aid = true;
+
+    const result = performAction(state, 'breakthrough_foundation', () => 0);
+
+    expect(result.success).toBe(true);
+    expect(result.state.realm).toBe(Realm.FoundationEstablishment);
+    expect(result.state.realmLayer).toBe(1);
+    expect(result.state.choices.flags.reached_foundation).toBe(true);
+    expect(result.state.breakthrough.successes.foundation).toBe(1);
+    expect(result.state.choices.flags.foundation_guardian).toBe(false);
+    expect(result.state.choices.flags.borrowed_foundation_aid).toBe(false);
+  });
+
+  it('should leave a foundation scar and larger lifespan loss on failed foundation breakthrough', () => {
+    let state = createReadyFoundationState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 140;
+    state.resources.qi = 120;
+    state.resources.insight = 18;
+    state.choices.flags.foundation_guardian = true;
+    state.choices.flags.borrowed_foundation_aid = true;
+    const beforeLifespan = state.resources.lifespan;
+
+    const result = performAction(state, 'breakthrough_foundation', () => 1);
+
+    expect(result.success).toBe(true);
+    expect(result.state.realm).toBe(Realm.QiCondensation);
+    expect(result.state.realmLayer).toBe(3);
+    expect(result.state.choices.flags.failed_foundation).toBe(true);
+    expect(result.state.choices.flags.foundation_scar).toBe(true);
+    expect(result.state.breakthrough.failures.foundation).toBe(1);
+    expect(result.state.resources.wounds).toBe(2);
+    expect(result.state.resources.lifespan).toBe(beforeLifespan - 180 - 120);
+    expect(result.state.choices.flags.foundation_guardian).toBe(false);
+    expect(result.state.choices.flags.borrowed_foundation_aid).toBe(false);
   });
 });

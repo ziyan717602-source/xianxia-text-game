@@ -7,6 +7,7 @@ const STABILIZING_POWDER_COST = PILL_RECIPES.stabilizing_powder.requiredResource
 const CLEANSING_PILL_COST = PILL_RECIPES.cleansing_pill.requiredResources;
 const QI_LAYER_2_COST = BREAKTHROUGH_RULES.qi_layer_2.requiredResources;
 const QI_LAYER_3_COST = BREAKTHROUGH_RULES.qi_layer_3.requiredResources;
+const FOUNDATION_COST = BREAKTHROUGH_RULES.foundation.requiredResources;
 
 export const ACTIONS: Record<string, Action> = {
   kuzuo: {
@@ -291,6 +292,34 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  seek_foundation_guardian: {
+    id: 'seek_foundation_guardian',
+    name: '求护法',
+    cost: { essence: 20, coins: 8, insight: 2 },
+    output: {},
+    cooldown: 30,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['bottleneck_foundation'],
+      forbiddenFlags: ['foundation_guardian'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  borrow_foundation_pill: {
+    id: 'borrow_foundation_pill',
+    name: '借丹筑基',
+    cost: { coins: 12, insight: 3 },
+    output: { dantoxin: 12 },
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['bottleneck_foundation'],
+      forbiddenFlags: ['borrowed_foundation_aid'],
+      requiredLocation: 'market',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',
@@ -299,7 +328,6 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 30,
     riskProbability: 0,
     conditions: {
-      forbiddenFlags: ['reached_qi_layer_3'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
@@ -328,6 +356,20 @@ export const ACTIONS: Record<string, Action> = {
     conditions: {
       requiredFlags: ['prepared_qi_layer_3'],
       forbiddenFlags: ['reached_qi_layer_3'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  breakthrough_foundation: {
+    id: 'breakthrough_foundation',
+    name: '冲筑基',
+    cost: FOUNDATION_COST,
+    output: {},
+    cooldown: 120,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['prepared_foundation'],
+      forbiddenFlags: ['reached_foundation'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
