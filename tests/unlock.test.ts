@@ -217,6 +217,8 @@ describe('Unlock System', () => {
     state.choices.flags.prepared_foundation = true;
     state = checkUnlocks(state);
     expect(state.unlockedActions).toContain('breakthrough_foundation');
+    expect(state.unlockedActions).toContain('withdraw_foundation');
     expect(state.choices.flags.unlocked_breakthrough_foundation).toBe(true);
+    expect(state.choices.flags.unlocked_withdraw_foundation).toBe(true);
   });
 });

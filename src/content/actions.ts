@@ -301,7 +301,7 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['bottleneck_foundation'],
-      forbiddenFlags: ['foundation_guardian'],
+      forbiddenFlags: ['foundation_guardian', 'foundation_guardian_account_open'],
       requiredLocation: 'outer_gate',
       requiredRealm: Realm.QiCondensation,
     },
@@ -315,8 +315,22 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['bottleneck_foundation'],
-      forbiddenFlags: ['borrowed_foundation_aid'],
+      forbiddenFlags: ['borrowed_foundation_aid', 'foundation_pill_debt_open'],
       requiredLocation: 'market',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  withdraw_foundation: {
+    id: 'withdraw_foundation',
+    name: '筑基收功',
+    cost: { essence: 25, qi: 6 },
+    output: {},
+    cooldown: 80,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['prepared_foundation'],
+      forbiddenFlags: ['reached_foundation'],
+      requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
   },

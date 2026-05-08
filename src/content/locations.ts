@@ -22,6 +22,7 @@ export const LOCATIONS: Record<string, Location> = {
       'take_stabilizing_powder',
       'take_cleansing_pill',
       'stabilize_bottleneck',
+      'withdraw_foundation',
       'breakthrough_qi_2',
       'breakthrough_qi_3',
       'breakthrough_foundation',
@@ -31,6 +32,7 @@ export const LOCATIONS: Record<string, Location> = {
     eventWeights: {
       'find_jade_slip': 1.5,
       'dantoxin_in_meridians': 1.4,
+      'foundation_scar_aches': 1.3,
       'winter_stillness': 1.2,
     },
     qiDensity: 1,
@@ -58,6 +60,7 @@ export const LOCATIONS: Record<string, Location> = {
     eventWeights: {
       'market_rumor': 1.2,
       'market_price_rise': 1.2,
+      'market_foundation_debt': 1.4,
       'outer_gate_rules': 1.2,
     },
     qiDensity: 0.8,
@@ -71,6 +74,7 @@ export const LOCATIONS: Record<string, Location> = {
     eventWeights: {
       'outer_gate_rules': 1.4,
       'outer_gate_register': 1.5,
+      'outer_gate_guardian_account': 1.4,
       'market_rumor': 0.5,
     },
     qiDensity: 0.9,

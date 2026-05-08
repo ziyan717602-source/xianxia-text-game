@@ -179,7 +179,34 @@ describe('Breakthrough system', () => {
     expect(state.choices.flags.bottleneck_foundation).toBe(true);
     expect(state.choices.flags.prepared_foundation).toBe(true);
     expect(state.unlockedActions).toContain('breakthrough_foundation');
+    expect(state.unlockedActions).toContain('withdraw_foundation');
     expect(getAvailableActionsAtLocation(state)).toContain('breakthrough_foundation');
+    expect(getAvailableActionsAtLocation(state)).toContain('withdraw_foundation');
+  });
+
+  it('should withdraw from foundation and keep a reduced prepared bottleneck', () => {
+    let state = createReadyFoundationState();
+    state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
+    state.resources.essence = 140;
+    state.resources.qi = 120;
+    state.resources.dantoxin = 8;
+    state.resources.wounds = 1;
+    state.choices.flags.foundation_guardian = true;
+    state.choices.flags.borrowed_foundation_aid = true;
+    state.choices.qualities.reckless_breakthrough = 2;
+
+    const result = performAction(state, 'withdraw_foundation');
+
+    expect(result.success).toBe(true);
+    expect(result.log).toContain('筑基关口');
+    expect(result.state.breakthrough.preparation.foundation).toBe(1);
+    expect(result.state.choices.flags.withdrew_foundation).toBe(true);
+    expect(result.state.choices.tags.foundation_pause).toBe('withdrew');
+    expect(result.state.choices.flags.foundation_guardian).toBe(false);
+    expect(result.state.choices.flags.borrowed_foundation_aid).toBe(false);
+    expect(result.state.resources.dantoxin).toBe(5);
+    expect(result.state.resources.wounds).toBe(0);
+    expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
   });
 
   it('should make guardian and borrowed aid improve foundation odds', () => {
@@ -208,6 +235,7 @@ describe('Breakthrough system', () => {
     expect(result.success).toBe(true);
     expect(result.log).toContain('护法');
     expect(result.state.choices.flags.foundation_guardian).toBe(true);
+    expect(result.state.choices.flags.foundation_guardian_account_open).toBe(true);
     expect(result.state.choices.tags.sect_trace).toBe('guardian');
     expect(result.state.choices.qualities.sect_trace).toBeGreaterThan(state.choices.qualities.sect_trace);
     expect(getAvailableActionsAtLocation(result.state)).not.toContain('seek_foundation_guardian');
@@ -227,6 +255,7 @@ describe('Breakthrough system', () => {
     expect(result.success).toBe(true);
     expect(result.log).toContain('借你一枚筑基用丹');
     expect(result.state.choices.flags.borrowed_foundation_aid).toBe(true);
+    expect(result.state.choices.flags.foundation_pill_debt_open).toBe(true);
     expect(result.state.choices.tags.market_debt).toBe('foundation_pill');
     expect(result.state.resources.dantoxin).toBe(state.resources.dantoxin + 12);
     expect(getAvailableActionsAtLocation(result.state)).not.toContain('borrow_foundation_pill');

@@ -1,5 +1,5 @@
 import { GameState, Realm, Season } from '../game/types';
-import { adjustQuality, setFlag, setTag } from '../game/choices';
+import { adjustQuality, removeTag, setFlag, setTag } from '../game/choices';
 import { resolveCombatEvent } from '../game/combat';
 import { addRelationship, updateRelationship } from '../game/relationships';
 import { LOCATIONS } from './locations';
@@ -7,6 +7,7 @@ import { LOCATIONS } from './locations';
 const WOUNDED_CULTIVATOR_ID = 'wounded_cultivator';
 const MARKET_KEEPER_ID = 'market_keeper';
 const OUTER_GATE_CLERK_ID = 'outer_gate_clerk';
+const FOUNDATION_GUARDIAN_ID = 'foundation_guardian';
 
 function uniqueTags(existing: string[], added: string[]): string[] {
   return Array.from(new Set([...existing, ...added]));
@@ -113,6 +114,28 @@ function recordOuterGateClerk(
     {
       id: OUTER_GATE_CLERK_ID,
       identity: '外门书吏',
+    },
+    {
+      ...changes,
+      state: 'Alive',
+    }
+  );
+}
+
+function recordFoundationGuardian(
+  state: GameState,
+  changes: {
+    tags?: string[];
+    debtsDelta?: number;
+    favorsDelta?: number;
+    grudgesDelta?: number;
+  }
+): GameState {
+  return touchRelationship(
+    state,
+    {
+      id: FOUNDATION_GUARDIAN_ID,
+      identity: '外门护法',
     },
     {
       ...changes,
@@ -604,6 +627,189 @@ export const EVENTS: ActiveEvent[] = [
           };
           newState = adjustQuality(newState, 'reckless_breakthrough', 2);
           return { state: newState, log: '你把药气硬压入丹田。真气浮起两缕，脉里多了一处暗伤。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'foundation_scar_aches',
+    text: '筑基未成后，骨缝里仍有冷意。旧伤并不催人，只在行气时露出一点边。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['foundation_scar']) &&
+      !state.choices.flags['foundation_scar_aches_seen'],
+    weight: (state) => 26 + state.resources.wounds * 8,
+    choices: [
+      {
+        text: '闭门养骨',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_scar_aches_seen');
+
+          if (newState.resources.essence < 40) {
+            newState.resources = {
+              ...newState.resources,
+              wounds: newState.resources.wounds + 1,
+            };
+            return { state: newState, log: '精元不足，强行行气只把旧伤翻起。伤添一处。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            essence: newState.resources.essence - 40,
+            wounds: Math.max(0, newState.resources.wounds - 1),
+            lifespan: Math.max(0, newState.resources.lifespan - 60),
+          };
+          newState = setFlag(newState, 'nursed_foundation_scar');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你闭门养骨。旧伤退了一分，寿元也照常少去。' };
+        },
+      },
+      {
+        text: '寻药缓伤',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_scar_aches_seen');
+
+          if (newState.resources.herbs < 3) {
+            newState.resources = {
+              ...newState.resources,
+              insight: newState.resources.insight + 1,
+            };
+            return { state: newState, log: '药不够。你只记下几味能缓骨伤的药性。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            herbs: newState.resources.herbs - 3,
+            dantoxin: newState.resources.dantoxin + 2,
+            wounds: Math.max(0, newState.resources.wounds - 1),
+          };
+          newState = setFlag(newState, 'herbs_on_foundation_scar');
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          return { state: newState, log: '三味药压住骨伤，药滞也留下两分。' };
+        },
+      },
+      {
+        text: '照旧运功',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_scar_aches_seen');
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 2,
+            wounds: newState.resources.wounds + 1,
+          };
+          newState = setFlag(newState, 'ignored_foundation_scar');
+          newState = adjustQuality(newState, 'reckless_breakthrough', 1);
+          return { state: newState, log: '你照旧运功。真气多了两缕，骨伤也深了一点。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'market_foundation_debt',
+    text: '坊市掌柜把一只旧木盒推到柜前。盒上无丹，只有账。',
+    condition: (state) =>
+      state.currentLocationId === 'market' &&
+      state.choices.tags['market_debt'] === 'foundation_pill' &&
+      !state.choices.flags['market_foundation_debt_seen'],
+    weight: (state) => 24 + (state.choices.qualities['market_ties'] ?? 0) * 3,
+    choices: [
+      {
+        text: '付清丹账（十二钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'market_foundation_debt_seen');
+
+          if (newState.resources.coins < 12) {
+            newState = recordMarketKeeper(newState, { tags: ['筑基丹账未清'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。掌柜合上木盒，账仍在。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 12 };
+          newState = removeTag(newState, 'market_debt');
+          newState = setFlag(newState, 'foundation_debt_settled');
+          newState = setFlag(newState, 'foundation_pill_debt_open', false);
+          newState = adjustQuality(newState, 'market_ties', 1);
+          newState = recordMarketKeeper(newState, { tags: ['筑基丹账清'] });
+          return { state: newState, log: '十二枚钱入账。掌柜划去旧页，没有多说。' };
+        },
+      },
+      {
+        text: '再记一笔',
+        effect: (state) => {
+          let newState = setFlag(state, 'market_foundation_debt_seen');
+          newState = setFlag(newState, 'foundation_debt_delayed');
+          newState = adjustQuality(newState, 'market_ties', -1);
+          newState = adjustQuality(newState, 'karmic_weight', 1);
+          newState = recordMarketKeeper(newState, { tags: ['筑基丹账拖延'], debtsDelta: 2 });
+          return { state: newState, log: '掌柜添了两笔小字。坊市的价目往后未必照旧。' };
+        },
+      },
+      {
+        text: '避开掌柜',
+        effect: (state) => {
+          let newState = setFlag(state, 'market_foundation_debt_seen');
+          newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
+          newState = setFlag(newState, 'avoided_foundation_debt');
+          newState = adjustQuality(newState, 'market_ties', -2);
+          newState = recordMarketKeeper(newState, { tags: ['避过筑基丹账'], debtsDelta: 1 });
+          return { state: newState, log: '你绕过柜台。十步路没有代价，旧账有。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_guardian_account',
+    text: '外门石阶下，那位护法的人把你拦住。没有责问，只报出一条规矩。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      Boolean(state.choices.flags['sought_foundation_guardian']) &&
+      !state.choices.flags['outer_gate_guardian_account_seen'],
+    weight: (state) => 22 + (state.choices.qualities['sect_trace'] ?? 0) * 3,
+    choices: [
+      {
+        text: '按规谢过（四钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_guardian_account_seen');
+
+          if (newState.resources.coins < 4) {
+            newState = setFlag(newState, 'foundation_guardian_account_open', false);
+            newState = recordFoundationGuardian(newState, { tags: ['谢礼不足'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。来人记下你的名字，转身上阶。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 4 };
+          newState = setFlag(newState, 'thanked_foundation_guardian');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = recordFoundationGuardian(newState, { tags: ['收过谢礼'], favorsDelta: 1 });
+          return { state: newState, log: '四枚钱交上去。护法的人点头，外门名册多了一处熟字。' };
+        },
+      },
+      {
+        text: '补一件短差',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_guardian_account_seen');
+          newState.resources = {
+            ...newState.resources,
+            essence: Math.max(0, newState.resources.essence - 25),
+            insight: newState.resources.insight + 1,
+          };
+          newState = setFlag(newState, 'repaid_guardian_with_errand');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = adjustQuality(newState, 'sect_trace', 2);
+          newState = recordFoundationGuardian(newState, { tags: ['补过短差'], favorsDelta: 1 });
+          return { state: newState, log: '你补了一件短差。事不重，规矩在你身上又落一层。' };
+        },
+      },
+      {
+        text: '置若罔闻',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_guardian_account_seen');
+          newState = setFlag(newState, 'brushed_off_guardian_account');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = adjustQuality(newState, 'sect_trace', -1);
+          newState = recordFoundationGuardian(newState, { tags: ['未理会'], grudgesDelta: 1 });
+          return { state: newState, log: '你没有应声。阶上无人追来，账却不在阶上。' };
         },
       },
     ],

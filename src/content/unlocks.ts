@@ -529,5 +529,26 @@ export const UNLOCKS: UnlockRule[] = [
       }
       return state;
     }
+  },
+  {
+    id: 'unlock_withdraw_foundation',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      state.realmLayer === 3 &&
+      Boolean(state.choices.flags.prepared_foundation) &&
+      !state.choices.flags.reached_foundation,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('withdraw_foundation')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'withdraw_foundation'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_withdraw_foundation: true }
+          }
+        };
+      }
+      return state;
+    }
   }
 ];

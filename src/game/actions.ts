@@ -45,6 +45,7 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   breakthrough_qi_2: 'quiet_cultivation',
   breakthrough_qi_3: 'quiet_cultivation',
   breakthrough_foundation: 'quiet_cultivation',
+  withdraw_foundation: 'quiet_cultivation',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -240,6 +241,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
           ...newState.choices.flags,
           foundation_guardian: true,
           sought_foundation_guardian: true,
+          foundation_guardian_account_open: true,
         },
         tags: {
           ...newState.choices.tags,
@@ -262,6 +264,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
         flags: {
           ...newState.choices.flags,
           borrowed_foundation_aid: true,
+          foundation_pill_debt_open: true,
         },
         tags: {
           ...newState.choices.tags,
@@ -275,6 +278,44 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       },
     };
     customLog = '坊市有人借你一枚筑基用丹。药气重，账也重。';
+  }
+
+  if (actionId === 'withdraw_foundation') {
+    const currentPreparation = newState.breakthrough.preparation.foundation ?? 0;
+    newState = {
+      ...newState,
+      resources: {
+        ...newState.resources,
+        dantoxin: Math.max(0, newState.resources.dantoxin - 3),
+        wounds: Math.max(0, newState.resources.wounds - 1),
+      },
+      breakthrough: {
+        ...newState.breakthrough,
+        preparation: {
+          ...newState.breakthrough.preparation,
+          foundation: Math.max(1, currentPreparation - 1),
+        },
+        lastTargetId: 'foundation',
+      },
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          withdrew_foundation: true,
+          foundation_guardian: false,
+          borrowed_foundation_aid: false,
+        },
+        tags: {
+          ...newState.choices.tags,
+          foundation_pause: 'withdrew',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          reckless_breakthrough: Math.max(0, (newState.choices.qualities.reckless_breakthrough ?? 0) - 1),
+        },
+      },
+    };
+    customLog = '你把筑基关口压回周天。气未散尽，护法与借丹都暂且作罢。';
   }
 
   if (actionId === 'short_retreat') {

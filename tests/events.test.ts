@@ -220,4 +220,82 @@ describe('Event System', () => {
     expect(result.state.resources.insight).toBe(2);
     expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
   });
+
+  it('should expose foundation scar care after a failed foundation breakthrough', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 3;
+    state.currentLocationId = 'home';
+    state.resources.essence = 80;
+    state.resources.wounds = 2;
+    state.resources.lifespan = 1000;
+    state.choices.flags.foundation_scar = true;
+
+    const event = EVENTS.find(e => e.id === 'foundation_scar_aches');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.choices.flags.foundation_scar_aches_seen).toBe(true);
+    expect(result.state.choices.flags.nursed_foundation_scar).toBe(true);
+    expect(result.state.resources.essence).toBe(40);
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.resources.lifespan).toBe(940);
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
+  it('should settle a borrowed foundation pill debt at the market', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'market';
+    state.resources.coins = 12;
+    state.choices.tags.market_debt = 'foundation_pill';
+    state.choices.flags.foundation_pill_debt_open = true;
+
+    const event = EVENTS.find(e => e.id === 'market_foundation_debt');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.market_foundation_debt_seen).toBe(true);
+    expect(result.state.choices.flags.foundation_debt_settled).toBe(true);
+    expect(result.state.choices.flags.foundation_pill_debt_open).toBe(false);
+    expect(result.state.choices.tags.market_debt).toBeUndefined();
+    expect(result.state.relationships.market_keeper.tags).toContain('筑基丹账清');
+  });
+
+  it('should record delayed foundation pill debt as a market relationship', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'market';
+    state.choices.tags.market_debt = 'foundation_pill';
+
+    const event = EVENTS.find(e => e.id === 'market_foundation_debt')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.choices.flags.foundation_debt_delayed).toBe(true);
+    expect(result.state.choices.qualities.market_ties).toBe(-1);
+    expect(result.state.choices.qualities.karmic_weight).toBe(1);
+    expect(result.state.relationships.market_keeper.debts).toBe(2);
+    expect(result.state.relationships.market_keeper.tags).toContain('筑基丹账拖延');
+  });
+
+  it('should resolve the outer gate guardian account after seeking foundation support', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'outer_gate';
+    state.resources.coins = 4;
+    state.choices.flags.sought_foundation_guardian = true;
+    state.choices.flags.foundation_guardian_account_open = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_guardian_account');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.outer_gate_guardian_account_seen).toBe(true);
+    expect(result.state.choices.flags.thanked_foundation_guardian).toBe(true);
+    expect(result.state.choices.flags.foundation_guardian_account_open).toBe(false);
+    expect(result.state.choices.qualities.sect_trace).toBe(1);
+    expect(result.state.relationships.foundation_guardian.tags).toContain('收过谢礼');
+  });
 });
