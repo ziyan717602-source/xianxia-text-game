@@ -101,6 +101,10 @@ export function getRecentSummary(state: GameState): string[] {
   const relationshipLine = woundedCultivator
     ? `受伤散修：人情${woundedCultivator.favors}，仇怨${woundedCultivator.grudges}。`
     : '旧识：暂无。';
+  const sectTrace = state.choices.qualities.sect_trace ?? 0;
+  const sectLine = sectTrace > 0
+    ? `外门影子：规矩${Math.floor(sectTrace)}，短差${Math.floor(state.choices.qualities.action_sect_errand_count ?? 0)}。`
+    : null;
   const alchemyLine =
     state.resources.qiPills > 0 ||
     state.resources.stabilizingPowders > 0 ||
@@ -116,7 +120,11 @@ export function getRecentSummary(state: GameState): string[] {
     relationshipLine,
   ];
 
-  return alchemyLine ? [...lines, alchemyLine] : lines;
+  return [
+    ...lines,
+    ...(sectLine ? [sectLine] : []),
+    ...(alchemyLine ? [alchemyLine] : []),
+  ];
 }
 
 function createSummaryLog(state: GameState): string {

@@ -55,6 +55,19 @@ describe('Unlock System', () => {
     expect(state.choices.flags['unlocked_yinqi']).toBe(true);
   });
 
+  it('should unlock short retreat after repeated daily practice', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.resources.qi = 22;
+    state.choices.qualities.action_rike_tuna_count = 3;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('short_retreat');
+    expect(state.choices.flags.unlocked_short_retreat).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;
@@ -145,6 +158,25 @@ describe('Unlock System', () => {
     state = checkUnlocks(state);
     expect(state.unlockedActions).toContain('take_cleansing_pill');
     expect(state.choices.flags.has_cleansing_pill).toBe(true);
+  });
+
+  it('should unlock sect errands and later outer gate supply', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.heard_outer_gate_rules = true;
+    state.choices.flags.accepted_outer_gate_errand = true;
+    state.choices.qualities.sect_trace = 2;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('sect_errand');
+
+    state.choices.flags.completed_sect_errand = true;
+    state.choices.qualities.sect_trace = 4;
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('sect_supply');
+    expect(state.choices.flags.unlocked_sect_supply).toBe(true);
   });
 
   it('should unlock bottleneck preparation and qi breakthrough actions in sequence', () => {

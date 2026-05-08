@@ -83,8 +83,12 @@ describe('Location System', () => {
   it('should expose outer gate actions when unlocked at the outer gate', () => {
     const state = createInitialState();
     state.currentLocationId = 'outer_gate';
-    state.unlockedActions = ['sect_chore', 'listen_lesson'];
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.heard_outer_gate_rules = true;
+    state.choices.flags.completed_sect_errand = true;
+    state.unlockedActions = ['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson'];
 
-    expect(getAvailableActionsAtLocation(state)).toEqual(['sect_chore', 'listen_lesson']);
+    expect(getAvailableActionsAtLocation(state)).toEqual(['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson']);
   });
 });

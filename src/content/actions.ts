@@ -87,6 +87,32 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'outer_gate',
     },
   },
+  sect_errand: {
+    id: 'sect_errand',
+    name: '领外门短差',
+    cost: { essence: 40 },
+    output: { coins: 4, herbs: 1, insight: 1 },
+    cooldown: 50,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['heard_outer_gate_rules'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  sect_supply: {
+    id: 'sect_supply',
+    name: '领外门供给',
+    cost: { essence: 20 },
+    output: { herbs: 3, coins: 2 },
+    cooldown: 80,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['completed_sect_errand'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   listen_lesson: {
     id: 'listen_lesson',
     name: '听课',
@@ -315,6 +341,18 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
       requiredLocation: 'home',
+    },
+  },
+  short_retreat: {
+    id: 'short_retreat',
+    name: '三日闭关',
+    cost: { essence: 90, qi: 2 },
+    output: { qi: 26 },
+    cooldown: 150,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
     },
   },
 };

@@ -147,6 +147,42 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.sect_trace).toBe(1);
   });
 
+  it('should let the outer gate clerk register a sect trace relationship', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.coins = 3;
+    state.choices.flags.heard_outer_gate_rules = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_register');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.outer_gate_registered).toBe(true);
+    expect(result.state.choices.tags.sect_trace).toBe('registered');
+    expect(result.state.choices.qualities.sect_trace).toBe(2);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('记名');
+  });
+
+  it('should let the outer gate clerk point to errand work', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.heard_outer_gate_rules = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_register')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.choices.flags.accepted_outer_gate_errand).toBe(true);
+    expect(result.state.choices.tags.sect_trace).toBe('errand');
+    expect(result.state.resources.insight).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('给过短差');
+  });
+
   it('should expose and resolve the meridian dantoxin event', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

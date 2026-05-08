@@ -23,6 +23,14 @@ describe('World ledger', () => {
     expect(getRecentSummary(state)).toContain('近十日：枯坐1次。');
   });
 
+  it('should include sect traces in recent summaries', () => {
+    const state = createInitialState();
+    state.choices.qualities.sect_trace = 4;
+    state.choices.qualities.action_sect_errand_count = 2;
+
+    expect(getRecentSummary(state)).toContain('外门影子：规矩4，短差2。');
+  });
+
   it('should append a ten-day summary and clear recent action counts', () => {
     let state = createInitialState();
 

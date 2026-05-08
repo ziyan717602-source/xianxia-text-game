@@ -29,6 +29,7 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   tuna: 'quiet_cultivation',
   tiaoxi: 'quiet_cultivation',
   rike_tuna: 'quiet_cultivation',
+  short_retreat: 'quiet_cultivation',
   inspect_root: 'quiet_cultivation',
   attune_technique: 'quiet_cultivation',
   study_qi_formula: 'alchemy_affinity',
@@ -49,6 +50,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   trade: 'market_ties',
   gossip: 'market_ties',
   sect_chore: 'sect_trace',
+  sect_errand: 'sect_trace',
+  sect_supply: 'sect_trace',
   listen_lesson: 'sect_trace',
   yinqi: 'quiet_cultivation',
 };
@@ -223,6 +226,18 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     const result = resolveBreakthrough(newState, actionId, random);
     newState = result.state;
     customLog = result.log;
+  }
+
+  if (actionId === 'short_retreat') {
+    customLog = '你闭门三日。日课并作一段，气息涨落有常。';
+  }
+
+  if (actionId === 'sect_errand') {
+    customLog = '你领了一件外门短差。事小，规矩不少。';
+  }
+
+  if (actionId === 'sect_supply') {
+    customLog = '外门按册给了些供给。数目不多，账上有名。';
   }
 
   const adjustedOutput = applyAlchemyOutputModifiers(

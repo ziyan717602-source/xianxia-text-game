@@ -238,6 +238,11 @@ async function run() {
     assertIncludes(bodyText, '进行了枯坐');
 
     await evaluate(cdp, `
+      document.querySelector('.event-dialog .choice-button')?.click()
+    `);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    await evaluate(cdp, `
       [...document.querySelectorAll('button')]
         .find((button) => button.textContent.trim() === '山路')
         .click()

@@ -25,6 +25,7 @@ export const LOCATIONS: Record<string, Location> = {
       'breakthrough_qi_2',
       'breakthrough_qi_3',
       'rike_tuna',
+      'short_retreat',
     ],
     eventWeights: {
       'find_jade_slip': 1.5,
@@ -65,9 +66,10 @@ export const LOCATIONS: Record<string, Location> = {
   'outer_gate': {
     id: 'outer_gate',
     name: '外门',
-    availableActions: ['sect_chore', 'listen_lesson', 'gossip'],
+    availableActions: ['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson', 'gossip'],
     eventWeights: {
       'outer_gate_rules': 1.4,
+      'outer_gate_register': 1.5,
       'market_rumor': 0.5,
     },
     qiDensity: 0.9,

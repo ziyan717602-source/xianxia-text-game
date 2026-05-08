@@ -66,6 +66,17 @@ describe('Cultivation roots and techniques', () => {
     expect(output.qi).toBeGreaterThan(1);
   });
 
+  it('should apply the technique bonus to short retreats as a batch practice', () => {
+    let state = createInitialState(42);
+    state = revealRoot(state).state;
+    state = attuneTechnique(state).state;
+    state.currentLocationId = 'home';
+
+    const output = applyCultivationOutputModifiers(state, 'short_retreat', { qi: 26 });
+
+    expect(output.qi).toBeGreaterThan(26);
+  });
+
   it('should perform inspect_root and attune_technique actions', () => {
     let state = createInitialState(7);
     state.realm = Realm.QiCondensation;

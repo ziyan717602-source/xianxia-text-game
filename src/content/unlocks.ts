@@ -120,6 +120,26 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_short_retreat',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      (state.choices.qualities['action_rike_tuna_count'] || 0) >= 3 &&
+      state.resources.qi >= 20,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('short_retreat')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'short_retreat'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_short_retreat: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&
@@ -345,6 +365,50 @@ export const UNLOCKS: UnlockRule[] = [
               unlocked_take_cleansing_pill: true,
               has_cleansing_pill: true
             }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_sect_errand',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['heard_outer_gate_rules']) &&
+      (
+        Boolean(state.choices.flags['accepted_outer_gate_errand']) ||
+        Boolean(state.choices.flags['outer_gate_registered']) ||
+        (state.choices.qualities['sect_trace'] || 0) >= 2
+      ),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('sect_errand')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'sect_errand'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_sect_errand: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_sect_supply',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['completed_sect_errand']) &&
+      (state.choices.qualities['sect_trace'] || 0) >= 4,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('sect_supply')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'sect_supply'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_sect_supply: true }
           }
         };
       }

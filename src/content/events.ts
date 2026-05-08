@@ -6,6 +6,7 @@ import { LOCATIONS } from './locations';
 
 const WOUNDED_CULTIVATOR_ID = 'wounded_cultivator';
 const MARKET_KEEPER_ID = 'market_keeper';
+const OUTER_GATE_CLERK_ID = 'outer_gate_clerk';
 
 function uniqueTags(existing: string[], added: string[]): string[] {
   return Array.from(new Set([...existing, ...added]));
@@ -91,6 +92,27 @@ function recordMarketKeeper(
     {
       id: MARKET_KEEPER_ID,
       identity: '坊市掌柜',
+    },
+    {
+      ...changes,
+      state: 'Alive',
+    }
+  );
+}
+
+function recordOuterGateClerk(
+  state: GameState,
+  changes: {
+    tags?: string[];
+    debtsDelta?: number;
+    favorsDelta?: number;
+  }
+): GameState {
+  return touchRelationship(
+    state,
+    {
+      id: OUTER_GATE_CLERK_ID,
+      identity: '外门书吏',
     },
     {
       ...changes,
@@ -465,6 +487,56 @@ export const EVENTS: ActiveEvent[] = [
           newState = setFlag(newState, 'dismissed_outer_gate_rules');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你离开人群。规矩仍在那里，不因你听不听而改。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_register',
+    text: '外门石阶前坐着一名书吏。桌上一册薄簿，墨迹未干。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['heard_outer_gate_rules']) &&
+      !state.choices.flags['outer_gate_clerk_seen'],
+    weight: (state) => 18 + (state.choices.qualities['sect_trace'] ?? 0) * 4,
+    choices: [
+      {
+        text: '照名登记（三钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_clerk_seen');
+
+          if (newState.resources.coins < 3) {
+            newState = recordOuterGateClerk(newState, { tags: ['钱不足未记'] });
+            return { state: newState, log: '你钱不够。书吏合上薄簿，未多看你。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 3 };
+          newState = setFlag(newState, 'outer_gate_registered');
+          newState = setTag(newState, 'sect_trace', 'registered');
+          newState = adjustQuality(newState, 'sect_trace', 2);
+          newState = recordOuterGateClerk(newState, { tags: ['记名'] });
+          return { state: newState, log: '三枚钱落入木匣。书吏在薄簿上添了你的名字。' };
+        },
+      },
+      {
+        text: '问短差',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_clerk_seen');
+          newState = setFlag(newState, 'accepted_outer_gate_errand');
+          newState = setTag(newState, 'sect_trace', 'errand');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+          newState = adjustQuality(newState, 'sect_trace', 2);
+          newState = recordOuterGateClerk(newState, { tags: ['给过短差'] });
+          return { state: newState, log: '书吏递来一张小条。差事不重，限期很明。' };
+        },
+      },
+      {
+        text: '退下不记',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_clerk_seen');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你退到阶下。薄簿仍摊在那里。' };
         },
       },
     ],
