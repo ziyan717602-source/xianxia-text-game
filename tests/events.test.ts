@@ -183,6 +183,86 @@ describe('Event System', () => {
     expect(result.state.relationships.outer_gate_clerk.tags).toContain('给过短差');
   });
 
+  it('should help a failed same-gate peer with stabilizing powder', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.stabilizingPowders = 1;
+    state.choices.flags.outer_gate_registered = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_peer_failure');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.stabilizingPowders).toBe(0);
+    expect(result.state.choices.flags.outer_gate_peer_failure_seen).toBe(true);
+    expect(result.state.choices.flags.helped_same_gate_with_powder).toBe(true);
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
+    expect(result.state.choices.qualities.sect_contribution).toBe(1);
+    expect(result.state.relationships.same_gate_peer.favors).toBe(1);
+    expect(result.state.relationships.same_gate_peer.tags).toContain('欠你药情');
+  });
+
+  it('should create a same-gate pill debt when lending a qi pill', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.qiPills = 1;
+    state.choices.qualities.sect_trace = 2;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_peer_failure')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.resources.qiPills).toBe(0);
+    expect(result.state.choices.flags.same_gate_peer_qi_pill_debt_open).toBe(true);
+    expect(result.state.choices.qualities.sect_trace).toBe(3);
+    expect(result.state.choices.qualities.karmic_weight).toBe(1);
+    expect(result.state.relationships.same_gate_peer.debts).toBe(1);
+    expect(result.state.relationships.same_gate_peer.tags).toContain('借过小聚气丸');
+  });
+
+  it('should let a same-gate peer repay a pill debt', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'outer_gate';
+    state.resources.qiPills = 1;
+    state.choices.qualities.sect_trace = 2;
+
+    const failureEvent = EVENTS.find(e => e.id === 'outer_gate_peer_failure')!;
+    state = failureEvent.choices[1].effect(state).state;
+
+    const returnEvent = EVENTS.find(e => e.id === 'same_gate_peer_return');
+    expect(returnEvent?.condition(state)).toBe(true);
+
+    const result = returnEvent!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(6);
+    expect(result.state.choices.flags.same_gate_peer_return_seen).toBe(true);
+    expect(result.state.choices.flags.same_gate_peer_debt_settled).toBe(true);
+    expect(result.state.choices.flags.same_gate_peer_qi_pill_debt_open).toBe(false);
+    expect(result.state.relationships.same_gate_peer.debts).toBe(0);
+    expect(result.state.relationships.same_gate_peer.tags).toContain('还过药账');
+  });
+
+  it('should record a same-gate grudge when the failed peer is ignored', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.completed_sect_errand = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_peer_failure')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.insight).toBe(1);
+    expect(result.state.choices.flags.left_same_gate_peer_failed).toBe(true);
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
+    expect(result.state.relationships.same_gate_peer.grudges).toBe(1);
+    expect(result.state.relationships.same_gate_peer.tags).toContain('被你旁观');
+  });
+
   it('should expose and resolve the meridian dantoxin event', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

@@ -8,6 +8,7 @@ const WOUNDED_CULTIVATOR_ID = 'wounded_cultivator';
 const MARKET_KEEPER_ID = 'market_keeper';
 const OUTER_GATE_CLERK_ID = 'outer_gate_clerk';
 const FOUNDATION_GUARDIAN_ID = 'foundation_guardian';
+const SAME_GATE_PEER_ID = 'same_gate_peer';
 
 function uniqueTags(existing: string[], added: string[]): string[] {
   return Array.from(new Set([...existing, ...added]));
@@ -142,6 +143,29 @@ function recordFoundationGuardian(
     {
       ...changes,
       state: 'Alive',
+    }
+  );
+}
+
+function recordSameGatePeer(
+  state: GameState,
+  changes: {
+    tags?: string[];
+    debtsDelta?: number;
+    favorsDelta?: number;
+    grudgesDelta?: number;
+    state?: 'Alive' | 'Departed' | 'Deceased';
+  }
+): GameState {
+  return touchRelationship(
+    state,
+    {
+      id: SAME_GATE_PEER_ID,
+      identity: '失意同门',
+    },
+    {
+      ...changes,
+      state: changes.state ?? 'Alive',
     }
   );
 }
@@ -562,6 +586,144 @@ export const EVENTS: ActiveEvent[] = [
           let newState = setFlag(state, 'outer_gate_clerk_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你退到阶下。薄簿仍摊在那里。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_peer_failure',
+    text: '外门阶侧有人收功失败。那人衣袖上还沾着炉灰，气息散得很慢。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm !== Realm.Mortal &&
+      (
+        Boolean(state.choices.flags['outer_gate_registered']) ||
+        Boolean(state.choices.flags['completed_sect_errand']) ||
+        (state.choices.qualities['sect_trace'] ?? 0) >= 2
+      ) &&
+      !state.choices.flags['outer_gate_peer_failure_seen'],
+    weight: (state) =>
+      16 +
+      (state.choices.qualities['sect_trace'] ?? 0) * 3 +
+      Math.min(12, state.resources.dantoxin),
+    choices: [
+      {
+        text: '递稳息散',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_peer_failure_seen');
+
+          if (newState.resources.stabilizingPowders < 1) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'same_gate_peer_needed_powder');
+            newState = adjustQuality(newState, 'alchemy_affinity', 1);
+            newState = recordSameGatePeer(newState, { tags: ['求稳息散未得'] });
+            return { state: newState, log: '你没有稳息散，只记下他气乱的样子。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            stabilizingPowders: newState.resources.stabilizingPowders - 1,
+          };
+          newState = setFlag(newState, 'helped_same_gate_with_powder');
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          newState = adjustQuality(newState, 'sect_contribution', 1);
+          newState = recordSameGatePeer(newState, { tags: ['受稳息散', '欠你药情'], favorsDelta: 1 });
+          return { state: newState, log: '一包稳息散递过去。他压住乱气，向你记下一礼。' };
+        },
+      },
+      {
+        text: '借小聚气丸',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_peer_failure_seen');
+
+          if (newState.resources.qiPills < 1) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'same_gate_peer_asked_qi_pill');
+            newState = recordSameGatePeer(newState, { tags: ['借丹未成'] });
+            return { state: newState, log: '你身上没有小聚气丸。那人点头，仍坐回阶侧。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            qiPills: newState.resources.qiPills - 1,
+          };
+          newState = setFlag(newState, 'same_gate_peer_qi_pill_debt_open');
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = adjustQuality(newState, 'karmic_weight', 1);
+          newState = recordSameGatePeer(newState, { tags: ['借过小聚气丸'], debtsDelta: 1 });
+          return { state: newState, log: '你借出一枚小聚气丸。药能续气，账也随之落下。' };
+        },
+      },
+      {
+        text: '只看一眼',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_peer_failure_seen');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+          newState = setFlag(newState, 'left_same_gate_peer_failed');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          newState = recordSameGatePeer(newState, { tags: ['被你旁观'], grudgesDelta: 1 });
+          return { state: newState, log: '你看了一眼，没有停步。外门阶侧的炉灰仍在。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'same_gate_peer_return',
+    text: '那名同门又在外门阶侧出现。气息比上回稳些，袖口仍有旧炉灰。',
+    condition: (state) => {
+      const relationship = state.relationships[SAME_GATE_PEER_ID];
+      return (
+        state.currentLocationId === 'outer_gate' &&
+        !!relationship &&
+        (relationship.favors > 0 || relationship.debts > 0 || relationship.grudges > 0) &&
+        !state.choices.flags['same_gate_peer_return_seen']
+      );
+    },
+    weight: (state) => {
+      const relationship = state.relationships[SAME_GATE_PEER_ID];
+      return 18 + (relationship?.favors ?? 0) * 8 + (relationship?.debts ?? 0) * 8 + (relationship?.grudges ?? 0) * 6;
+    },
+    choices: [
+      {
+        text: '收回药账',
+        effect: (state) => {
+          let newState = setFlag(state, 'same_gate_peer_return_seen');
+          const relationship = newState.relationships[SAME_GATE_PEER_ID];
+
+          if (!relationship || relationship.debts <= 0) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = recordSameGatePeer(newState, { tags: ['无账可还'] });
+            return { state: newState, log: '他没有可还的账，只说了两句外门近事。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins + 6 };
+          newState = setFlag(newState, 'same_gate_peer_debt_settled');
+          newState = setFlag(newState, 'same_gate_peer_qi_pill_debt_open', false);
+          newState = adjustQuality(newState, 'market_ties', 1);
+          newState = recordSameGatePeer(newState, { tags: ['还过药账'], debtsDelta: -1 });
+          return { state: newState, log: '他还来六枚钱。药账划去，人情未必也划去。' };
+        },
+      },
+      {
+        text: '问冲关得失',
+        effect: (state) => {
+          let newState = setFlag(state, 'same_gate_peer_return_seen');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
+          newState = setFlag(newState, 'same_gate_peer_shared_breakthrough_lesson');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = recordSameGatePeer(newState, { tags: ['说过冲关得失'], favorsDelta: -1 });
+          return { state: newState, log: '他把那日气乱处说了一遍。话不长，关口却清楚一点。' };
+        },
+      },
+      {
+        text: '不再牵连',
+        effect: (state) => {
+          let newState = setFlag(state, 'same_gate_peer_return_seen');
+          newState = setFlag(newState, 'same_gate_peer_left_open');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          newState = recordSameGatePeer(newState, { tags: ['旧事未结'], state: 'Departed' });
+          return { state: newState, log: '你没有再问。那人站了一会，沿阶下去。' };
         },
       },
     ],

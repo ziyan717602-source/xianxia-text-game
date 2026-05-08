@@ -89,6 +89,8 @@ export const LOCATIONS: Record<string, Location> = {
     eventWeights: {
       'outer_gate_rules': 1.4,
       'outer_gate_register': 1.5,
+      'outer_gate_peer_failure': 1.3,
+      'same_gate_peer_return': 1.3,
       'outer_gate_guardian_account': 1.4,
       'outer_gate_foundation_registry': 1.5,
       'outer_gate_missed_roll_call': 1.5,
