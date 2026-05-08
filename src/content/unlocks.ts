@@ -399,7 +399,7 @@ export const UNLOCKS: UnlockRule[] = [
     id: 'unlock_sect_supply',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&
-      Boolean(state.choices.flags['completed_sect_errand']) &&
+      (Boolean(state.choices.flags['completed_sect_errand']) || Boolean(state.choices.flags['completed_sect_patrol'])) &&
       (state.choices.qualities['sect_trace'] || 0) >= 4,
     effect: (state) => {
       if (!state.unlockedActions.includes('sect_supply')) {
@@ -409,6 +409,45 @@ export const UNLOCKS: UnlockRule[] = [
           choices: {
             ...state.choices,
             flags: { ...state.choices.flags, unlocked_sect_supply: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_sect_roll_call',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['outer_gate_registered']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('sect_roll_call')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'sect_roll_call'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_sect_roll_call: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_sect_patrol',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['attended_outer_gate_roll_call']) &&
+      (state.choices.qualities['sect_trace'] || 0) >= 3,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('sect_patrol')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'sect_patrol'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_sect_patrol: true }
           }
         };
       }

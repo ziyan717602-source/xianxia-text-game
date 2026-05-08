@@ -113,3 +113,5 @@
 - 外门规矩：听闻后写入 `heard_outer_gate_rules`、`sect_trace` tag/quality。
 - 外门书吏：登记或问短差会写入 `outer_gate_clerk` 关系，开启外门短差。
 - 外门短差/供给：用 `sect_trace` 和 `completed_sect_errand` 渐进解锁，先作为宗门影子，不做完整宗门身份。
+- 外门点卯/巡值：登记后可点卯，点卯后可领巡值，写入 `sect_discipline`、`sect_contribution` 和近日摘要。
+- 外门失期/巡值回报：登记后闭关不点卯会触发失期事件；巡值后可照规交差、夹带草药或问边界路。

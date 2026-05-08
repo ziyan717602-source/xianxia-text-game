@@ -70,11 +70,22 @@ export const LOCATIONS: Record<string, Location> = {
   'outer_gate': {
     id: 'outer_gate',
     name: '外门',
-    availableActions: ['sect_chore', 'sect_errand', 'sect_supply', 'listen_lesson', 'gossip', 'seek_foundation_guardian'],
+    availableActions: [
+      'sect_chore',
+      'sect_errand',
+      'sect_supply',
+      'sect_roll_call',
+      'sect_patrol',
+      'listen_lesson',
+      'gossip',
+      'seek_foundation_guardian',
+    ],
     eventWeights: {
       'outer_gate_rules': 1.4,
       'outer_gate_register': 1.5,
       'outer_gate_guardian_account': 1.4,
+      'outer_gate_missed_roll_call': 1.5,
+      'outer_gate_patrol_report': 1.3,
       'market_rumor': 0.5,
     },
     qiDensity: 0.9,

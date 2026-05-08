@@ -107,6 +107,7 @@ function recordOuterGateClerk(
     tags?: string[];
     debtsDelta?: number;
     favorsDelta?: number;
+    grudgesDelta?: number;
   }
 ): GameState {
   return touchRelationship(
@@ -810,6 +811,115 @@ export const EVENTS: ActiveEvent[] = [
           newState = adjustQuality(newState, 'sect_trace', -1);
           newState = recordFoundationGuardian(newState, { tags: ['未理会'], grudgesDelta: 1 });
           return { state: newState, log: '你没有应声。阶上无人追来，账却不在阶上。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_missed_roll_call',
+    text: '外门书吏翻到你的名字。薄簿边上空着一格，点卯没有落墨。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['outer_gate_registered']) &&
+      !state.choices.flags['attended_outer_gate_roll_call'] &&
+      ((state.choices.qualities['action_short_retreat_count'] ?? 0) > 0 ||
+        (state.choices.qualities['action_withdraw_foundation_count'] ?? 0) > 0) &&
+      !state.choices.flags['outer_gate_missed_roll_call_seen'],
+    weight: (state) => 28 + (state.choices.qualities['sect_trace'] ?? 0) * 3,
+    choices: [
+      {
+        text: '补交罚钱（三钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
+
+          if (newState.resources.coins < 3) {
+            newState = setFlag(newState, 'outer_gate_discipline_debt_open');
+            newState = adjustQuality(newState, 'sect_discipline', -1);
+            newState = recordOuterGateClerk(newState, { tags: ['点卯欠罚'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。书吏在薄簿旁添了一点朱。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 3 };
+          newState = setFlag(newState, 'outer_gate_fine_paid');
+          newState = setTag(newState, 'sect_status', 'fined');
+          newState = adjustQuality(newState, 'sect_discipline', -1);
+          newState = recordOuterGateClerk(newState, { tags: ['收过点卯罚钱'] });
+          return { state: newState, log: '三枚钱落入木匣。空格补上，规矩没有消失。' };
+        },
+      },
+      {
+        text: '补做杂务',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
+          newState.resources = {
+            ...newState.resources,
+            essence: Math.max(0, newState.resources.essence - 25),
+            insight: newState.resources.insight + 1,
+          };
+          newState = setFlag(newState, 'worked_off_missed_roll_call');
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['补过点卯杂务'] });
+          return { state: newState, log: '你补了一件杂务。书吏划掉空格，未抬头。' };
+        },
+      },
+      {
+        text: '置之不理',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
+          newState = setFlag(newState, 'ignored_outer_gate_roll_call');
+          newState = adjustQuality(newState, 'sect_discipline', -2);
+          newState = adjustQuality(newState, 'sect_trace', -1);
+          newState = recordOuterGateClerk(newState, { tags: ['点卯未理'], grudgesDelta: 1 });
+          return { state: newState, log: '你没有补格。薄簿合上，名字仍在。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_patrol_report',
+    text: '巡值回山，书吏摊开另一册薄簿。山门外无大事，也要写成字。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['completed_sect_patrol']) &&
+      !state.choices.flags['outer_gate_patrol_report_seen'],
+    weight: (state) => 22 + (state.choices.qualities['sect_contribution'] ?? 0) * 6,
+    choices: [
+      {
+        text: '照规交差',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_patrol_report_seen');
+          newState.resources = { ...newState.resources, coins: newState.resources.coins + 2 };
+          newState = setFlag(newState, 'reported_outer_gate_patrol');
+          newState = adjustQuality(newState, 'sect_contribution', 1);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['收过巡值回报'], favorsDelta: 1 });
+          return { state: newState, log: '你照规回报。两枚钱入手，名册上多一笔贡献。' };
+        },
+      },
+      {
+        text: '夹带草药',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_patrol_report_seen');
+          newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 2 };
+          newState = setFlag(newState, 'kept_patrol_herbs');
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          newState = adjustQuality(newState, 'sect_discipline', -1);
+          newState = adjustQuality(newState, 'karmic_weight', 1);
+          return { state: newState, log: '你把两株草药留在袖中。山门无言，账本暂时无字。' };
+        },
+      },
+      {
+        text: '问边界路径',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_patrol_report_seen');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
+          newState = setFlag(newState, 'heard_outer_gate_border_route');
+          newState = adjustQuality(newState, 'combat_edge', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['问过边界路'] });
+          return { state: newState, log: '书吏指了两处边界路。你记下，山门外的线清楚了一点。' };
         },
       },
     ],

@@ -56,6 +56,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   sect_chore: 'sect_trace',
   sect_errand: 'sect_trace',
   sect_supply: 'sect_trace',
+  sect_roll_call: 'sect_trace',
+  sect_patrol: 'sect_trace',
   listen_lesson: 'sect_trace',
   yinqi: 'quiet_cultivation',
 };
@@ -320,6 +322,51 @@ export function performAction(state: GameState, actionId: string, random?: () =>
 
   if (actionId === 'short_retreat') {
     customLog = '你闭门三日。日课并作一段，气息涨落有常。';
+  }
+
+  if (actionId === 'sect_roll_call') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          attended_outer_gate_roll_call: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          sect_status: 'roll_called',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          sect_discipline: (newState.choices.qualities.sect_discipline ?? 0) + 1,
+        },
+      },
+    };
+    customLog = '外门点过名。薄簿合上，规矩落在纸上。';
+  }
+
+  if (actionId === 'sect_patrol') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          accepted_outer_gate_patrol: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          sect_status: 'patrol',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          sect_contribution: (newState.choices.qualities.sect_contribution ?? 0) + 1,
+          sect_discipline: (newState.choices.qualities.sect_discipline ?? 0) + 1,
+        },
+      },
+    };
+    customLog = '你领了外门巡值。山门内外走一圈，事归薄簿。';
   }
 
   if (actionId === 'sect_errand') {

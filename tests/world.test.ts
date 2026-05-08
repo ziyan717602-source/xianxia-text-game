@@ -26,9 +26,11 @@ describe('World ledger', () => {
   it('should include sect traces in recent summaries', () => {
     const state = createInitialState();
     state.choices.qualities.sect_trace = 4;
+    state.choices.qualities.sect_discipline = 1;
     state.choices.qualities.action_sect_errand_count = 2;
+    state.choices.qualities.action_sect_patrol_count = 1;
 
-    expect(getRecentSummary(state)).toContain('外门影子：规矩4，短差2。');
+    expect(getRecentSummary(state)).toContain('外门影子：规矩4，点卯1，短差2，巡值1。');
   });
 
   it('should append a ten-day summary and clear recent action counts', () => {

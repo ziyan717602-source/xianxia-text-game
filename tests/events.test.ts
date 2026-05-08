@@ -298,4 +298,69 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.sect_trace).toBe(1);
     expect(result.state.relationships.foundation_guardian.tags).toContain('收过谢礼');
   });
+
+  it('should punish missing outer gate roll call after registered retreat', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.coins = 3;
+    state.choices.flags.outer_gate_registered = true;
+    state.choices.qualities.action_short_retreat_count = 1;
+    state.choices.qualities.sect_trace = 2;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_missed_roll_call');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.outer_gate_missed_roll_call_seen).toBe(true);
+    expect(result.state.choices.flags.outer_gate_fine_paid).toBe(true);
+    expect(result.state.choices.tags.sect_status).toBe('fined');
+    expect(result.state.choices.qualities.sect_discipline).toBe(-1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('收过点卯罚钱');
+  });
+
+  it('should let a missed roll call be worked off with outer gate labor', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.essence = 40;
+    state.choices.flags.outer_gate_registered = true;
+    state.choices.qualities.action_short_retreat_count = 1;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_missed_roll_call')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.resources.essence).toBe(15);
+    expect(result.state.resources.insight).toBe(1);
+    expect(result.state.choices.flags.worked_off_missed_roll_call).toBe(true);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.choices.qualities.sect_trace).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('补过点卯杂务');
+  });
+
+  it('should resolve an outer gate patrol report into contribution', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.completed_sect_patrol = true;
+    state.choices.qualities.sect_contribution = 1;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_patrol_report');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(2);
+    expect(result.state.choices.flags.outer_gate_patrol_report_seen).toBe(true);
+    expect(result.state.choices.flags.reported_outer_gate_patrol).toBe(true);
+    expect(result.state.choices.qualities.sect_contribution).toBe(2);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.favors).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('收过巡值回报');
+  });
 });

@@ -102,8 +102,10 @@ export function getRecentSummary(state: GameState): string[] {
     ? `受伤散修：人情${woundedCultivator.favors}，仇怨${woundedCultivator.grudges}。`
     : '旧识：暂无。';
   const sectTrace = state.choices.qualities.sect_trace ?? 0;
+  const sectDiscipline = state.choices.qualities.sect_discipline ?? 0;
+  const sectPatrols = state.choices.qualities.action_sect_patrol_count ?? 0;
   const sectLine = sectTrace > 0
-    ? `外门影子：规矩${Math.floor(sectTrace)}，短差${Math.floor(state.choices.qualities.action_sect_errand_count ?? 0)}。`
+    ? `外门影子：规矩${Math.floor(sectTrace)}，点卯${Math.floor(sectDiscipline)}，短差${Math.floor(state.choices.qualities.action_sect_errand_count ?? 0)}，巡值${Math.floor(sectPatrols)}。`
     : null;
   const alchemyLine =
     state.resources.qiPills > 0 ||

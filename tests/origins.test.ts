@@ -4,6 +4,8 @@ import { performAction } from '../src/game/actions';
 import { getAvailableActionsAtLocation } from '../src/game/location';
 import { applyOrigin, getOriginName, hasSelectedOrigin } from '../src/game/origins';
 import { createInitialState } from '../src/game/state';
+import { Realm } from '../src/game/types';
+import { checkUnlocks } from '../src/game/unlock';
 
 describe('Origin system', () => {
   it('should expose five selectable ordinary origins', () => {
@@ -57,6 +59,8 @@ describe('Origin system', () => {
     state = applyOrigin(state, 'outer_child');
 
     expect(state.currentLocationId).toBe('outer_gate');
+    expect(state.choices.flags.heard_outer_gate_rules).toBe(true);
+    expect(state.choices.flags.outer_gate_registered).toBe(true);
     expect(state.choices.tags.sect_trace).toBe('outer_registered');
     expect(getAvailableActionsAtLocation(state)).toEqual(['sect_chore', 'listen_lesson']);
 
@@ -65,6 +69,11 @@ describe('Origin system', () => {
     expect(result.success).toBe(true);
     expect(result.state.resources.insight).toBe(2);
     expect(result.state.choices.qualities.sect_trace).toBe(3);
+
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('sect_roll_call');
   });
 
   it('should ignore origin application after one has been selected', () => {

@@ -179,6 +179,24 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_sect_supply).toBe(true);
   });
 
+  it('should unlock outer gate roll call and patrol from the registry', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.outer_gate_registered = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('sect_roll_call');
+    expect(state.choices.flags.unlocked_sect_roll_call).toBe(true);
+
+    state.choices.flags.attended_outer_gate_roll_call = true;
+    state.choices.qualities.sect_trace = 3;
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('sect_patrol');
+    expect(state.choices.flags.unlocked_sect_patrol).toBe(true);
+  });
+
   it('should unlock bottleneck preparation and qi breakthrough actions in sequence', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

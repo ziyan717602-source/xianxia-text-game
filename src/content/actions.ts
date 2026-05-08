@@ -114,6 +114,32 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  sect_roll_call: {
+    id: 'sect_roll_call',
+    name: '外门点卯',
+    cost: { essence: 10 },
+    output: { insight: 1 },
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['outer_gate_registered'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  sect_patrol: {
+    id: 'sect_patrol',
+    name: '领外门巡值',
+    cost: { essence: 35 },
+    output: { coins: 3, herbs: 1, insight: 1 },
+    cooldown: 60,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['attended_outer_gate_roll_call'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   listen_lesson: {
     id: 'listen_lesson',
     name: '听课',
