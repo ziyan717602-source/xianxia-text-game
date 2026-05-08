@@ -201,6 +201,54 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_repair_cave_dwelling',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.reached_foundation) &&
+      Boolean(state.choices.flags.completed_foundation_daily_practice) &&
+      !state.choices.flags.cave_dwelling &&
+      state.resources.coins >= 14 &&
+      state.resources.herbs >= 6 &&
+      state.resources.insight >= 6 &&
+      (
+        (state.choices.qualities.formation_craft ?? 0) >= 2 ||
+        Boolean(state.choices.flags.foundation_reworked_qi_array) ||
+        Boolean(state.choices.flags.home_qi_array)
+      ),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('repair_cave_dwelling')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'repair_cave_dwelling'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_repair_cave_dwelling: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_cave_seclusion',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.cave_dwelling),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('cave_seclusion')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'cave_seclusion'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_cave_seclusion: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&

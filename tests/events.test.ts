@@ -418,6 +418,76 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.formation_craft).toBe(2);
   });
 
+  it('should maintain a cave dwelling after cave seclusion', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.coins = 6;
+    state.resources.herbs = 3;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.cave_dwelling_upkeep_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_dwelling_upkeep');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.resources.herbs).toBe(0);
+    expect(result.state.choices.flags.cave_dwelling_upkeep_pending).toBe(false);
+    expect(result.state.choices.flags.maintained_cave_dwelling).toBe(true);
+    expect(result.state.choices.flags.cave_dwelling_neglected).toBe(false);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_stable');
+    expect(result.state.choices.qualities.formation_craft).toBe(2);
+  });
+
+  it('should let cave dwelling upkeep draw on sect supply records', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.cave_dwelling_upkeep_pending = true;
+    state.choices.flags.completed_sect_supply = true;
+    state.choices.qualities.sect_contribution = 2;
+
+    const event = EVENTS.find(e => e.id === 'cave_dwelling_upkeep')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.choices.flags.cave_dwelling_upkeep_pending).toBe(false);
+    expect(result.state.choices.flags.cave_dwelling_supported_by_sect).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_supplied');
+    expect(result.state.choices.tags.sect_status).toBe('cave_supply');
+    expect(result.state.choices.qualities.formation_craft).toBe(1);
+    expect(result.state.choices.qualities.sect_trace).toBe(1);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.choices.qualities.sect_contribution).toBe(1);
+  });
+
+  it('should allow neglecting cave dwelling upkeep for immediate qi at a cost', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.qi = 10;
+    state.resources.lifespan = 1000;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.cave_dwelling_upkeep_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_dwelling_upkeep')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.qi).toBe(16);
+    expect(result.state.resources.dantoxin).toBe(2);
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.resources.lifespan).toBe(940);
+    expect(result.state.choices.flags.cave_dwelling_upkeep_pending).toBe(false);
+    expect(result.state.choices.flags.cave_dwelling_neglected).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_strained');
+    expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
+  });
+
   it('should settle a borrowed foundation pill debt at the market', () => {
     let state = createInitialState();
     state.currentLocationId = 'market';

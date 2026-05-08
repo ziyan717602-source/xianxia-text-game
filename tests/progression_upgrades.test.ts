@@ -88,6 +88,51 @@ describe('Progression upgrades', () => {
     expect(state.choices.qualities.quiet_cultivation).toBe(1);
   });
 
+  it('should repair a cave dwelling and use it for longer foundation seclusion', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.essence = 100;
+    state.resources.qi = 100;
+    state.resources.herbs = 6;
+    state.resources.coins = 14;
+    state.resources.insight = 6;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.completed_foundation_daily_practice = true;
+    state.choices.qualities.formation_craft = 2;
+    state.unlockedActions.push('repair_cave_dwelling', 'cave_seclusion');
+
+    const repair = performAction(state, 'repair_cave_dwelling');
+    state = repair.state;
+
+    expect(repair.success).toBe(true);
+    expect(repair.log).toContain('小洞府');
+    expect(state.resources.essence).toBe(30);
+    expect(state.resources.herbs).toBe(0);
+    expect(state.resources.coins).toBe(0);
+    expect(state.resources.insight).toBe(0);
+    expect(state.choices.flags.cave_dwelling).toBe(true);
+    expect(state.choices.tags.dwelling).toBe('cave_dwelling');
+    expect(state.choices.tags.foundation_state).toBe('cave_dwelling');
+    expect(state.choices.qualities.formation_craft).toBe(3);
+
+    state.resources.essence = 130;
+    const retreat = performAction(state, 'cave_seclusion');
+    state = retreat.state;
+
+    expect(retreat.success).toBe(true);
+    expect(retreat.log).toContain('洞府中一闭');
+    expect(state.resources.essence).toBe(10);
+    expect(state.resources.qi).toBe(160);
+    expect(state.resources.insight).toBe(2);
+    expect(state.time.tick).toBe(560);
+    expect(state.choices.flags.cave_dwelling_upkeep_pending).toBe(true);
+    expect(state.choices.flags.used_cave_dwelling).toBe(true);
+    expect(state.choices.flags.completed_cave_seclusion).toBe(true);
+    expect(state.choices.tags.dwelling).toBe('cave_seclusion_active');
+    expect(state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
   it('should perform outer gate errands and unlock supply-like support', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

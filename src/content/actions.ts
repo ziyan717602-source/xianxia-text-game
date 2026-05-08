@@ -399,6 +399,33 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.FoundationEstablishment,
     },
   },
+  repair_cave_dwelling: {
+    id: 'repair_cave_dwelling',
+    name: '整修洞府',
+    cost: { essence: 70, herbs: 6, coins: 14, insight: 6 },
+    output: {},
+    cooldown: 140,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['reached_foundation'],
+      forbiddenFlags: ['cave_dwelling'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
+  cave_seclusion: {
+    id: 'cave_seclusion',
+    name: '洞府闭关',
+    cost: { essence: 120, qi: 12 },
+    output: { qi: 72, insight: 2 },
+    cooldown: 420,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['cave_dwelling'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',

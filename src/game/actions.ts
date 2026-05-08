@@ -49,6 +49,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   arrange_qi_array: 'formation_craft',
   array_retreat: 'quiet_cultivation',
   foundation_daily_practice: 'quiet_cultivation',
+  repair_cave_dwelling: 'formation_craft',
+  cave_seclusion: 'quiet_cultivation',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -389,6 +391,48 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     customLog = usesArray
       ? '筑基后的日课压过旧阵。阵脚仍能聚气，也多了一层负担。'
       : '筑基后的日课不再照旧。气沉得更深，耗时也更长。';
+  }
+
+  if (actionId === 'repair_cave_dwelling') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          cave_dwelling: true,
+          cave_dwelling_upkeep_pending: false,
+          cave_dwelling_upkeep_seen: false,
+        },
+        tags: {
+          ...newState.choices.tags,
+          dwelling: 'cave_dwelling',
+          foundation_state: 'cave_dwelling',
+        },
+      },
+    };
+    customLog = '你把居处整修成一处小洞府。石缝、药架和阵脚各归其位。';
+  }
+
+  if (actionId === 'cave_seclusion') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          cave_dwelling_upkeep_pending: true,
+          cave_dwelling_upkeep_seen: false,
+          used_cave_dwelling: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          dwelling: 'cave_seclusion_active',
+          foundation_state: 'cave_seclusion',
+        },
+      },
+    };
+    customLog = '洞府中一闭，日课被收成更长的一段。气息沉下去，也留下维护的账。';
   }
 
   if (actionId === 'short_retreat') {

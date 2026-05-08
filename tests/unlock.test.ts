@@ -99,6 +99,29 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_foundation_daily_practice).toBe(true);
   });
 
+  it('should unlock cave dwelling repair and cave seclusion after foundation routine', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.coins = 14;
+    state.resources.herbs = 6;
+    state.resources.insight = 6;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.completed_foundation_daily_practice = true;
+    state.choices.qualities.formation_craft = 2;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('repair_cave_dwelling');
+    expect(state.choices.flags.unlocked_repair_cave_dwelling).toBe(true);
+
+    state.choices.flags.cave_dwelling = true;
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('cave_seclusion');
+    expect(state.choices.flags.unlocked_cave_seclusion).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;

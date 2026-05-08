@@ -118,3 +118,4 @@
 - 失意同门：外门遇见冲关失败者，可递稳息散、借小聚气丸或旁观离开；后续回访会清药账、说冲关得失或留下未结旧事。
 - 筑基后坊市旧账：筑基后若仍有丹账、赊欠或拖延，会在坊市触发清账、以药抵账或压账选择，写入掌柜关系、`market_status` 和 `karmic_weight`。
 - 外门筑基名册：筑基后若曾登记、求护法或积累宗门痕迹，会在外门触发入册、补供例或不入册选择，写入书吏/护法关系、`sect_status`、`sect_discipline` 和 `sect_contribution`。
+- 洞府维护：洞府闭关后在居处触发，可用钱药维护、调用外门供给或暂不维护；结果写入 `dwelling`、`formation_craft`、`sect_*` 和 `reckless_breakthrough`。

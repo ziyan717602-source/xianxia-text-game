@@ -160,7 +160,7 @@ export function applyCultivationOutputModifiers(
   actionId: string,
   output: Partial<Resources>
 ): Partial<Resources> {
-  if (!['tuna', 'rike_tuna', 'short_retreat', 'array_retreat', 'foundation_daily_practice'].includes(actionId)) return output;
+  if (!['tuna', 'rike_tuna', 'short_retreat', 'array_retreat', 'foundation_daily_practice', 'cave_seclusion'].includes(actionId)) return output;
   if (!state.cultivation.rootKnown) return output;
 
   const technique = TECHNIQUES[state.cultivation.activeTechniqueId];
@@ -179,7 +179,9 @@ export function applyCultivationOutputModifiers(
     bonus += 1;
   }
 
-  const multiplier = actionId === 'foundation_daily_practice'
+  const multiplier = actionId === 'cave_seclusion'
+    ? 9
+    : actionId === 'foundation_daily_practice'
     ? 7
     : actionId === 'array_retreat'
       ? 6

@@ -1420,6 +1420,95 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'cave_dwelling_upkeep',
+    text: '洞府闭关后，药架空了几格，阵脚也浮出细灰。洞府能藏气，也要有人照看。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['cave_dwelling']) &&
+      Boolean(state.choices.flags['cave_dwelling_upkeep_pending']) &&
+      !state.choices.flags['cave_dwelling_upkeep_seen'],
+    weight: (state) =>
+      28 +
+      (state.choices.qualities['formation_craft'] ?? 0) * 4 +
+      (state.choices.qualities['quiet_cultivation'] ?? 0) * 2,
+    choices: [
+      {
+        text: '按期维护（六钱三药）',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_dwelling_upkeep_seen');
+
+          if (newState.resources.coins < 6 || newState.resources.herbs < 3) {
+            newState = setFlag(newState, 'cave_dwelling_upkeep_pending', false);
+            newState = setFlag(newState, 'cave_dwelling_neglected');
+            newState = setTag(newState, 'dwelling', 'cave_dwelling_thin');
+            newState = adjustQuality(newState, 'formation_craft', 1);
+            return { state: newState, log: '钱药不足，洞府只粗略收拾。气还在，账也在。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            coins: newState.resources.coins - 6,
+            herbs: newState.resources.herbs - 3,
+          };
+          newState = setFlag(newState, 'cave_dwelling_upkeep_pending', false);
+          newState = setFlag(newState, 'maintained_cave_dwelling');
+          newState = setFlag(newState, 'cave_dwelling_neglected', false);
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_stable');
+          newState = adjustQuality(newState, 'formation_craft', 2);
+          return { state: newState, log: '六钱三药补入洞府。阵脚沉下去，药架也重新有了余地。' };
+        },
+      },
+      {
+        text: '用外门供给补上',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_dwelling_upkeep_seen');
+          const hasSupplyPath =
+            Boolean(newState.choices.flags['completed_sect_supply']) ||
+            Boolean(newState.choices.flags['foundation_registered_outer_gate']) ||
+            (newState.choices.qualities['sect_contribution'] ?? 0) >= 2;
+
+          if (!hasSupplyPath) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'cave_dwelling_upkeep_pending', false);
+            newState = setFlag(newState, 'cave_dwelling_supply_unavailable');
+            newState = setTag(newState, 'dwelling', 'cave_dwelling_waiting');
+            newState = adjustQuality(newState, 'sect_trace', 1);
+            return { state: newState, log: '外门供给没有落到你名下。你只问清了以后该走哪一道手续。' };
+          }
+
+          newState = setFlag(newState, 'cave_dwelling_upkeep_pending', false);
+          newState = setFlag(newState, 'cave_dwelling_supported_by_sect');
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_supplied');
+          newState = setTag(newState, 'sect_status', 'cave_supply');
+          newState = adjustQuality(newState, 'formation_craft', 1);
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = adjustQuality(newState, 'sect_contribution', -1);
+          return { state: newState, log: '外门供给补入洞府。东西不多，名册上的线又多一条。' };
+        },
+      },
+      {
+        text: '暂不维护',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_dwelling_upkeep_seen');
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 6,
+            dantoxin: newState.resources.dantoxin + 2,
+            wounds: newState.resources.wounds + 1,
+            lifespan: Math.max(0, newState.resources.lifespan - 60),
+          };
+          newState = setFlag(newState, 'cave_dwelling_upkeep_pending', false);
+          newState = setFlag(newState, 'cave_dwelling_neglected');
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_strained');
+          newState = adjustQuality(newState, 'reckless_breakthrough', 1);
+          return { state: newState, log: '你暂不维护。洞府余气仍可榨出六缕，丹毒、暗伤和寿元各记一笔。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'winter_stillness',
     text: '冬夜很长。屋外无声，炉灰白了一层。',
     condition: (state) =>
