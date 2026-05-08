@@ -140,6 +140,48 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_arrange_qi_array',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['completed_short_retreat']) &&
+      !state.choices.flags['home_qi_array'] &&
+      state.resources.insight >= 4 &&
+      state.resources.coins >= 8 &&
+      state.resources.herbs >= 4,
+    effect: (state) => {
+      if (!state.unlockedActions.includes('arrange_qi_array')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'arrange_qi_array'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_arrange_qi_array: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_array_retreat',
+    condition: (state) =>
+      state.realm === Realm.QiCondensation &&
+      Boolean(state.choices.flags['home_qi_array']),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('array_retreat')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'array_retreat'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_array_retreat: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&

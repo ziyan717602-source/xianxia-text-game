@@ -68,6 +68,25 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_short_retreat).toBe(true);
   });
 
+  it('should unlock qi array setup after short retreat has become routine', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.resources.coins = 8;
+    state.resources.herbs = 4;
+    state.resources.insight = 4;
+    state.choices.flags.completed_short_retreat = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('arrange_qi_array');
+    expect(state.choices.flags.unlocked_arrange_qi_array).toBe(true);
+
+    state.choices.flags.home_qi_array = true;
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('array_retreat');
+    expect(state.choices.flags.unlocked_array_retreat).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;

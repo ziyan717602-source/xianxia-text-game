@@ -707,6 +707,68 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'qi_array_maintenance',
+    text: '阵中闭关之后，墙角几处阵脚有些松。灵气仍聚，只是不如初布时安稳。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      Boolean(state.choices.flags['home_qi_array']) &&
+      Boolean(state.choices.flags['qi_array_maintenance_pending']) &&
+      !state.choices.flags['qi_array_maintenance_seen'],
+    weight: (state) => 24 + (state.choices.qualities['formation_craft'] ?? 0) * 4,
+    choices: [
+      {
+        text: '补换阵脚（四钱二药）',
+        effect: (state) => {
+          let newState = setFlag(state, 'qi_array_maintenance_seen');
+
+          if (newState.resources.coins < 4 || newState.resources.herbs < 2) {
+            newState = setFlag(newState, 'qi_array_unstable');
+            newState = setFlag(newState, 'qi_array_maintenance_pending', false);
+            return { state: newState, log: '钱药不足，阵脚只勉强压住。下次闭关，气未必稳。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            coins: newState.resources.coins - 4,
+            herbs: newState.resources.herbs - 2,
+          };
+          newState = setFlag(newState, 'qi_array_maintenance_pending', false);
+          newState = setFlag(newState, 'maintained_qi_array');
+          newState = setTag(newState, 'dwelling', 'qi_array_stable');
+          newState = adjustQuality(newState, 'formation_craft', 1);
+          return { state: newState, log: '你补换阵脚。草药压住浮气，阵纹重新贴住屋角。' };
+        },
+      },
+      {
+        text: '暂且不用',
+        effect: (state) => {
+          let newState = setFlag(state, 'qi_array_maintenance_seen');
+          newState = setFlag(newState, 'qi_array_maintenance_pending', false);
+          newState = setTag(newState, 'dwelling', 'qi_array_settled');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你没有再催阵。阵脚慢慢冷下去，屋中气息仍在。' };
+        },
+      },
+      {
+        text: '强催阵气',
+        effect: (state) => {
+          let newState = setFlag(state, 'qi_array_maintenance_seen');
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 4,
+            dantoxin: newState.resources.dantoxin + 3,
+            wounds: newState.resources.wounds + 1,
+          };
+          newState = setFlag(newState, 'qi_array_maintenance_pending', false);
+          newState = setFlag(newState, 'strained_qi_array');
+          newState = setTag(newState, 'dwelling', 'qi_array_strained');
+          newState = adjustQuality(newState, 'reckless_breakthrough', 1);
+          return { state: newState, log: '你强催阵气。真气多了四缕，药滞和暗伤也各添一分。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'market_foundation_debt',
     text: '坊市掌柜把一只旧木盒推到柜前。盒上无丹，只有账。',
     condition: (state) =>

@@ -24,6 +24,44 @@ describe('Progression upgrades', () => {
     expect(state.choices.qualities.quiet_cultivation).toBe(1);
   });
 
+  it('should arrange a qi array and use it as the next retreat upgrade', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.resources.essence = 100;
+    state.resources.qi = 40;
+    state.resources.herbs = 6;
+    state.resources.coins = 10;
+    state.resources.insight = 6;
+    state.unlockedActions.push('arrange_qi_array', 'array_retreat');
+
+    const arrange = performAction(state, 'arrange_qi_array');
+    state = arrange.state;
+
+    expect(arrange.success).toBe(true);
+    expect(arrange.log).toContain('聚气阵');
+    expect(state.resources.essence).toBe(60);
+    expect(state.resources.herbs).toBe(2);
+    expect(state.resources.coins).toBe(2);
+    expect(state.resources.insight).toBe(2);
+    expect(state.choices.flags.home_qi_array).toBe(true);
+    expect(state.choices.tags.dwelling).toBe('qi_array');
+    expect(state.choices.qualities.formation_craft).toBe(1);
+
+    state.resources.essence = 100;
+    const retreat = performAction(state, 'array_retreat');
+    state = retreat.state;
+
+    expect(retreat.success).toBe(true);
+    expect(retreat.log).toContain('阵中');
+    expect(state.resources.qi).toBe(74);
+    expect(state.resources.insight).toBe(3);
+    expect(state.time.tick).toBe(320);
+    expect(state.choices.flags.qi_array_maintenance_pending).toBe(true);
+    expect(state.choices.flags.completed_array_retreat).toBe(true);
+    expect(state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
   it('should perform outer gate errands and unlock supply-like support', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

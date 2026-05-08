@@ -244,6 +244,46 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
   });
 
+  it('should maintain a qi array after array retreat', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'home';
+    state.resources.coins = 5;
+    state.resources.herbs = 2;
+    state.choices.flags.home_qi_array = true;
+    state.choices.flags.qi_array_maintenance_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'qi_array_maintenance');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(1);
+    expect(result.state.resources.herbs).toBe(0);
+    expect(result.state.choices.flags.qi_array_maintenance_pending).toBe(false);
+    expect(result.state.choices.flags.maintained_qi_array).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('qi_array_stable');
+    expect(result.state.choices.qualities.formation_craft).toBe(1);
+  });
+
+  it('should let a qi array be overdrawn at a cost', () => {
+    let state = createInitialState();
+    state.currentLocationId = 'home';
+    state.resources.qi = 10;
+    state.choices.flags.home_qi_array = true;
+    state.choices.flags.qi_array_maintenance_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'qi_array_maintenance')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.qi).toBe(14);
+    expect(result.state.resources.dantoxin).toBe(3);
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.choices.flags.strained_qi_array).toBe(true);
+    expect(result.state.choices.flags.qi_array_maintenance_pending).toBe(false);
+    expect(result.state.choices.tags.dwelling).toBe('qi_array_strained');
+    expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
+  });
+
   it('should settle a borrowed foundation pill debt at the market', () => {
     let state = createInitialState();
     state.currentLocationId = 'market';

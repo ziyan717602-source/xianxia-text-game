@@ -360,6 +360,32 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  arrange_qi_array: {
+    id: 'arrange_qi_array',
+    name: '布聚气阵',
+    cost: { essence: 40, herbs: 4, coins: 8, insight: 4 },
+    output: {},
+    cooldown: 80,
+    riskProbability: 0,
+    conditions: {
+      forbiddenFlags: ['home_qi_array'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+  array_retreat: {
+    id: 'array_retreat',
+    name: '阵中闭关',
+    cost: { essence: 95, qi: 4 },
+    output: { qi: 38, insight: 1 },
+    cooldown: 240,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['home_qi_array'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',

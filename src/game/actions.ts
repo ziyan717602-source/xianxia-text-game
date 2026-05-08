@@ -46,6 +46,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   breakthrough_qi_3: 'quiet_cultivation',
   breakthrough_foundation: 'quiet_cultivation',
   withdraw_foundation: 'quiet_cultivation',
+  arrange_qi_array: 'formation_craft',
+  array_retreat: 'quiet_cultivation',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -318,6 +320,44 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       },
     };
     customLog = '你把筑基关口压回周天。气未散尽，护法与借丹都暂且作罢。';
+  }
+
+  if (actionId === 'arrange_qi_array') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          home_qi_array: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          dwelling: 'qi_array',
+        },
+      },
+    };
+    customLog = '你在居处布下聚气阵。阵纹不繁，足够承接一段闭关。';
+  }
+
+  if (actionId === 'array_retreat') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          qi_array_maintenance_pending: true,
+          qi_array_maintenance_seen: false,
+          used_qi_array: true,
+        },
+        tags: {
+          ...newState.choices.tags,
+          dwelling: 'qi_array_active',
+        },
+      },
+    };
+    customLog = '阵中一闭，外声隔在阵脚之外。气来得慢，却连成一段。';
   }
 
   if (actionId === 'short_retreat') {
