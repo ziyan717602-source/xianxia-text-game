@@ -386,6 +386,19 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.QiCondensation,
     },
   },
+  foundation_daily_practice: {
+    id: 'foundation_daily_practice',
+    name: '筑基日课',
+    cost: { essence: 80, qi: 8, insight: 1 },
+    output: { qi: 46, insight: 1 },
+    cooldown: 220,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['reached_foundation'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',

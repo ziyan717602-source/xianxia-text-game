@@ -48,6 +48,7 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   withdraw_foundation: 'quiet_cultivation',
   arrange_qi_array: 'formation_craft',
   array_retreat: 'quiet_cultivation',
+  foundation_daily_practice: 'quiet_cultivation',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -358,6 +359,36 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       },
     };
     customLog = '阵中一闭，外声隔在阵脚之外。气来得慢，却连成一段。';
+  }
+
+  if (actionId === 'foundation_daily_practice') {
+    const needsSettling = !newState.choices.flags.foundation_practice_settling_seen;
+    const usesArray = Boolean(newState.choices.flags.home_qi_array);
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          foundation_practice_started: true,
+          ...(needsSettling ? { foundation_practice_settling_pending: true } : {}),
+          ...(usesArray
+            ? {
+                qi_array_maintenance_pending: true,
+                qi_array_maintenance_seen: false,
+              }
+            : {}),
+        },
+        tags: {
+          ...newState.choices.tags,
+          foundation_state: 'daily_practice',
+          ...(usesArray ? { dwelling: 'foundation_array_active' } : {}),
+        },
+      },
+    };
+    customLog = usesArray
+      ? '筑基后的日课压过旧阵。阵脚仍能聚气，也多了一层负担。'
+      : '筑基后的日课不再照旧。气沉得更深，耗时也更长。';
   }
 
   if (actionId === 'short_retreat') {

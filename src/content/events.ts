@@ -987,6 +987,90 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'foundation_practice_settling',
+    text: '筑基后的第一段日课收住时，旧日周天没有完全散去。气沉入骨，丹毒、旧伤和阵脚都显得更清楚。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['foundation_practice_settling_pending']) &&
+      !state.choices.flags['foundation_practice_settling_seen'],
+    weight: (state) =>
+      30 +
+      (state.choices.qualities['quiet_cultivation'] ?? 0) * 2 +
+      (state.choices.qualities['formation_craft'] ?? 0) * 2,
+    choices: [
+      {
+        text: '按日收束',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_practice_settling_seen');
+          newState = setFlag(newState, 'foundation_practice_settling_pending', false);
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 5,
+            lifespan: Math.max(0, newState.resources.lifespan - 80),
+          };
+          newState = setFlag(newState, 'foundation_settled_by_daily_practice');
+          newState = setTag(newState, 'foundation_state', 'settled_quiet');
+          newState = adjustQuality(newState, 'quiet_cultivation', 2);
+          return { state: newState, log: '你按日收束。真气多了五缕，寿元少去八十刻。' };
+        },
+      },
+      {
+        text: '查旧伤药滞',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_practice_settling_seen');
+          newState = setFlag(newState, 'foundation_practice_settling_pending', false);
+          newState.resources = {
+            ...newState.resources,
+            insight: newState.resources.insight + 1,
+            dantoxin: Math.max(0, newState.resources.dantoxin - 6),
+            wounds: Math.max(0, newState.resources.wounds - 1),
+          };
+          newState = setFlag(newState, 'foundation_checked_old_burdens');
+          newState = setTag(newState, 'foundation_state', 'checked_burdens');
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你照见旧伤和药滞。丹毒退六分，旧伤轻一处，见闻也添一分。' };
+        },
+      },
+      {
+        text: '重排居处阵脚',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_practice_settling_seen');
+          newState = setFlag(newState, 'foundation_practice_settling_pending', false);
+
+          if (!newState.choices.flags.home_qi_array) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'foundation_noted_array_need');
+            newState = adjustQuality(newState, 'formation_craft', 1);
+            return { state: newState, log: '居处未成阵脚。你只记下筑基后该如何重排气路。' };
+          }
+
+          if (newState.resources.coins < 4 || newState.resources.herbs < 2) {
+            newState = setFlag(newState, 'qi_array_unstable');
+            newState = adjustQuality(newState, 'formation_craft', 1);
+            return { state: newState, log: '钱药不足，旧阵只重排了一半。阵脚能用，也更挑时日。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            coins: newState.resources.coins - 4,
+            herbs: newState.resources.herbs - 2,
+            qi: newState.resources.qi + 2,
+          };
+          newState = setFlag(newState, 'foundation_reworked_qi_array');
+          newState = setFlag(newState, 'qi_array_maintenance_pending', false);
+          newState = setFlag(newState, 'qi_array_unstable', false);
+          newState = setFlag(newState, 'strained_qi_array', false);
+          newState = setTag(newState, 'dwelling', 'foundation_array');
+          newState = setTag(newState, 'foundation_state', 'array_reworked');
+          newState = adjustQuality(newState, 'formation_craft', 2);
+          return { state: newState, log: '你以四钱二药重排阵脚。旧阵贴住筑基后的气路，真气多了两缕。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'winter_stillness',
     text: '冬夜很长。屋外无声，炉灰白了一层。',
     condition: (state) =>

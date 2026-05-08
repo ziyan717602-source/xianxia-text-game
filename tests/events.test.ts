@@ -284,6 +284,60 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
   });
 
+  it('should settle foundation practice by checking old burdens', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.dantoxin = 12;
+    state.resources.wounds = 1;
+    state.choices.flags.foundation_practice_settling_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'foundation_practice_settling');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[1].effect(state);
+
+    expect(result.state.choices.flags.foundation_practice_settling_seen).toBe(true);
+    expect(result.state.choices.flags.foundation_practice_settling_pending).toBe(false);
+    expect(result.state.choices.flags.foundation_checked_old_burdens).toBe(true);
+    expect(result.state.resources.dantoxin).toBe(6);
+    expect(result.state.resources.wounds).toBe(0);
+    expect(result.state.resources.insight).toBe(1);
+    expect(result.state.choices.tags.foundation_state).toBe('checked_burdens');
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
+  it('should let foundation practice rework a qi array', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.qi = 20;
+    state.resources.coins = 4;
+    state.resources.herbs = 2;
+    state.choices.flags.home_qi_array = true;
+    state.choices.flags.qi_array_maintenance_pending = true;
+    state.choices.flags.qi_array_unstable = true;
+    state.choices.flags.strained_qi_array = true;
+    state.choices.flags.foundation_practice_settling_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'foundation_practice_settling')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.resources.herbs).toBe(0);
+    expect(result.state.resources.qi).toBe(22);
+    expect(result.state.choices.flags.foundation_reworked_qi_array).toBe(true);
+    expect(result.state.choices.flags.qi_array_maintenance_pending).toBe(false);
+    expect(result.state.choices.flags.qi_array_unstable).toBe(false);
+    expect(result.state.choices.flags.strained_qi_array).toBe(false);
+    expect(result.state.choices.tags.dwelling).toBe('foundation_array');
+    expect(result.state.choices.tags.foundation_state).toBe('array_reworked');
+    expect(result.state.choices.qualities.formation_craft).toBe(2);
+  });
+
   it('should settle a borrowed foundation pill debt at the market', () => {
     let state = createInitialState();
     state.currentLocationId = 'market';

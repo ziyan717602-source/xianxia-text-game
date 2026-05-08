@@ -182,6 +182,25 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_foundation_daily_practice',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.reached_foundation),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('foundation_daily_practice')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'foundation_daily_practice'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_foundation_daily_practice: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&

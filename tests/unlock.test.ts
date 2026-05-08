@@ -87,6 +87,18 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_array_retreat).toBe(true);
   });
 
+  it('should unlock foundation daily practice after foundation establishment', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.choices.flags.reached_foundation = true;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('foundation_daily_practice');
+    expect(state.choices.flags.unlocked_foundation_daily_practice).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;

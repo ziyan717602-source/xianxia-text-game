@@ -62,6 +62,32 @@ describe('Progression upgrades', () => {
     expect(state.choices.qualities.quiet_cultivation).toBe(1);
   });
 
+  it('should continue routine cultivation after foundation establishment', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.essence = 100;
+    state.resources.qi = 60;
+    state.resources.insight = 5;
+    state.choices.flags.reached_foundation = true;
+    state.unlockedActions.push('foundation_daily_practice');
+
+    const result = performAction(state, 'foundation_daily_practice');
+    state = result.state;
+
+    expect(result.success).toBe(true);
+    expect(result.log).toContain('筑基后的日课');
+    expect(state.resources.essence).toBe(20);
+    expect(state.resources.qi).toBe(98);
+    expect(state.resources.insight).toBe(5);
+    expect(state.time.tick).toBe(220);
+    expect(state.choices.flags.foundation_practice_started).toBe(true);
+    expect(state.choices.flags.foundation_practice_settling_pending).toBe(true);
+    expect(state.choices.flags.completed_foundation_daily_practice).toBe(true);
+    expect(state.choices.tags.foundation_state).toBe('daily_practice');
+    expect(state.choices.qualities.quiet_cultivation).toBe(1);
+  });
+
   it('should perform outer gate errands and unlock supply-like support', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;
