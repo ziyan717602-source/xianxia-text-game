@@ -1509,6 +1509,72 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'cave_herb_plot_ripens',
+    text: '洞府药畦里有几味草药到时候了。叶色不盛，却比山路上来得安稳。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['cave_herb_plot']) &&
+      Boolean(state.choices.flags['cave_herb_plot_ripening_pending']) &&
+      !state.choices.flags['cave_herb_plot_ripens_seen'],
+    weight: (state) =>
+      26 +
+      (state.time.season === Season.Spring ? 6 : 0) +
+      (state.choices.qualities['alchemy_affinity'] ?? 0) * 4,
+    choices: [
+      {
+        text: '按时采收',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_herb_plot_ripens_seen');
+          newState.resources = {
+            ...newState.resources,
+            herbs: newState.resources.herbs + 4,
+          };
+          newState = setFlag(newState, 'cave_herb_plot_ripening_pending', false);
+          newState = setFlag(newState, 'harvested_cave_herb_plot');
+          newState = setTag(newState, 'cave_support', 'herb_plot_stable');
+          newState = adjustQuality(newState, 'alchemy_affinity', 2);
+          return { state: newState, log: '你按时采收。四味草药入匣，药畦的土气没有被伤。' };
+        },
+      },
+      {
+        text: '留作种株',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_herb_plot_ripens_seen');
+          newState.resources = {
+            ...newState.resources,
+            herbs: newState.resources.herbs + 2,
+            insight: newState.resources.insight + 1,
+          };
+          newState = setFlag(newState, 'cave_herb_plot_ripening_pending', false);
+          newState = setFlag(newState, 'cave_herb_seed_stock');
+          newState = setTag(newState, 'cave_support', 'herb_seed_stock');
+          newState = adjustQuality(newState, 'alchemy_affinity', 2);
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你只取两味，其余留作种株。药性见闻添了一分，药畦也安静下来。' };
+        },
+      },
+      {
+        text: '催熟入炉',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_herb_plot_ripens_seen');
+          newState.resources = {
+            ...newState.resources,
+            herbs: newState.resources.herbs + 6,
+            dantoxin: newState.resources.dantoxin + 2,
+            lifespan: Math.max(0, newState.resources.lifespan - 40),
+          };
+          newState = setFlag(newState, 'cave_herb_plot_ripening_pending', false);
+          newState = setFlag(newState, 'forced_cave_herb_plot');
+          newState = setTag(newState, 'cave_support', 'forced_growth');
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          newState = adjustQuality(newState, 'reckless_breakthrough', 1);
+          return { state: newState, log: '你催熟入炉。六味草药到手，药滞和寿元各留下细账。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'winter_stillness',
     text: '冬夜很长。屋外无声，炉灰白了一层。',
     condition: (state) =>

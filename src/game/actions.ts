@@ -51,6 +51,8 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   foundation_daily_practice: 'quiet_cultivation',
   repair_cave_dwelling: 'formation_craft',
   cave_seclusion: 'quiet_cultivation',
+  prepare_cave_herb_plot: 'alchemy_affinity',
+  tend_cave_herb_plot: 'alchemy_affinity',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -433,6 +435,45 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       },
     };
     customLog = '洞府中一闭，日课被收成更长的一段。气息沉下去，也留下维护的账。';
+  }
+
+  if (actionId === 'prepare_cave_herb_plot') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          cave_herb_plot: true,
+          cave_herb_plot_ripening_pending: false,
+          cave_herb_plot_ripens_seen: false,
+        },
+        tags: {
+          ...newState.choices.tags,
+          cave_support: 'herb_plot',
+        },
+      },
+    };
+    customLog = '你在洞府边辟出一方药畦。土气不厚，足够养几味常用草药。';
+  }
+
+  if (actionId === 'tend_cave_herb_plot') {
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          cave_herb_plot_ripening_pending: true,
+          cave_herb_plot_ripens_seen: false,
+        },
+        tags: {
+          ...newState.choices.tags,
+          cave_support: 'herb_plot_tended',
+        },
+      },
+    };
+    customLog = '你照看药畦。草药不离洞府，长势也记在洞府的账上。';
   }
 
   if (actionId === 'short_retreat') {

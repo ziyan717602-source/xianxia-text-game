@@ -249,6 +249,54 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_prepare_cave_herb_plot',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.cave_dwelling) &&
+      !state.choices.flags.cave_herb_plot &&
+      state.resources.coins >= 10 &&
+      state.resources.herbs >= 4 &&
+      state.resources.insight >= 3 &&
+      (
+        Boolean(state.choices.flags.maintained_cave_dwelling) ||
+        Boolean(state.choices.flags.cave_dwelling_supported_by_sect) ||
+        (state.choices.qualities.alchemy_affinity ?? 0) >= 3 ||
+        (state.choices.qualities.formation_craft ?? 0) >= 4
+      ),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('prepare_cave_herb_plot')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'prepare_cave_herb_plot'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_prepare_cave_herb_plot: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
+    id: 'unlock_tend_cave_herb_plot',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.cave_herb_plot),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('tend_cave_herb_plot')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'tend_cave_herb_plot'],
+          choices: {
+            ...state.choices,
+            flags: { ...state.choices.flags, unlocked_tend_cave_herb_plot: true }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&

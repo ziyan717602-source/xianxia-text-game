@@ -133,6 +133,47 @@ describe('Progression upgrades', () => {
     expect(state.choices.qualities.quiet_cultivation).toBe(1);
   });
 
+  it('should prepare and tend a cave herb plot as a dwelling supply upgrade', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.essence = 100;
+    state.resources.herbs = 5;
+    state.resources.coins = 10;
+    state.resources.insight = 4;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.maintained_cave_dwelling = true;
+    state.unlockedActions.push('prepare_cave_herb_plot', 'tend_cave_herb_plot');
+
+    const prepare = performAction(state, 'prepare_cave_herb_plot');
+    state = prepare.state;
+
+    expect(prepare.success).toBe(true);
+    expect(prepare.log).toContain('药畦');
+    expect(state.resources.essence).toBe(40);
+    expect(state.resources.herbs).toBe(1);
+    expect(state.resources.coins).toBe(0);
+    expect(state.resources.insight).toBe(1);
+    expect(state.choices.flags.cave_herb_plot).toBe(true);
+    expect(state.choices.tags.cave_support).toBe('herb_plot');
+    expect(state.choices.qualities.alchemy_affinity).toBe(1);
+
+    state.resources.essence = 100;
+    const tend = performAction(state, 'tend_cave_herb_plot');
+    state = tend.state;
+
+    expect(tend.success).toBe(true);
+    expect(tend.log).toContain('照看药畦');
+    expect(state.resources.essence).toBe(45);
+    expect(state.resources.herbs).toBe(4);
+    expect(state.resources.insight).toBe(2);
+    expect(state.time.tick).toBe(300);
+    expect(state.choices.flags.cave_herb_plot_ripening_pending).toBe(true);
+    expect(state.choices.flags.completed_tend_cave_herb_plot).toBe(true);
+    expect(state.choices.tags.cave_support).toBe('herb_plot_tended');
+    expect(state.choices.qualities.alchemy_affinity).toBe(2);
+  });
+
   it('should perform outer gate errands and unlock supply-like support', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;

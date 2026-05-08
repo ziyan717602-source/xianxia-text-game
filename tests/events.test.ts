@@ -488,6 +488,48 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
   });
 
+  it('should harvest a ripened cave herb plot without damaging it', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.choices.flags.cave_herb_plot = true;
+    state.choices.flags.cave_herb_plot_ripening_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_herb_plot_ripens');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.herbs).toBe(4);
+    expect(result.state.choices.flags.cave_herb_plot_ripening_pending).toBe(false);
+    expect(result.state.choices.flags.harvested_cave_herb_plot).toBe(true);
+    expect(result.state.choices.tags.cave_support).toBe('herb_plot_stable');
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(2);
+  });
+
+  it('should allow forcing cave herb growth for more herbs at a toxin and lifespan cost', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.lifespan = 1000;
+    state.choices.flags.cave_herb_plot = true;
+    state.choices.flags.cave_herb_plot_ripening_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_herb_plot_ripens')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.herbs).toBe(6);
+    expect(result.state.resources.dantoxin).toBe(2);
+    expect(result.state.resources.lifespan).toBe(960);
+    expect(result.state.choices.flags.cave_herb_plot_ripening_pending).toBe(false);
+    expect(result.state.choices.flags.forced_cave_herb_plot).toBe(true);
+    expect(result.state.choices.tags.cave_support).toBe('forced_growth');
+    expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
+    expect(result.state.choices.qualities.reckless_breakthrough).toBe(1);
+  });
+
   it('should settle a borrowed foundation pill debt at the market', () => {
     let state = createInitialState();
     state.currentLocationId = 'market';

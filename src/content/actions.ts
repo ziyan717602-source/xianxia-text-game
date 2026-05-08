@@ -426,6 +426,33 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.FoundationEstablishment,
     },
   },
+  prepare_cave_herb_plot: {
+    id: 'prepare_cave_herb_plot',
+    name: '辟洞府药畦',
+    cost: { essence: 60, herbs: 4, coins: 10, insight: 3 },
+    output: {},
+    cooldown: 120,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['cave_dwelling'],
+      forbiddenFlags: ['cave_herb_plot'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
+  tend_cave_herb_plot: {
+    id: 'tend_cave_herb_plot',
+    name: '照看药畦',
+    cost: { essence: 55 },
+    output: { herbs: 3, insight: 1 },
+    cooldown: 180,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['cave_herb_plot'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',

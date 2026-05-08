@@ -122,6 +122,28 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_cave_seclusion).toBe(true);
   });
 
+  it('should unlock cave herb plot preparation and tending from a maintained cave dwelling', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.coins = 10;
+    state.resources.herbs = 4;
+    state.resources.insight = 3;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.maintained_cave_dwelling = true;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('prepare_cave_herb_plot');
+    expect(state.choices.flags.unlocked_prepare_cave_herb_plot).toBe(true);
+
+    state.choices.flags.cave_herb_plot = true;
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('tend_cave_herb_plot');
+    expect(state.choices.flags.unlocked_tend_cave_herb_plot).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;
