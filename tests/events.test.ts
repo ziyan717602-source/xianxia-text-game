@@ -373,6 +373,51 @@ describe('Event System', () => {
     expect(result.state.relationships.market_keeper.tags).toContain('筑基丹账拖延');
   });
 
+  it('should reckon a foundation market account after foundation establishment', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'market';
+    state.resources.coins = 16;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.foundation_pill_debt_open = true;
+    state.choices.tags.market_debt = 'foundation_pill';
+
+    const event = EVENTS.find(e => e.id === 'foundation_market_reckoning');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.foundation_market_reckoning_seen).toBe(true);
+    expect(result.state.choices.flags.foundation_market_reckoned).toBe(true);
+    expect(result.state.choices.flags.foundation_pill_debt_open).toBe(false);
+    expect(result.state.choices.tags.market_debt).toBeUndefined();
+    expect(result.state.choices.tags.market_status).toBe('foundation_account_clear');
+    expect(result.state.choices.qualities.market_ties).toBe(2);
+    expect(result.state.relationships.market_keeper.tags).toContain('筑基后清账');
+  });
+
+  it('should let a foundation market account be pressed into a grudge', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'market';
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.foundation_debt_delayed = true;
+
+    const event = EVENTS.find(e => e.id === 'foundation_market_reckoning')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.choices.flags.foundation_market_pressed_account).toBe(true);
+    expect(result.state.choices.flags.foundation_pill_debt_open).toBe(false);
+    expect(result.state.choices.tags.market_status).toBe('pressed_account');
+    expect(result.state.choices.qualities.market_ties).toBe(-2);
+    expect(result.state.choices.qualities.karmic_weight).toBe(2);
+    expect(result.state.relationships.market_keeper.grudges).toBe(1);
+    expect(result.state.relationships.market_keeper.tags).toContain('筑基后压账');
+  });
+
   it('should resolve the outer gate guardian account after seeking foundation support', () => {
     let state = createInitialState();
     state.currentLocationId = 'outer_gate';
@@ -391,6 +436,56 @@ describe('Event System', () => {
     expect(result.state.choices.flags.foundation_guardian_account_open).toBe(false);
     expect(result.state.choices.qualities.sect_trace).toBe(1);
     expect(result.state.relationships.foundation_guardian.tags).toContain('收过谢礼');
+  });
+
+  it('should move a foundation cultivator into the outer gate foundation registry', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.coins = 6;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.outer_gate_registered = true;
+    state.choices.flags.sought_foundation_guardian = true;
+    state.choices.flags.foundation_guardian_account_open = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_foundation_registry');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.outer_gate_foundation_registry_seen).toBe(true);
+    expect(result.state.choices.flags.outer_gate_guardian_account_seen).toBe(true);
+    expect(result.state.choices.flags.foundation_registered_outer_gate).toBe(true);
+    expect(result.state.choices.flags.foundation_guardian_account_open).toBe(false);
+    expect(result.state.choices.tags.sect_status).toBe('foundation_registered');
+    expect(result.state.choices.qualities.sect_trace).toBe(2);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('记筑基名册');
+    expect(result.state.relationships.foundation_guardian.tags).toContain('筑基后销账');
+  });
+
+  it('should let a foundation cultivator avoid the outer gate registry', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.outer_gate_registered = true;
+    state.choices.flags.sought_foundation_guardian = true;
+
+    const event = EVENTS.find(e => e.id === 'outer_gate_foundation_registry')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.choices.flags.foundation_avoided_registry).toBe(true);
+    expect(result.state.choices.flags.foundation_guardian_account_open).toBe(false);
+    expect(result.state.choices.tags.sect_status).toBe('unregistered_foundation');
+    expect(result.state.choices.qualities.sect_trace).toBe(-2);
+    expect(result.state.choices.qualities.sect_discipline).toBe(-2);
+    expect(result.state.choices.qualities.karmic_weight).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.grudges).toBe(1);
+    expect(result.state.relationships.foundation_guardian.grudges).toBe(1);
   });
 
   it('should punish missing outer gate roll call after registered retreat', () => {

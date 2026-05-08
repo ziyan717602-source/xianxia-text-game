@@ -86,6 +86,7 @@ function recordMarketKeeper(
     tags?: string[];
     debtsDelta?: number;
     favorsDelta?: number;
+    grudgesDelta?: number;
   }
 ): GameState {
   return touchRelationship(
@@ -825,6 +826,7 @@ export const EVENTS: ActiveEvent[] = [
     text: '外门石阶下，那位护法的人把你拦住。没有责问，只报出一条规矩。',
     condition: (state) =>
       state.currentLocationId === 'outer_gate' &&
+      state.realm !== Realm.FoundationEstablishment &&
       Boolean(state.choices.flags['sought_foundation_guardian']) &&
       !state.choices.flags['outer_gate_guardian_account_seen'],
     weight: (state) => 22 + (state.choices.qualities['sect_trace'] ?? 0) * 3,
@@ -873,6 +875,191 @@ export const EVENTS: ActiveEvent[] = [
           newState = adjustQuality(newState, 'sect_trace', -1);
           newState = recordFoundationGuardian(newState, { tags: ['未理会'], grudgesDelta: 1 });
           return { state: newState, log: '你没有应声。阶上无人追来，账却不在阶上。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'foundation_market_reckoning',
+    text: '筑基之后再到坊市，掌柜把旧账翻到新页。药价、丹账和人情都在一张纸上。',
+    condition: (state) => {
+      const relationship = state.relationships[MARKET_KEEPER_ID];
+      return (
+        state.currentLocationId === 'market' &&
+        state.realm === Realm.FoundationEstablishment &&
+        Boolean(state.choices.flags['reached_foundation']) &&
+        (
+          state.choices.tags['market_debt'] === 'foundation_pill' ||
+          Boolean(state.choices.flags['foundation_pill_debt_open']) ||
+          Boolean(state.choices.flags['foundation_debt_delayed']) ||
+          Boolean(state.choices.flags['avoided_foundation_debt']) ||
+          (relationship?.debts ?? 0) > 0
+        ) &&
+        !state.choices.flags['foundation_market_reckoning_seen']
+      );
+    },
+    weight: (state) =>
+      26 +
+      (state.choices.qualities['market_ties'] ?? 0) * 3 +
+      (state.relationships[MARKET_KEEPER_ID]?.debts ?? 0) * 8,
+    choices: [
+      {
+        text: '清旧账（十六钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_market_reckoning_seen');
+
+          if (newState.resources.coins < 16) {
+            newState = setFlag(newState, 'foundation_market_reckoning_debt_open');
+            newState = adjustQuality(newState, 'market_ties', -1);
+            newState = recordMarketKeeper(newState, { tags: ['筑基后旧账未清'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。掌柜把旧账移到新页，价目也跟着换了一行。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 16 };
+          newState = removeTag(newState, 'market_debt');
+          newState = setFlag(newState, 'foundation_market_reckoned');
+          newState = setFlag(newState, 'foundation_pill_debt_open', false);
+          newState = setFlag(newState, 'foundation_market_reckoning_debt_open', false);
+          newState = setTag(newState, 'market_status', 'foundation_account_clear');
+          newState = adjustQuality(newState, 'market_ties', 2);
+          newState = adjustQuality(newState, 'karmic_weight', -1);
+          newState = recordMarketKeeper(newState, { tags: ['筑基后清账'], debtsDelta: -3, favorsDelta: 1 });
+          return { state: newState, log: '十六枚钱入柜。旧账划去，掌柜把新价目推到你眼前。' };
+        },
+      },
+      {
+        text: '以药抵账（四药二见闻）',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_market_reckoning_seen');
+
+          if (newState.resources.herbs < 4 || newState.resources.insight < 2) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'foundation_market_medicine_owed');
+            newState = adjustQuality(newState, 'alchemy_affinity', 1);
+            newState = recordMarketKeeper(newState, { tags: ['药账未成'], debtsDelta: 1 });
+            return { state: newState, log: '药和见闻都不够。掌柜听完药性，只把账又添了一行。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            herbs: newState.resources.herbs - 4,
+            insight: newState.resources.insight - 2,
+          };
+          newState = removeTag(newState, 'market_debt');
+          newState = setFlag(newState, 'foundation_market_paid_with_medicine');
+          newState = setFlag(newState, 'foundation_pill_debt_open', false);
+          newState = setTag(newState, 'market_status', 'medicine_account');
+          newState = adjustQuality(newState, 'alchemy_affinity', 2);
+          newState = adjustQuality(newState, 'market_ties', 1);
+          newState = recordMarketKeeper(newState, { tags: ['药抵筑基账'], debtsDelta: -2 });
+          return { state: newState, log: '四味药和两分药性见闻抵了旧账。掌柜收药，不再提木盒。' };
+        },
+      },
+      {
+        text: '借筑基名头压账',
+        effect: (state) => {
+          let newState = setFlag(state, 'foundation_market_reckoning_seen');
+          newState = removeTag(newState, 'market_debt');
+          newState = setFlag(newState, 'foundation_market_pressed_account');
+          newState = setFlag(newState, 'foundation_pill_debt_open', false);
+          newState = setTag(newState, 'market_status', 'pressed_account');
+          newState = adjustQuality(newState, 'market_ties', -2);
+          newState = adjustQuality(newState, 'karmic_weight', 2);
+          newState = recordMarketKeeper(newState, { tags: ['筑基后压账'], debtsDelta: -1, grudgesDelta: 1 });
+          return { state: newState, log: '你以筑基气势压下旧账。掌柜合账很快，眼神也很快冷下去。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'outer_gate_foundation_registry',
+    text: '外门书吏换了一册薄簿。筑基之后，旧名册仍在，只是栏位不同。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['reached_foundation']) &&
+      (
+        Boolean(state.choices.flags['outer_gate_registered']) ||
+        Boolean(state.choices.flags['sought_foundation_guardian']) ||
+        Boolean(state.choices.flags['foundation_guardian_account_open']) ||
+        (state.choices.qualities['sect_trace'] ?? 0) >= 2
+      ) &&
+      !state.choices.flags['outer_gate_foundation_registry_seen'],
+    weight: (state) =>
+      24 +
+      (state.choices.qualities['sect_trace'] ?? 0) * 4 +
+      (state.choices.qualities['sect_contribution'] ?? 0) * 4,
+    choices: [
+      {
+        text: '入筑基名册（六钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_foundation_registry_seen');
+          newState = setFlag(newState, 'outer_gate_guardian_account_seen');
+
+          if (newState.resources.coins < 6) {
+            newState = setFlag(newState, 'foundation_registry_debt_open');
+            newState = setTag(newState, 'sect_status', 'foundation_unpaid');
+            newState = adjustQuality(newState, 'sect_discipline', -1);
+            newState = recordOuterGateClerk(newState, { tags: ['筑基名册欠费'], debtsDelta: 1 });
+            if (newState.choices.flags.sought_foundation_guardian) {
+              newState = recordFoundationGuardian(newState, { tags: ['筑基后欠册费'], debtsDelta: 1 });
+            }
+            return { state: newState, log: '钱不够。书吏照样写名，只在旁边加了一点朱。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 6 };
+          newState = setFlag(newState, 'foundation_registered_outer_gate');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = setFlag(newState, 'foundation_registry_debt_open', false);
+          newState = setTag(newState, 'sect_status', 'foundation_registered');
+          newState = adjustQuality(newState, 'sect_trace', 2);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['记筑基名册'], favorsDelta: 1 });
+          if (newState.choices.flags.sought_foundation_guardian) {
+            newState = recordFoundationGuardian(newState, { tags: ['筑基后销账'], debtsDelta: -1, favorsDelta: 1 });
+          }
+          return { state: newState, log: '六枚钱入匣。书吏把你的名字移到筑基册上，旧护法账一并划去。' };
+        },
+      },
+      {
+        text: '补巡山供例',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_foundation_registry_seen');
+          newState = setFlag(newState, 'outer_gate_guardian_account_seen');
+          newState.resources = {
+            ...newState.resources,
+            essence: Math.max(0, newState.resources.essence - 35),
+            insight: newState.resources.insight + 1,
+          };
+          newState = setFlag(newState, 'foundation_registered_by_service');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = setTag(newState, 'sect_status', 'foundation_service');
+          newState = adjustQuality(newState, 'sect_trace', 2);
+          newState = adjustQuality(newState, 'sect_contribution', 2);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['筑基补供例'], favorsDelta: 1 });
+          if (newState.choices.flags.sought_foundation_guardian) {
+            newState = recordFoundationGuardian(newState, { tags: ['以供例抵护法账'], favorsDelta: 1 });
+          }
+          return { state: newState, log: '你补了一趟巡山供例。路不远，名册却因此换了栏。' };
+        },
+      },
+      {
+        text: '不入册',
+        effect: (state) => {
+          let newState = setFlag(state, 'outer_gate_foundation_registry_seen');
+          newState = setFlag(newState, 'outer_gate_guardian_account_seen');
+          newState = setFlag(newState, 'foundation_avoided_registry');
+          newState = setFlag(newState, 'foundation_guardian_account_open', false);
+          newState = setTag(newState, 'sect_status', 'unregistered_foundation');
+          newState = adjustQuality(newState, 'sect_trace', -2);
+          newState = adjustQuality(newState, 'sect_discipline', -2);
+          newState = adjustQuality(newState, 'karmic_weight', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['筑基未入册'], grudgesDelta: 1 });
+          if (newState.choices.flags.sought_foundation_guardian) {
+            newState = recordFoundationGuardian(newState, { tags: ['筑基后避册'], grudgesDelta: 1 });
+          }
+          return { state: newState, log: '你没有入册。石阶无人阻拦，薄簿上留下一个空栏。' };
         },
       },
     ],
