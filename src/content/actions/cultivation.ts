@@ -1,0 +1,112 @@
+import { Action, Realm } from '../../game/types';
+
+export const CULTIVATION_ACTIONS: Record<string, Action> = {
+inspect_root: {
+    id: 'inspect_root',
+    actionGroup: 'cultivation',
+    name: '内视灵根',
+    cost: { essence: 20, insight: 1 },
+    output: {},
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      forbiddenFlags: ['root_known'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+attune_technique: {
+    id: 'attune_technique',
+    actionGroup: 'cultivation',
+    name: '按相修订',
+    cost: { essence: 20, insight: 2 },
+    output: {},
+    cooldown: 20,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['root_known'],
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+  },
+rike_tuna: {
+    id: 'rike_tuna',
+    actionGroup: 'cultivation',
+    name: '日课吐纳',
+    cost: { essence: 60 },
+    output: { qi: 8 },
+    cooldown: 50,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'home',
+    },
+    isGlobalAction: true, // Daily practice — can be done anywhere
+  },
+short_retreat: {
+    id: 'short_retreat',
+    actionGroup: 'cultivation',
+    name: '三日闭关',
+    cost: { essence: 90, qi: 2 },
+    output: { qi: 26 },
+    cooldown: 150,
+    riskProbability: 0,
+    conditions: {
+      requiredLocation: 'home',
+      requiredRealm: Realm.QiCondensation,
+    },
+    isGlobalAction: true, // Retreat — internal cultivation, not location-bound
+  },
+foundation_daily_practice: {
+    id: 'foundation_daily_practice',
+    actionGroup: 'cultivation',
+    name: '筑基日课',
+    cost: { essence: 25 },
+    output: { qi: 6, insight: 1 },
+    cooldown: 10,
+    riskProbability: 0,
+    conditions: {
+      requiredRealm: Realm.FoundationEstablishment,
+      requiredFlags: ['foundation_morning_seen'],
+      forbiddenFlags: [],
+    },
+  },
+inner_gate_rumor: {
+    id: 'inner_gate_rumor',
+    actionGroup: 'cultivation',
+    name: '内门传闻',
+    cost: { essence: 10 },
+    output: { insight: 3 },
+    cooldown: 8,
+    riskProbability: 0,
+    conditions: {
+      requiredRealm: Realm.FoundationEstablishment,
+      requiredLocation: 'outer_gate',
+    },
+  },
+foundation_meditation: {
+    id: 'foundation_meditation',
+    actionGroup: 'cultivation',
+    name: '筑基静修',
+    cost: { essence: 50, herbs: 2 },
+    output: { qi: 12, insight: 2 },
+    cooldown: 30,
+    riskProbability: 0.05,
+    conditions: {
+      requiredRealm: Realm.FoundationEstablishment,
+      requiredLocation: 'home',
+    },
+  },
+thunder_cultivation: {
+    id: 'thunder_cultivation',
+    actionGroup: 'cultivation',
+    name: '雷修日课',
+    cost: { essence: 40, qi: 15 },
+    output: { qi: 25, insight: 5 },
+    cooldown: 15,
+    riskProbability: 0,
+    conditions: {
+      requiredRealm: Realm.NascentSoul,
+      requiredLocation: 'thunder_peak',
+    },
+  }
+};
