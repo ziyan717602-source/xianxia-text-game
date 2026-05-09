@@ -1,5 +1,7 @@
 import { GameState } from './types';
 import { deriveGameTime, INITIAL_MAX_STAMINA } from './state';
+import { processDwellingBatch } from './dwelling';
+import { processDantoxinDrift } from './dantoxin';
 import { advanceWorld } from './world';
 
 export const TICK_INTERVAL_MS = 1000; // 1 real second = 1 tick
@@ -20,7 +22,7 @@ function processTicks(state: GameState, ticks: number): GameState {
     time: deriveGameTime(nextTick),
   };
 
-  return advanceWorld(nextState);
+  return advanceWorld(processDantoxinDrift(processDwellingBatch(nextState)));
 }
 
 /**

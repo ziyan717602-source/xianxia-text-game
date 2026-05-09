@@ -297,6 +297,38 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
   {
+    id: 'unlock_arrange_cave_supply',
+    condition: (state) =>
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags.cave_dwelling) &&
+      !state.choices.flags.cave_supply_arranged &&
+      state.resources.coins >= 6 &&
+      state.resources.insight >= 2 &&
+      (
+        Boolean(state.choices.flags.completed_sect_supply) ||
+        Boolean(state.choices.flags.foundation_registered_outer_gate) ||
+        Boolean(state.choices.flags.foundation_registered_by_service) ||
+        (state.choices.qualities.sect_contribution ?? 0) >= 2
+      ),
+    effect: (state) => {
+      if (!state.unlockedActions.includes('arrange_cave_supply')) {
+        return {
+          ...state,
+          unlockedActions: [...state.unlockedActions, 'arrange_cave_supply'],
+          choices: {
+            ...state.choices,
+            flags: {
+              ...state.choices.flags,
+              unlocked_arrange_cave_supply: true,
+              cave_supply_route_known: true,
+            }
+          }
+        };
+      }
+      return state;
+    }
+  },
+  {
     id: 'unlock_inspect_root',
     condition: (state) =>
       state.realm === Realm.QiCondensation &&

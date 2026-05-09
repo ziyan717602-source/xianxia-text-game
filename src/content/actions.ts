@@ -453,6 +453,20 @@ export const ACTIONS: Record<string, Action> = {
       requiredRealm: Realm.FoundationEstablishment,
     },
   },
+  arrange_cave_supply: {
+    id: 'arrange_cave_supply',
+    name: '定洞府供给',
+    cost: { essence: 30, coins: 6, insight: 2 },
+    output: {},
+    cooldown: 80,
+    riskProbability: 0,
+    conditions: {
+      requiredFlags: ['cave_dwelling', 'cave_supply_route_known'],
+      forbiddenFlags: ['cave_supply_arranged'],
+      requiredLocation: 'outer_gate',
+      requiredRealm: Realm.FoundationEstablishment,
+    },
+  },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
     name: '稳固关口',

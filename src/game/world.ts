@@ -93,14 +93,39 @@ function formatActionSummary(recentActions: Record<string, number>): string {
   return `近十日：${entries.join('，')}。`;
 }
 
+function formatDwellingStatus(tag: string | undefined): string {
+  switch (tag) {
+    case 'cave_dwelling_keeping':
+      return '常养';
+    case 'cave_dwelling_shared':
+      return '借静坐';
+    case 'cave_dwelling_supplied':
+      return '有供给';
+    case 'cave_dwelling_supply_strained':
+      return '供给紧';
+    case 'cave_dwelling_slow':
+      return '缓养';
+    case 'cave_dwelling_strained':
+      return '紧用';
+    case 'cave_dwelling_stable':
+      return '已稳';
+    default:
+      return '已成';
+  }
+}
+
 export function getRecentSummary(state: GameState): string[] {
   const recentActions = state.world?.recentActions ?? {};
   const currentLocation = LOCATIONS[state.currentLocationId]?.name ?? '未知之地';
   const term = getSolarTerm(state.time).name;
   const woundedCultivator = state.relationships.wounded_cultivator;
+  const sameGatePeer = state.relationships.same_gate_peer;
   const relationshipLine = woundedCultivator
     ? `受伤散修：人情${woundedCultivator.favors}，仇怨${woundedCultivator.grudges}。`
     : '旧识：暂无。';
+  const sameGateLine = sameGatePeer
+    ? `失意同门：人情${sameGatePeer.favors}，药账${sameGatePeer.debts}，仇怨${sameGatePeer.grudges}。`
+    : null;
   const sectTrace = state.choices.qualities.sect_trace ?? 0;
   const sectDiscipline = state.choices.qualities.sect_discipline ?? 0;
   const sectPatrols = state.choices.qualities.action_sect_patrol_count ?? 0;
@@ -114,6 +139,12 @@ export function getRecentSummary(state: GameState): string[] {
     state.resources.dantoxin > 0
       ? `丹药${Math.floor(state.resources.qiPills)}，稳息${Math.floor(state.resources.stabilizingPowders)}，清躁${Math.floor(state.resources.cleansingPills)}，丹毒${Math.floor(state.resources.dantoxin)}。`
     : null;
+  const caveLine = state.choices.flags.cave_dwelling
+    ? `洞府：${formatDwellingStatus(state.choices.tags.dwelling)}，累计${Math.floor(state.choices.qualities.cave_dwelling_batch_days ?? 0)}日${state.choices.flags.cave_supply_account_pending ? '，供给待销账' : ''}${state.choices.flags.cave_supply_strain_pending ? '，供给失衡' : ''}。`
+    : null;
+  const chronicDantoxinLine = state.choices.flags.chronic_dantoxin_pending
+    ? `药滞：积日${Math.floor(state.choices.qualities.chronic_dantoxin_days ?? 0)}，待清。`
+    : null;
 
   const lines = [
     `${term}，所在：${currentLocation}。`,
@@ -124,8 +155,11 @@ export function getRecentSummary(state: GameState): string[] {
 
   return [
     ...lines,
+    ...(sameGateLine ? [sameGateLine] : []),
     ...(sectLine ? [sectLine] : []),
     ...(alchemyLine ? [alchemyLine] : []),
+    ...(caveLine ? [caveLine] : []),
+    ...(chronicDantoxinLine ? [chronicDantoxinLine] : []),
   ];
 }
 

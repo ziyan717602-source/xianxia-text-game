@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { performAction } from '../src/game/actions';
 import { createInitialState, TICKS_PER_DAY } from '../src/game/state';
 import { processTick, TICK_INTERVAL_MS } from '../src/game/tick';
+import { Realm } from '../src/game/types';
 import { getRecentSummary, getSolarTerm, SOLAR_TERM_DAYS } from '../src/game/world';
 
 describe('World ledger', () => {
@@ -31,6 +32,29 @@ describe('World ledger', () => {
     state.choices.qualities.action_sect_patrol_count = 1;
 
     expect(getRecentSummary(state)).toContain('外门影子：规矩4，点卯1，短差2，巡值1。');
+  });
+
+  it('should include cave and same-gate ledgers in recent summaries', () => {
+    const state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.tags.dwelling = 'cave_dwelling_keeping';
+    state.choices.qualities.cave_dwelling_batch_days = 20;
+    state.relationships.same_gate_peer = {
+      id: 'same_gate_peer',
+      identity: '失意同门',
+      tags: ['还过药账'],
+      lastInteractionTick: 0,
+      debts: 0,
+      favors: 1,
+      grudges: 0,
+      state: 'Alive',
+    };
+
+    const summary = getRecentSummary(state);
+
+    expect(summary).toContain('失意同门：人情1，药账0，仇怨0。');
+    expect(summary).toContain('洞府：常养，累计20日。');
   });
 
   it('should append a ten-day summary and clear recent action counts', () => {

@@ -263,6 +263,68 @@ describe('Event System', () => {
     expect(result.state.relationships.same_gate_peer.tags).toContain('被你旁观');
   });
 
+  it('should let a foundation cultivator guide the same-gate peer through the registry', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.essence = 30;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.foundation_registered_outer_gate = true;
+    state.resources.qiPills = 1;
+    state.choices.qualities.sect_trace = 2;
+
+    const failureEvent = EVENTS.find(e => e.id === 'outer_gate_peer_failure')!;
+    state = failureEvent.choices[1].effect(state).state;
+
+    const event = EVENTS.find(e => e.id === 'same_gate_foundation_revisit');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.essence).toBe(10);
+    expect(result.state.choices.flags.same_gate_foundation_revisit_seen).toBe(true);
+    expect(result.state.choices.flags.same_gate_guided_to_foundation_registry).toBe(true);
+    expect(result.state.choices.qualities.sect_contribution).toBe(1);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.relationships.same_gate_peer.debts).toBe(0);
+    expect(result.state.relationships.same_gate_peer.favors).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('给同门看册');
+  });
+
+  it('should let a foundation cave dwelling carry a same-gate favor with upkeep cost', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.qi = 20;
+    state.choices.flags.reached_foundation = true;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.left_same_gate_peer_failed = true;
+    state.relationships.same_gate_peer = {
+      id: 'same_gate_peer',
+      identity: '失意同门',
+      tags: ['被你旁观'],
+      lastInteractionTick: 0,
+      debts: 0,
+      favors: 0,
+      grudges: 1,
+      state: 'Alive',
+    };
+
+    const event = EVENTS.find(e => e.id === 'same_gate_foundation_revisit')!;
+    const result = event.choices[1].effect(state);
+
+    expect(result.state.resources.qi).toBe(16);
+    expect(result.state.choices.flags.same_gate_used_cave_dwelling).toBe(true);
+    expect(result.state.choices.flags.cave_dwelling_upkeep_pending).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_shared');
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(1);
+    expect(result.state.choices.qualities.karmic_weight).toBe(-1);
+    expect(result.state.relationships.same_gate_peer.favors).toBe(1);
+    expect(result.state.relationships.same_gate_peer.grudges).toBe(0);
+  });
+
   it('should expose and resolve the meridian dantoxin event', () => {
     let state = createInitialState();
     state.realm = Realm.QiCondensation;
@@ -299,6 +361,54 @@ describe('Event System', () => {
     expect(result.state.resources.herbs).toBe(1);
     expect(result.state.resources.insight).toBe(2);
     expect(result.state.choices.qualities.alchemy_affinity).toBe(1);
+  });
+
+  it('should clear chronic dantoxin by retreating at a lifespan cost', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.essence = 80;
+    state.resources.qi = 10;
+    state.resources.dantoxin = 68;
+    state.resources.lifespan = 1000;
+    state.choices.flags.chronic_dantoxin_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'chronic_dantoxin_residue');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.choices.flags.chronic_dantoxin_seen).toBe(true);
+    expect(result.state.choices.flags.chronic_dantoxin_pending).toBe(false);
+    expect(result.state.choices.flags.chronic_dantoxin_tended).toBe(true);
+    expect(result.state.resources.essence).toBe(30);
+    expect(result.state.resources.qi).toBe(4);
+    expect(result.state.resources.dantoxin).toBe(50);
+    expect(result.state.resources.lifespan).toBe(920);
+    expect(result.state.choices.qualities.quiet_cultivation).toBe(2);
+  });
+
+  it('should let chronic dantoxin be pressed down at a larger later cost', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.resources.qi = 10;
+    state.resources.dantoxin = 50;
+    state.resources.lifespan = 1000;
+    state.choices.flags.chronic_dantoxin_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'chronic_dantoxin_residue')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.choices.flags.chronic_dantoxin_pressed_down).toBe(true);
+    expect(result.state.choices.flags.dantoxin_rooted_in_channels).toBe(true);
+    expect(result.state.resources.qi).toBe(14);
+    expect(result.state.resources.dantoxin).toBe(58);
+    expect(result.state.resources.wounds).toBe(1);
+    expect(result.state.resources.lifespan).toBe(940);
+    expect(result.state.choices.qualities.reckless_breakthrough).toBe(2);
   });
 
   it('should expose foundation scar care after a failed foundation breakthrough', () => {
@@ -743,5 +853,110 @@ describe('Event System', () => {
     expect(result.state.choices.qualities.sect_discipline).toBe(1);
     expect(result.state.relationships.outer_gate_clerk.favors).toBe(1);
     expect(result.state.relationships.outer_gate_clerk.tags).toContain('收过巡值回报');
+  });
+
+  it('should settle a cave supply account with sect contribution', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.cave_supply_arranged = true;
+    state.choices.flags.cave_supply_account_pending = true;
+    state.choices.qualities.sect_contribution = 2;
+
+    const event = EVENTS.find(e => e.id === 'cave_supply_account');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.choices.flags.cave_supply_account_seen).toBe(true);
+    expect(result.state.choices.flags.cave_supply_account_pending).toBe(false);
+    expect(result.state.choices.flags.cave_supply_account_settled).toBe(true);
+    expect(result.state.choices.tags.sect_status).toBe('cave_supply_clear');
+    expect(result.state.choices.qualities.sect_contribution).toBe(1);
+    expect(result.state.choices.qualities.sect_discipline).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('洞府供给销账');
+  });
+
+  it('should defer a cave supply account as a sect debt', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.choices.flags.cave_supply_arranged = true;
+    state.choices.flags.cave_supply_account_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_supply_account')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.choices.flags.cave_supply_account_seen).toBe(true);
+    expect(result.state.choices.flags.cave_supply_account_pending).toBe(false);
+    expect(result.state.choices.flags.cave_supply_account_deferred).toBe(true);
+    expect(result.state.choices.tags.sect_status).toBe('cave_supply_deferred');
+    expect(result.state.choices.qualities.sect_discipline).toBe(-1);
+    expect(result.state.choices.qualities.karmic_weight).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.debts).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.tags).toContain('洞府供给押账');
+  });
+
+  it('should restore a strained cave supply by paying the outstanding account', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.coins = 10;
+    state.choices.flags.cave_supply_arranged = true;
+    state.choices.flags.cave_supply_account_deferred = true;
+    state.choices.flags.cave_supply_coin_debt_open = true;
+    state.choices.flags.cave_supply_strain_pending = true;
+    state.relationships.outer_gate_clerk = {
+      id: 'outer_gate_clerk',
+      identity: '外门书吏',
+      tags: ['洞府供给押账'],
+      lastInteractionTick: 0,
+      debts: 2,
+      favors: 0,
+      grudges: 0,
+      state: 'Alive',
+    };
+
+    const event = EVENTS.find(e => e.id === 'cave_supply_strain');
+    expect(event?.condition(state)).toBe(true);
+
+    const result = event!.choices[0].effect(state);
+
+    expect(result.state.resources.coins).toBe(0);
+    expect(result.state.choices.flags.cave_supply_strain_seen).toBe(true);
+    expect(result.state.choices.flags.cave_supply_strain_pending).toBe(false);
+    expect(result.state.choices.flags.cave_supply_account_deferred).toBe(false);
+    expect(result.state.choices.flags.cave_supply_coin_debt_open).toBe(false);
+    expect(result.state.choices.flags.cave_supply_restabilized).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_supplied');
+    expect(result.state.relationships.outer_gate_clerk.debts).toBe(0);
+  });
+
+  it('should suspend cave supply if the player keeps taking from a strained account', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'home';
+    state.choices.flags.cave_supply_arranged = true;
+    state.choices.flags.cave_supply_strain_pending = true;
+
+    const event = EVENTS.find(e => e.id === 'cave_supply_strain')!;
+    const result = event.choices[2].effect(state);
+
+    expect(result.state.resources.qi).toBe(6);
+    expect(result.state.resources.herbs).toBe(2);
+    expect(result.state.choices.flags.cave_supply_arranged).toBe(false);
+    expect(result.state.choices.flags.cave_dwelling_supported_by_sect).toBe(false);
+    expect(result.state.choices.flags.cave_supply_suspended).toBe(true);
+    expect(result.state.choices.flags.cave_dwelling_neglected).toBe(true);
+    expect(result.state.choices.tags.dwelling).toBe('cave_dwelling_strained');
+    expect(result.state.choices.tags.sect_status).toBe('cave_supply_suspended');
+    expect(result.state.choices.qualities.sect_discipline).toBe(-2);
+    expect(result.state.choices.qualities.karmic_weight).toBe(2);
+    expect(result.state.relationships.outer_gate_clerk.debts).toBe(1);
+    expect(result.state.relationships.outer_gate_clerk.grudges).toBe(1);
   });
 });

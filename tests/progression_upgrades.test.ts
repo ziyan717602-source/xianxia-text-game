@@ -242,4 +242,34 @@ describe('Progression upgrades', () => {
     expect(state.choices.qualities.sect_discipline).toBe(2);
     expect(state.choices.qualities.sect_trace).toBe(2);
   });
+
+  it('should arrange outer gate supply for a cave dwelling', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.currentLocationId = 'outer_gate';
+    state.resources.essence = 100;
+    state.resources.coins = 8;
+    state.resources.insight = 3;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.cave_supply_route_known = true;
+    state.choices.qualities.sect_contribution = 2;
+    state.unlockedActions.push('arrange_cave_supply');
+
+    const result = performAction(state, 'arrange_cave_supply');
+    state = result.state;
+
+    expect(result.success).toBe(true);
+    expect(result.log).toContain('洞府');
+    expect(state.resources.essence).toBe(70);
+    expect(state.resources.coins).toBe(2);
+    expect(state.resources.insight).toBe(1);
+    expect(state.choices.flags.cave_supply_arranged).toBe(true);
+    expect(state.choices.flags.cave_dwelling_supported_by_sect).toBe(true);
+    expect(state.choices.tags.dwelling).toBe('cave_dwelling_supplied');
+    expect(state.choices.tags.sect_status).toBe('cave_supply_arranged');
+    expect(state.choices.qualities.sect_contribution).toBe(1);
+    expect(state.choices.qualities.sect_trace).toBe(1);
+    expect(state.choices.qualities.sect_discipline).toBe(1);
+  });
 });

@@ -1,6 +1,6 @@
 # 技术路线
 
-更新时间：2026-05-07
+更新时间：2026-05-09
 
 ## 目标
 
@@ -37,6 +37,8 @@ UI 不保存权威状态。所有关键状态都来自 `src/game`。
 
 - Vite + React + TypeScript 工程。
 - `src/game` 纯逻辑骨架。
+- `src/game/dwelling.ts` 洞府按游戏日批量结算，避免长期离线收益依赖逐 tick 循环。
+- `src/game/dantoxin.ts` 丹毒按游戏日漂移，把高丹毒的长期压力转成可测试的 pending flag 和事件窗口。
 - `src/content` 事件、地点、解锁配置。
 - `src/storage/save.ts` localStorage 存档和迁移入口。
 - `src/ui` 主界面和 game loop hook。
@@ -47,7 +49,7 @@ UI 不保存权威状态。所有关键状态都来自 `src/game`。
 
 - 事件仍只保存 `activeEventId`，后续动态 NPC/敌人/地点参数需要 `activeEventContext`。
 - UI 已统一到单份 CSS，但还未拆分 `ResourcePanel`、`ActionPanel`、`LogPanel`、`EventModal`。
-- 离线收益已做基础批量 tick，后续事件抽样、日课、闭关仍需要更细的批量结算规则。
+- 离线收益已做基础批量 tick；洞府供养已按游戏日批量结算并保留残余天数，外门洞府供给会提高批量效率并压出销账/失衡事件；丹毒已按游戏日漂移成慢性药滞窗口。后续事件抽样、日课、闭关和更高阶托管仍需要更细的批量结算规则。
 
 ## 状态模型
 

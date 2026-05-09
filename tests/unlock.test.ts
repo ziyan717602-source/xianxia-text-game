@@ -144,6 +144,22 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_tend_cave_herb_plot).toBe(true);
   });
 
+  it('should unlock cave supply arrangement through outer gate records', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.coins = 6;
+    state.resources.insight = 2;
+    state.choices.flags.cave_dwelling = true;
+    state.choices.flags.foundation_registered_outer_gate = true;
+
+    state = checkUnlocks(state);
+
+    expect(state.unlockedActions).toContain('arrange_cave_supply');
+    expect(state.choices.flags.unlocked_arrange_cave_supply).toBe(true);
+    expect(state.choices.flags.cave_supply_route_known).toBe(true);
+  });
+
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;

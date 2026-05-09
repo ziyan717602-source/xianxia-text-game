@@ -729,6 +729,111 @@ export const EVENTS: ActiveEvent[] = [
     ],
   },
   {
+    id: 'same_gate_foundation_revisit',
+    text: '筑基之后再过外门石阶，那名失意同门也在。旧炉灰洗去一些，眼神仍停在册页外。',
+    condition: (state) => {
+      const relationship = state.relationships[SAME_GATE_PEER_ID];
+      return (
+        state.currentLocationId === 'outer_gate' &&
+        state.realm === Realm.FoundationEstablishment &&
+        Boolean(state.choices.flags['reached_foundation']) &&
+        !!relationship &&
+        (
+          Boolean(state.choices.flags['same_gate_peer_return_seen']) ||
+          relationship.favors > 0 ||
+          relationship.debts > 0 ||
+          relationship.grudges > 0
+        ) &&
+        !state.choices.flags['same_gate_foundation_revisit_seen']
+      );
+    },
+    weight: (state) => {
+      const relationship = state.relationships[SAME_GATE_PEER_ID];
+      return (
+        18 +
+        (relationship?.favors ?? 0) * 6 +
+        (relationship?.debts ?? 0) * 5 +
+        (relationship?.grudges ?? 0) * 4 +
+        (state.choices.qualities['sect_trace'] ?? 0) * 2
+      );
+    },
+    choices: [
+      {
+        text: '引他看筑基册',
+        effect: (state) => {
+          let newState = setFlag(state, 'same_gate_foundation_revisit_seen');
+          const hasRegistryPath =
+            Boolean(newState.choices.flags['foundation_registered_outer_gate']) ||
+            Boolean(newState.choices.flags['foundation_registered_by_service']) ||
+            newState.choices.tags['sect_status'] === 'foundation_registered' ||
+            newState.choices.tags['sect_status'] === 'foundation_service';
+
+          if (!hasRegistryPath) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'same_gate_registry_path_unclear');
+            newState = adjustQuality(newState, 'sect_trace', 1);
+            newState = recordSameGatePeer(newState, { tags: ['问过筑基册'] });
+            return { state: newState, log: '你也未入清楚的册。两人看了一阵，书吏没有多话。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            essence: Math.max(0, newState.resources.essence - 20),
+          };
+          newState = setFlag(newState, 'same_gate_guided_to_foundation_registry');
+          newState = adjustQuality(newState, 'sect_contribution', 1);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = recordSameGatePeer(newState, { tags: ['得看筑基册'], debtsDelta: -1, favorsDelta: 1 });
+          newState = recordOuterGateClerk(newState, { tags: ['给同门看册'], favorsDelta: 1 });
+          return { state: newState, log: '你带他看了一眼筑基册。名字未必马上落墨，路却清楚了一点。' };
+        },
+      },
+      {
+        text: '借洞府静坐',
+        effect: (state) => {
+          let newState = setFlag(state, 'same_gate_foundation_revisit_seen');
+
+          if (!newState.choices.flags['cave_dwelling']) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'same_gate_noted_cave_need');
+            newState = adjustQuality(newState, 'quiet_cultivation', 1);
+            newState = recordSameGatePeer(newState, { tags: ['问过静坐处'] });
+            return { state: newState, log: '你还没有可借的洞府。他只问了几句静坐法，便收声。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            qi: Math.max(0, newState.resources.qi - 4),
+          };
+          newState = setFlag(newState, 'same_gate_used_cave_dwelling');
+          newState = setFlag(newState, 'cave_dwelling_upkeep_pending');
+          newState = setFlag(newState, 'cave_dwelling_upkeep_seen', false);
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_shared');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          newState = adjustQuality(newState, 'karmic_weight', -1);
+          newState = recordSameGatePeer(newState, { tags: ['入洞府静坐'], favorsDelta: 1, grudgesDelta: -1 });
+          return { state: newState, log: '你借出一段洞府清静。真气少了四缕，洞府维护也多了一笔。' };
+        },
+      },
+      {
+        text: '各行其路',
+        effect: (state) => {
+          const relationship = state.relationships[SAME_GATE_PEER_ID];
+          let newState = setFlag(state, 'same_gate_foundation_revisit_seen');
+          newState = setFlag(newState, 'same_gate_after_foundation_left_open');
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+
+          if ((relationship?.grudges ?? 0) > 0) {
+            newState = adjustQuality(newState, 'karmic_weight', 1);
+          }
+
+          newState = recordSameGatePeer(newState, { tags: ['筑基后各行其路'], state: 'Departed' });
+          return { state: newState, log: '你没有停步。他也没有叫住你。石阶照旧向上。' };
+        },
+      },
+    ],
+  },
+  {
     id: 'dantoxin_in_meridians',
     text: '夜里行气，药滞不散。气机过腕时有细刺，丹毒已经入脉。',
     condition: (state) =>
@@ -791,6 +896,96 @@ export const EVENTS: ActiveEvent[] = [
           };
           newState = adjustQuality(newState, 'reckless_breakthrough', 2);
           return { state: newState, log: '你把药气硬压入丹田。真气浮起两缕，脉里多了一处暗伤。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'chronic_dantoxin_residue',
+    text: '药滞积久，行气时不再只是细刺。几处经络像有旧灰，平日不显，闭目便在。',
+    condition: (state) =>
+      state.currentLocationId === 'home' &&
+      state.realm !== Realm.Mortal &&
+      state.resources.dantoxin >= 45 &&
+      Boolean(state.choices.flags['chronic_dantoxin_pending']) &&
+      !state.choices.flags['chronic_dantoxin_seen'],
+    weight: (state) =>
+      26 +
+      Math.min(24, Math.max(0, state.resources.dantoxin - 45)) +
+      (state.choices.qualities['alchemy_affinity'] ?? 0) * 2,
+    choices: [
+      {
+        text: '闭关清药',
+        effect: (state) => {
+          let newState = setFlag(state, 'chronic_dantoxin_seen');
+          newState = setFlag(newState, 'chronic_dantoxin_pending', false);
+
+          if (newState.resources.essence < 50) {
+            newState.resources = {
+              ...newState.resources,
+              dantoxin: newState.resources.dantoxin + 2,
+              wounds: newState.resources.wounds + 1,
+            };
+            newState = setFlag(newState, 'chronic_dantoxin_unresolved');
+            return { state: newState, log: '精元不足，药灰没有清下去。经络反添一处滞涩。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            essence: newState.resources.essence - 50,
+            qi: Math.max(0, newState.resources.qi - 6),
+            dantoxin: Math.max(0, newState.resources.dantoxin - 18),
+            lifespan: Math.max(0, newState.resources.lifespan - 80),
+          };
+          newState = setFlag(newState, 'chronic_dantoxin_tended');
+          newState = setFlag(newState, 'dantoxin_rooted_in_channels', newState.resources.dantoxin >= 45);
+          newState = adjustQuality(newState, 'quiet_cultivation', 2);
+          newState = adjustQuality(newState, 'alchemy_affinity', 1);
+          return { state: newState, log: '你闭关清药。真气折去六缕，丹毒退十八分，寿元也少了八十刻。' };
+        },
+      },
+      {
+        text: '连服清躁丸',
+        effect: (state) => {
+          let newState = setFlag(state, 'chronic_dantoxin_seen');
+          newState = setFlag(newState, 'chronic_dantoxin_pending', false);
+
+          if (newState.resources.cleansingPills < 1) {
+            newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+            newState = setFlag(newState, 'chronic_dantoxin_needs_cleansing_pill');
+            newState = adjustQuality(newState, 'alchemy_affinity', 1);
+            return { state: newState, log: '清躁丸不在手边。你只把药灰入脉的轻重记了下来。' };
+          }
+
+          newState.resources = {
+            ...newState.resources,
+            cleansingPills: newState.resources.cleansingPills - 1,
+            essence: Math.max(0, newState.resources.essence - 12),
+            dantoxin: Math.max(0, newState.resources.dantoxin - 24),
+            wounds: Math.max(0, newState.resources.wounds - 1),
+          };
+          newState = setFlag(newState, 'chronic_dantoxin_cleansed_by_pill');
+          newState = setFlag(newState, 'dantoxin_rooted_in_channels', newState.resources.dantoxin >= 45);
+          newState = adjustQuality(newState, 'alchemy_affinity', 2);
+          return { state: newState, log: '清躁丸寒苦下行。丹毒退二十四分，暗伤轻一处，精元也被压下。' };
+        },
+      },
+      {
+        text: '借药性压住',
+        effect: (state) => {
+          let newState = setFlag(state, 'chronic_dantoxin_seen');
+          newState = setFlag(newState, 'chronic_dantoxin_pending', false);
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 4,
+            dantoxin: newState.resources.dantoxin + 8,
+            wounds: newState.resources.wounds + 1,
+            lifespan: Math.max(0, newState.resources.lifespan - 60),
+          };
+          newState = setFlag(newState, 'chronic_dantoxin_pressed_down');
+          newState = setFlag(newState, 'dantoxin_rooted_in_channels');
+          newState = adjustQuality(newState, 'reckless_breakthrough', 2);
+          return { state: newState, log: '你借药性压住旧灰。真气浮起四缕，丹毒、暗伤和寿元各记一笔。' };
         },
       },
     ],
@@ -1331,6 +1526,159 @@ export const EVENTS: ActiveEvent[] = [
           newState = adjustQuality(newState, 'combat_edge', 1);
           newState = recordOuterGateClerk(newState, { tags: ['问过边界路'] });
           return { state: newState, log: '书吏指了两处边界路。你记下，山门外的线清楚了一点。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'cave_supply_account',
+    text: '外门供给送到洞府数月后，书吏把一页小账夹进名册。米盐、药架、阵脚油墨，都写得很细。',
+    condition: (state) =>
+      state.currentLocationId === 'outer_gate' &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['cave_supply_arranged']) &&
+      Boolean(state.choices.flags['cave_supply_account_pending']) &&
+      !state.choices.flags['cave_supply_account_seen'],
+    weight: (state) =>
+      20 +
+      (state.choices.qualities['sect_trace'] ?? 0) * 3 +
+      (state.choices.qualities['sect_discipline'] ?? 0) * 2,
+    choices: [
+      {
+        text: '按贡献销账',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_account_seen');
+
+          if ((newState.choices.qualities['sect_contribution'] ?? 0) < 1) {
+            newState = setFlag(newState, 'cave_supply_account_pending', false);
+            newState = setFlag(newState, 'cave_supply_contribution_short');
+            newState = adjustQuality(newState, 'sect_discipline', -1);
+            newState = recordOuterGateClerk(newState, { tags: ['洞府供给贡献不足'], debtsDelta: 1 });
+            return { state: newState, log: '贡献不够。书吏没有停笔，只在供给账边添了一点朱。' };
+          }
+
+          newState = setFlag(newState, 'cave_supply_account_pending', false);
+          newState = setFlag(newState, 'cave_supply_account_settled');
+          newState = setTag(newState, 'sect_status', 'cave_supply_clear');
+          newState = adjustQuality(newState, 'sect_contribution', -1);
+          newState = adjustQuality(newState, 'sect_discipline', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给销账'], favorsDelta: 1 });
+          return { state: newState, log: '一格贡献划去。洞府供给照旧，名册也照旧。' };
+        },
+      },
+      {
+        text: '交钱补册（八钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_account_seen');
+
+          if (newState.resources.coins < 8) {
+            newState = setFlag(newState, 'cave_supply_account_pending', false);
+            newState = setFlag(newState, 'cave_supply_coin_debt_open');
+            newState = adjustQuality(newState, 'sect_trace', -1);
+            newState = recordOuterGateClerk(newState, { tags: ['洞府供给钱账未清'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。供给没有立刻停，只多了一行欠账。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 8 };
+          newState = setFlag(newState, 'cave_supply_account_pending', false);
+          newState = setFlag(newState, 'cave_supply_paid_with_coins');
+          newState = setTag(newState, 'sect_status', 'cave_supply_paid');
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给钱账清'] });
+          return { state: newState, log: '八枚钱入匣。书吏把小账夹回册中。' };
+        },
+      },
+      {
+        text: '押到下月',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_account_seen');
+          newState = setFlag(newState, 'cave_supply_account_pending', false);
+          newState = setFlag(newState, 'cave_supply_account_deferred');
+          newState = setTag(newState, 'sect_status', 'cave_supply_deferred');
+          newState = adjustQuality(newState, 'sect_discipline', -1);
+          newState = adjustQuality(newState, 'karmic_weight', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给押账'], debtsDelta: 1 });
+          return { state: newState, log: '账押到下月。供给仍来，薄簿上的朱点也仍在。' };
+        },
+      },
+    ],
+  },
+  {
+    id: 'cave_supply_strain',
+    text: '洞府供给拖了几页账后，送来的药架少了一格，阵脚油墨也淡。供给还在，只是不再像先前那样齐。',
+    condition: (state) =>
+      (state.currentLocationId === 'home' || state.currentLocationId === 'outer_gate') &&
+      state.realm === Realm.FoundationEstablishment &&
+      Boolean(state.choices.flags['cave_supply_arranged']) &&
+      Boolean(state.choices.flags['cave_supply_strain_pending']) &&
+      !state.choices.flags['cave_supply_strain_seen'],
+    weight: (state) =>
+      22 +
+      (state.relationships[OUTER_GATE_CLERK_ID]?.debts ?? 0) * 8 +
+      Math.max(0, -(state.choices.qualities['sect_discipline'] ?? 0)) * 4,
+    choices: [
+      {
+        text: '补齐供给账（十钱）',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_strain_seen');
+          newState = setFlag(newState, 'cave_supply_strain_pending', false);
+
+          if (newState.resources.coins < 10) {
+            newState = setFlag(newState, 'cave_supply_coin_debt_open');
+            newState = adjustQuality(newState, 'sect_discipline', -1);
+            newState = recordOuterGateClerk(newState, { tags: ['洞府供给补账未成'], debtsDelta: 1 });
+            return { state: newState, log: '钱不够。书吏收回账页，供给仍旧减着。' };
+          }
+
+          newState.resources = { ...newState.resources, coins: newState.resources.coins - 10 };
+          newState = setFlag(newState, 'cave_supply_account_deferred', false);
+          newState = setFlag(newState, 'cave_supply_coin_debt_open', false);
+          newState = setFlag(newState, 'cave_supply_contribution_short', false);
+          newState = setFlag(newState, 'cave_supply_restabilized');
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_supplied');
+          newState = setTag(newState, 'sect_status', 'cave_supply_clear');
+          newState = adjustQuality(newState, 'sect_trace', 1);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给补账清'], debtsDelta: -2 });
+          return { state: newState, log: '十枚钱补到账上。药架补回一格，阵脚油墨也照旧送来。' };
+        },
+      },
+      {
+        text: '减半供给',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_strain_seen');
+          newState = setFlag(newState, 'cave_supply_strain_pending', false);
+          newState = setFlag(newState, 'cave_supply_arranged', false);
+          newState = setFlag(newState, 'cave_dwelling_supported_by_sect', false);
+          newState = setFlag(newState, 'cave_supply_reduced');
+          newState = setFlag(newState, 'cave_dwelling_upkeep_pending');
+          newState = setFlag(newState, 'cave_dwelling_upkeep_seen', false);
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_slow');
+          newState = setTag(newState, 'sect_status', 'cave_supply_reduced');
+          newState = adjustQuality(newState, 'sect_trace', -1);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给减半'], debtsDelta: -1 });
+          return { state: newState, log: '你把供给减半。洞府要重新自理一部分，外门账也少了一行。' };
+        },
+      },
+      {
+        text: '照旧取用',
+        effect: (state) => {
+          let newState = setFlag(state, 'cave_supply_strain_seen');
+          newState = setFlag(newState, 'cave_supply_strain_pending', false);
+          newState = setFlag(newState, 'cave_supply_arranged', false);
+          newState = setFlag(newState, 'cave_dwelling_supported_by_sect', false);
+          newState = setFlag(newState, 'cave_supply_suspended');
+          newState = setFlag(newState, 'cave_dwelling_neglected');
+          newState.resources = {
+            ...newState.resources,
+            qi: newState.resources.qi + 6,
+            herbs: newState.resources.herbs + 2,
+          };
+          newState = setTag(newState, 'dwelling', 'cave_dwelling_strained');
+          newState = setTag(newState, 'sect_status', 'cave_supply_suspended');
+          newState = adjustQuality(newState, 'sect_discipline', -2);
+          newState = adjustQuality(newState, 'karmic_weight', 2);
+          newState = recordOuterGateClerk(newState, { tags: ['洞府供给强取'], debtsDelta: 1, grudgesDelta: 1 });
+          return { state: newState, log: '你照旧取用。最后一批供给入洞府，名册上的供给栏也被划去。' };
         },
       },
     ],

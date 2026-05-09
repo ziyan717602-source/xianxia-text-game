@@ -53,6 +53,7 @@ const ACTION_ROUTE_QUALITIES: Record<string, string> = {
   cave_seclusion: 'quiet_cultivation',
   prepare_cave_herb_plot: 'alchemy_affinity',
   tend_cave_herb_plot: 'alchemy_affinity',
+  arrange_cave_supply: 'sect_trace',
   seek_foundation_guardian: 'sect_trace',
   borrow_foundation_pill: 'reckless_breakthrough',
   caiyao: 'alchemy_affinity',
@@ -474,6 +475,34 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       },
     };
     customLog = '你照看药畦。草药不离洞府，长势也记在洞府的账上。';
+  }
+
+  if (actionId === 'arrange_cave_supply') {
+    const currentContribution = newState.choices.qualities.sect_contribution ?? 0;
+    newState = {
+      ...newState,
+      choices: {
+        ...newState.choices,
+        flags: {
+          ...newState.choices.flags,
+          cave_supply_arranged: true,
+          cave_dwelling_supported_by_sect: true,
+          cave_supply_account_pending: false,
+          cave_supply_account_seen: false,
+        },
+        tags: {
+          ...newState.choices.tags,
+          dwelling: 'cave_dwelling_supplied',
+          sect_status: 'cave_supply_arranged',
+        },
+        qualities: {
+          ...newState.choices.qualities,
+          sect_contribution: Math.max(0, currentContribution - 1),
+          sect_discipline: (newState.choices.qualities.sect_discipline ?? 0) + 1,
+        },
+      },
+    };
+    customLog = '外门按册给洞府定了一条供给。东西不多，来往都有簿。';
   }
 
   if (actionId === 'short_retreat') {
