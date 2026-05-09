@@ -11,6 +11,7 @@ establish_dwelling: {
     riskProbability: 0,
     conditions: {
       requiredRealm: Realm.FoundationEstablishment,
+      forbiddenFlags: ['dwelling_level_1'],
     },
     upgradeTier: 'retreat',
     upgradeCondition: { flag: 'dwelling_level_1' },

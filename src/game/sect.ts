@@ -26,6 +26,9 @@ export function canAdvanceSectRank(state: GameState): boolean {
   if (rank === 'inner') {
     return contribution >= 50 && state.realm === Realm.GoldenCore;
   }
+  if (rank === 'core') {
+    return contribution >= 100 && discipline >= 10 && state.realm === Realm.NascentSoul;
+  }
   return false;
 }
 
@@ -40,6 +43,8 @@ export function advanceSectRank(state: GameState): GameState {
     newRank = 'inner';
   } else if (rank === 'inner') {
     newRank = 'core';
+  } else if (rank === 'core') {
+    newRank = 'elder';
   } else {
     return state;
   }
@@ -66,7 +71,7 @@ export function failTask(state: GameState): GameState {
     ...state,
     sect: {
       ...state.sect,
-      discipline: state.sect.discipline - 2,
+      discipline: Math.max(0, state.sect.discipline - 2),
       currentTask: null,
       taskDeadline: 0,
     },
@@ -159,7 +164,7 @@ export function leaveSect(state: GameState): GameState {
       },
       qualities: {
         ...state.choices.qualities,
-        sect_trace: (state.choices.qualities.sect_trace ?? 0) - 5,
+        sect_trace: Math.max(0, (state.choices.qualities.sect_trace ?? 0) - 5),
       },
     },
   };

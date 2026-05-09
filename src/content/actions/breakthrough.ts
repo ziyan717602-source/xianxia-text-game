@@ -208,5 +208,6 @@ attempt_ascension: {
     conditions: {
       requiredRealm: Realm.NascentSoul,
     },
+    isGlobalAction: true,
   }
 };

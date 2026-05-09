@@ -45,6 +45,7 @@ import { applyCultivationOutputModifiers, attuneTechnique, revealRoot } from '..
 import { deriveGameTime, INITIAL_MAX_STAMINA, getMaxStamina } from '../state';
 import { RESOURCE_LABELS, RESOURCE_KEYS } from '../resources';
 import { advanceWorld, recordActionInWorld } from '../world';
+import { REALM_LIFESPAN_DECAY_RATE } from '../tick';
 import { revealDaoPath, getDaoPathLabel } from '../daopath';
 import { updateKarmicWeight } from '../karma';
 import { completeTask, setCurrentTask, registerOuterDisciple } from '../sect';
@@ -313,11 +314,14 @@ function firstMissingMinResource(resources: Resources, minResources: Partial<Res
 function spendTicks(state: GameState, ticks: number): GameState {
   if (ticks <= 0) return state;
 
+  const lifespanDecayRate = REALM_LIFESPAN_DECAY_RATE[state.realm] ?? 1.0;
+  const lifespanDecay = ticks * lifespanDecayRate;
+
   return advanceWorld({
     ...state,
     resources: {
       ...state.resources,
-      lifespan: Math.max(0, state.resources.lifespan - ticks),
+      lifespan: Math.max(0, state.resources.lifespan - lifespanDecay),
     },
     time: deriveGameTime(state.time.tick + ticks),
   });
@@ -810,7 +814,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     const result = consumePill(newState, GOLDEN_CORE_FIRE_PILL_RECIPE_ID);
     newState = result.state;
     customLog = result.log;
-    newState = { ...newState, resources: { ...newState.resources, dantoxin: newState.resources.dantoxin + 3 } };
+    // Dantoxin already applied by consumePill via recipe.dantoxin
   }
   // New pill: nascent soul nurturing
   if (actionId === 'study_nascent_soul_nurturing_formula') {
@@ -893,7 +897,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     const result = consumePill(newState, SPIRIT_TRANSFORM_FIRE_PILL_RECIPE_ID);
     newState = result.state;
     customLog = result.log;
-    newState = { ...newState, resources: { ...newState.resources, dantoxin: newState.resources.dantoxin + 5 } };
+    // Dantoxin already applied by consumePill via recipe.dantoxin
   }
   // New pill: integration
   if (actionId === 'study_integration_formula') {
@@ -993,7 +997,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     const result = consumePill(newState, HEAVENLY_TRIBULATION_PILL_RECIPE_ID);
     newState = result.state;
     customLog = result.log;
-    newState = { ...newState, resources: { ...newState.resources, dantoxin: newState.resources.dantoxin + 10 } };
+    // Dantoxin already applied by consumePill via recipe.dantoxin
   }
   // New pill: tribulation soul
   if (actionId === 'study_tribulation_soul_formula') {

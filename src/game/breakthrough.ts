@@ -2,6 +2,7 @@ import { BREAKTHROUGH_BY_ACTION, BREAKTHROUGH_RULES, BreakthroughRule } from '..
 import { ELEMENT_LABELS } from '../content/cultivation';
 import { getKarmicBreakthroughPenalty } from './karma';
 import { BreakthroughState, GameState, Realm } from './types';
+import { REALM_LIFESPAN_YEARS, TICKS_PER_DAY, DAYS_PER_YEAR } from './state';
 
 export type BreakthroughOutcome = 'success' | 'partial' | 'failure';
 
@@ -152,10 +153,20 @@ export function resolveBreakthrough(
 
   if (roll <= chance) {
     const successes = (state.breakthrough.successes[rule.id] ?? 0) + 1;
+
+    // Extend lifespan on realm breakthrough (major realm change)
+    const oldLifespanYears = REALM_LIFESPAN_YEARS[rule.fromRealm] ?? 60;
+    const newLifespanYears = REALM_LIFESPAN_YEARS[rule.toRealm] ?? 60;
+    const lifespanGain = Math.max(0, (newLifespanYears - oldLifespanYears) * TICKS_PER_DAY * DAYS_PER_YEAR);
+
     const nextState: GameState = {
       ...state,
       realm: rule.toRealm,
       realmLayer: rule.toLayer,
+      resources: {
+        ...state.resources,
+        lifespan: state.resources.lifespan + lifespanGain,
+      },
       breakthrough: {
         ...baseBreakthrough,
         successes: {

@@ -65,6 +65,7 @@ export function recruitFollower(state: GameState, role: 'servant' | 'disciple' |
     loyalty: role === 'servant' ? 50 : role === 'disciple' ? 60 : 55,
     skill: role === 'servant' ? (state.seed % 4) + 1 : role === 'disciple' ? ((state.seed + 2) % 4) + 3 : ((state.seed + 1) % 3) + 2,
     taskAssignment: null,
+    accumulatedIncome: { herbs: 0, coins: 0, qi: 0 },
   };
 
   return {
@@ -129,18 +130,19 @@ export function collectFollowerIncome(state: GameState): GameState {
 
   for (const [id, follower] of Object.entries(newFollowers)) {
     if (follower.taskAssignment) {
-      const productivity = getFollowerProductivity(follower);
+      const income = follower.accumulatedIncome ?? { herbs: 0, coins: 0, qi: 0 };
       newResources = {
         ...newResources,
-        herbs: newResources.herbs + productivity.herbs,
-        coins: newResources.coins + productivity.coins,
-        qi: newResources.qi + productivity.qi,
+        herbs: newResources.herbs + income.herbs,
+        coins: newResources.coins + income.coins,
+        qi: newResources.qi + income.qi,
       };
 
-      // Loyalty decreases slightly with each collection
+      // Reset accumulated income after collection; loyalty decreases slightly
       newFollowers[id] = {
         ...follower,
         loyalty: Math.max(0, follower.loyalty - 1),
+        accumulatedIncome: { herbs: 0, coins: 0, qi: 0 },
       };
     }
   }
@@ -157,14 +159,30 @@ export function collectFollowerIncome(state: GameState): GameState {
 
 /** Process a day's worth of follower productivity (called from tick) */
 export function followerTick(state: GameState): GameState {
-  // Followers with low loyalty may leave
+  // Followers with low loyalty may leave; assigned followers accumulate income and lose loyalty
   const newFollowers: Record<string, Follower> = {};
   for (const [id, follower] of Object.entries(state.followers.followers)) {
     if (follower.loyalty <= 0) {
       // Follower leaves
       continue;
     }
-    newFollowers[id] = follower;
+
+    // Accumulate daily income for assigned followers
+    if (follower.taskAssignment) {
+      const productivity = getFollowerProductivity(follower);
+      const currentIncome = follower.accumulatedIncome ?? { herbs: 0, coins: 0, qi: 0 };
+      newFollowers[id] = {
+        ...follower,
+        accumulatedIncome: {
+          herbs: currentIncome.herbs + productivity.herbs,
+          coins: currentIncome.coins + productivity.coins,
+          qi: currentIncome.qi + productivity.qi,
+        },
+        loyalty: Math.max(0, follower.loyalty - 1), // small daily loyalty decay for assigned followers
+      };
+    } else {
+      newFollowers[id] = follower;
+    }
   }
 
   return {

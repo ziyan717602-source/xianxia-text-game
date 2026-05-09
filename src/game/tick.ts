@@ -12,7 +12,7 @@ export const TICK_INTERVAL_MS = 1000; // 1 real second = 1 tick
 export const STAMINA_RECOVERY_PER_TICK = 1;
 
 // Higher realms decay lifespan more slowly — ratio relative to mortal (1.0)
-const REALM_LIFESPAN_DECAY_RATE: Record<Realm, number> = {
+export const REALM_LIFESPAN_DECAY_RATE: Record<Realm, number> = {
   [Realm.Mortal]: 1.0,
   [Realm.QiCondensation]: 1.0,
   [Realm.FoundationEstablishment]: 0.8,

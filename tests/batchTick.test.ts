@@ -162,8 +162,8 @@ describe('processBatchTicks — batch offline settlement', () => {
     };
     state.followers = {
       followers: {
-        f1: { id: 'f1', name: '阿福', role: 'servant', loyalty: 0, skill: 3, taskAssignment: null },
-        f2: { id: 'f2', name: '小石', role: 'servant', loyalty: 50, skill: 2, taskAssignment: null },
+        f1: { id: 'f1', name: '阿福', role: 'servant', loyalty: 0, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
+        f2: { id: 'f2', name: '小石', role: 'servant', loyalty: 50, skill: 2, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
       },
       maxFollowers: 1,
     };

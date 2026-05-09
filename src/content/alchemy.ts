@@ -984,7 +984,7 @@ export const PILL_RECIPES: Record<string, PillRecipe> = {
     phase: Element.Fire,
     direction: 'rise',
     requiredResources: { essence: 70, herbs: 10, insight: 10 },
-    outputResource: 'warmFurnacePills',
+    outputResource: 'goldenCorePills',
     outputAmount: 1,
     effect: { qi: 15, dantoxin: 5 },
     dantoxin: 6,

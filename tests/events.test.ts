@@ -273,7 +273,7 @@ describe('Event System', () => {
     const result = event.choices[1].effect(state);
 
     expect(result.state.choices.flags.foundation_debt_delayed).toBe(true);
-    expect(result.state.choices.qualities.market_ties).toBe(-1);
+    expect(result.state.choices.qualities.market_ties).toBe(0); // Math.max(0, ...) prevents negative
     expect(result.state.choices.qualities.karmic_weight).toBe(1);
     expect(result.state.relationships.market_keeper.debts).toBe(2);
     expect(result.state.relationships.market_keeper.tags).toContain('筑基丹账拖延');
@@ -318,7 +318,7 @@ describe('Event System', () => {
     expect(result.state.choices.flags.outer_gate_missed_roll_call_seen).toBe(true);
     expect(result.state.choices.flags.outer_gate_fine_paid).toBe(true);
     expect(result.state.choices.tags.sect_status).toBe('fined');
-    expect(result.state.choices.qualities.sect_discipline).toBe(-1);
+    expect(result.state.choices.qualities.sect_discipline).toBe(0); // Math.max(0, ...) prevents negative
     expect(result.state.relationships.outer_gate_clerk.tags).toContain('收过点卯罚钱');
   });
 

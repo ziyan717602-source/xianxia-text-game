@@ -79,7 +79,7 @@ describe('Follower system', () => {
   test('canRecruitFollower: cannot exceed max followers', () => {
     const state = makeFoundationWithDwelling({
       followers: {
-        followers: { 'test_servant': { id: 'test_servant', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null } },
+        followers: { 'test_servant': { id: 'test_servant', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } } },
         maxFollowers: 1,
       },
     });
@@ -120,7 +120,7 @@ describe('Follower system', () => {
     const state = makeFoundationWithDwelling({
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },
@@ -133,7 +133,7 @@ describe('Follower system', () => {
     const noSect = makeFoundationWithDwelling({
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },
@@ -145,7 +145,7 @@ describe('Follower system', () => {
       sect: { ...createInitialState(42).sect, rank: 'outer' },
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },
@@ -164,24 +164,26 @@ describe('Follower system', () => {
     const state = makeFoundationWithDwelling({
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 80, skill: 5, taskAssignment: 'herb_gathering' },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 80, skill: 5, taskAssignment: 'herb_gathering', accumulatedIncome: { herbs: 4, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },
     });
     const initialHerbs = state.resources.herbs;
     const result = collectFollowerIncome(state);
-    // Herb gathering: skill=5, loyalty=80, factor = 5*0.5*0.8*2 = 4
+    // Accumulated income from followerTick: herbs=4
     expect(result.resources.herbs).toBeGreaterThan(initialHerbs);
-    // Loyalty decreases
+    // Loyalty decreases on collection
     expect(result.followers.followers['f1'].loyalty).toBeLessThan(80);
+    // Accumulated income is reset after collection
+    expect(result.followers.followers['f1'].accumulatedIncome.herbs).toBe(0);
   });
 
   test('collectFollowerIncome: unassigned followers produce nothing', () => {
     const state = makeFoundationWithDwelling({
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 50, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },
@@ -194,8 +196,8 @@ describe('Follower system', () => {
     const state = makeFoundationWithDwelling({
       followers: {
         followers: {
-          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 0, skill: 3, taskAssignment: null },
-          'f2': { id: 'f2', name: '小石', role: 'servant', loyalty: 50, skill: 2, taskAssignment: null },
+          'f1': { id: 'f1', name: '阿福', role: 'servant', loyalty: 0, skill: 3, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
+          'f2': { id: 'f2', name: '小石', role: 'servant', loyalty: 50, skill: 2, taskAssignment: null, accumulatedIncome: { herbs: 0, coins: 0, qi: 0 } },
         },
         maxFollowers: 1,
       },

@@ -315,6 +315,8 @@ export const SECT_EVENTS: ActiveEvent[] = [
       (state.currentLocationId === 'outer_gate' || state.currentLocationId === 'inner_gate') &&
       state.realm === Realm.FoundationEstablishment &&
       state.sect.rank === 'outer' &&
+      state.sect.contribution >= 20 &&
+      state.sect.discipline >= 5 &&
       !state.choices.flags['inner_gate_admission_seen'],
     weight: (state) => 30 + (state.sect.contribution ?? 0) * 2,
     choices: [
@@ -353,10 +355,10 @@ export const SECT_EVENTS: ActiveEvent[] = [
         text: '辩解',
         effect: (state, random) => {
           let newState = setFlag(state, 'sect_discipline_hearing_seen');
-          if (state.choices.qualities.sect_trace ?? 0 >= 5) {
+          if ((state.choices.qualities.sect_trace ?? 0) >= 5) {
             newState = {
               ...newState,
-              sect: { ...newState.sect, discipline: Math.min(0, newState.sect.discipline + 3) },
+              sect: { ...newState.sect, discipline: Math.max(0, newState.sect.discipline + 3) },
             };
             newState = adjustQuality(newState, 'sect_trace', 1);
             return { state: newState, log: '你一番话打动了执事。规矩薄上朱笔划去几分。' };

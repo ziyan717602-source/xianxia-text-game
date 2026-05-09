@@ -132,7 +132,7 @@ describe('Ascension system', () => {
     const state = makeNascentSoulState();
     const result = executeAscension(state, 'remain');
     expect(result.gameOver).toBe(false);
-    expect(result.state.ascension.ascended).toBe(true);
+    expect(result.state.ascension.ascended).toBe(false); // remain = did NOT ascend
     expect(result.state.ascension.ascensionChoice).toBe('remain');
     expect(result.state.choices.flags['chose_to_remain']).toBe(true);
     expect(result.state.choices.flags['ascension_blocked']).toBe(true);

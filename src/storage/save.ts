@@ -25,7 +25,7 @@ const MIGRATION_FALLBACK_TIME: GameTime = {
   day: 1,
 };
 
-export const CURRENT_SAVE_VERSION = 14;
+export const CURRENT_SAVE_VERSION = 15;
 
 /**
  * Stable fallback seed used when a legacy save has no seed field.
@@ -241,6 +241,27 @@ export function migrateSaveData(data: any): SaveData {
       },
     };
     migratedData.version = 14;
+  }
+
+  // ── V14 → V15: Add accumulatedIncome to followers ──
+  if (migratedData.version === 14) {
+    const followers = migratedData.state.followers?.followers ?? {};
+    const patchedFollowers: Record<string, unknown> = {};
+    for (const [id, f] of Object.entries(followers)) {
+      const follower = f as Record<string, unknown>;
+      patchedFollowers[id] = {
+        ...follower,
+        accumulatedIncome: follower.accumulatedIncome ?? { herbs: 0, coins: 0, qi: 0 },
+      };
+    }
+    migratedData.state = {
+      ...migratedData.state,
+      followers: {
+        ...(migratedData.state.followers ?? {}),
+        followers: patchedFollowers,
+      },
+    };
+    migratedData.version = 15;
   }
 
   return migratedData as SaveData;

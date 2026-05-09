@@ -229,6 +229,7 @@ export interface Follower {
   loyalty: number;
   skill: number;
   taskAssignment: string | null;
+  accumulatedIncome: { herbs: number; coins: number; qi: number };
 }
 
 /**

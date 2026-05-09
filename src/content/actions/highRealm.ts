@@ -15,7 +15,7 @@ golden_core_practice: {
     },
     upgradeTier: 'daily',
     upgradedFrom: 'foundation_daily_practice',
-    upgradeCondition: { realm: Realm.NascentSoul },
+    upgradeCondition: { realm: Realm.GoldenCore },
   },
 nascent_soul_practice: {
     id: 'nascent_soul_practice',

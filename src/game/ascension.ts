@@ -132,7 +132,7 @@ export function executeAscension(
         ...state,
         ascension: {
           ...state.ascension,
-          ascended: true,
+          ascended: false,
           ascensionChoice: 'remain',
           finalScore: score,
           finalSummary: summary,

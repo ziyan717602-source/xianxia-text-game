@@ -102,8 +102,8 @@ export const DEMON_DEFS: DemonDef[] = [
     description: '无人可依，形单影只。孤独亦为道，却易入歧途。',
     encounterText: '好久没人和你说话了。不是不想说，是找不到人。静到只剩自己的呼吸。',
     condition: (state) =>
-      Object.keys(state.relationships).length === 0 &&
-      (state.choices.qualities.quiet_cultivation ?? 0) >= 15,
+      Object.keys(state.relationships).length <= 2 &&
+      (state.choices.qualities.quiet_cultivation ?? 0) >= 12,
     progressIncrement: 8,
   },
 ];

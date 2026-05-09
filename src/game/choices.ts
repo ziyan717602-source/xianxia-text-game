@@ -70,7 +70,7 @@ export function adjustQuality(state: GameState, key: string, delta: number): Gam
       ...state.choices,
       qualities: {
         ...state.choices.qualities,
-        [key]: current + delta
+        [key]: Math.max(0, current + delta)
       }
     }
   };
