@@ -1,8 +1,8 @@
-import { GameState, Realm, SaveData } from '../game/types';
+import { GameState, GameTime, Realm, SaveData, Season } from '../game/types';
 import { createInitialAlchemyState } from '../game/alchemy';
 import { createInitialBreakthroughState } from '../game/breakthrough';
 import { createInitialCultivationState } from '../game/cultivation';
-import { createInitialState } from '../game/state';
+import { createInitialState, deriveGameTime } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
 import { createInitialDaoPathState } from '../game/daopath';
@@ -14,15 +14,39 @@ import { createInitialFollowerState } from '../game/follower';
 import { createInitialSecretRealmState } from '../game/secretRealm';
 import { createInitialAscensionState } from '../game/ascension';
 
+/**
+ * Safe fallback time used when a legacy save has no time field.
+ * Represents the start of the game (tick 0, year 1, Spring, day 1).
+ */
+const MIGRATION_FALLBACK_TIME: GameTime = {
+  tick: 0,
+  year: 1,
+  season: Season.Spring,
+  day: 1,
+};
+
 export const CURRENT_SAVE_VERSION = 14;
 
 /**
+ * Stable fallback seed used when a legacy save has no seed field.
+ * Using a constant (42) ensures migration is deterministic and reproducible,
+ * so the same old save always produces the same migrated result.
+ */
+export const MIGRATION_FALLBACK_SEED = 42;
+
+/**
  * 迁移旧版本存档到当前版本
+ *
+ * Each version step adds missing fields with stable, deterministic defaults.
+ * No migration step should use Math.random() — that would make migration
+ * non-deterministic and break reproducibility of loaded saves.
  */
 export function migrateSaveData(data: any): SaveData {
   let migratedData = { ...data };
 
-  // Example migration from V0 (e.g. before SaveData had version) to V1
+  // ── V0 → V1: Wrap raw GameState into SaveData envelope ──
+  // Old saves before versioning stored the GameState directly without
+  // the SaveData wrapper (version, createdAt, updatedAt, seed).
   if (!migratedData.version) {
     migratedData.version = 1;
     if (!migratedData.state) {
@@ -32,12 +56,13 @@ export function migrateSaveData(data: any): SaveData {
         state: migratedData,
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        // Math.random() acceptable here: generating a fallback seed for legacy saves that lack one
-        seed: migratedData.seed || Math.floor(Math.random() * 1000000)
+        seed: migratedData.seed || MIGRATION_FALLBACK_SEED,
       };
     }
   }
 
+  // ── V1 → V2: Add realmLayer field ──
+  // realmLayer tracks progress within a realm; QiCondensation starts at layer 1.
   if (migratedData.version === 1) {
     migratedData.state = {
       ...migratedData.state,
@@ -46,22 +71,38 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 2;
   }
 
+  // ── V2 → V3: Add world ledger ──
+  // WorldState tracks recent actions, logs, summaries, and solar terms.
+  // Defensive: use fallback time if state.time is missing (e.g. bare-bones old saves).
   if (migratedData.version === 2) {
+    const safeTime = migratedData.state.time ?? MIGRATION_FALLBACK_TIME;
     migratedData.state = {
       ...migratedData.state,
-      world: migratedData.state.world ?? createInitialWorldState(migratedData.state.time),
+      time: safeTime,
+      world: migratedData.state.world ?? createInitialWorldState(safeTime),
     };
     migratedData.version = 3;
   }
 
+  // ── V3 → V4: Mark legacy origin ──
+  // Older saves had no origin selection; mark them as legacy_path.
+  // Defensive: ensure choices object exists before markLegacyOrigin accesses it.
   if (migratedData.version === 3) {
+    if (!migratedData.state.choices) {
+      migratedData.state = {
+        ...migratedData.state,
+        choices: { flags: {}, tags: {}, qualities: {} },
+      };
+    }
     migratedData.state = markLegacyOrigin(migratedData.state);
     migratedData.version = 4;
   }
 
+  // ── V4 → V5: Add cultivation ledger ──
+  // CultivationState tracks spiritual root, phase affinities, and techniques.
+  // Uses stable fallback seed (42) when both state.seed and save.seed are missing.
   if (migratedData.version === 4) {
-    // Math.random() acceptable here: generating a fallback seed for legacy saves that lack one
-    const stateSeed = migratedData.state.seed ?? migratedData.seed ?? Math.floor(Math.random() * 1000000);
+    const stateSeed = migratedData.state.seed ?? migratedData.seed ?? MIGRATION_FALLBACK_SEED;
     migratedData.state = {
       ...migratedData.state,
       cultivation: migratedData.state.cultivation ?? createInitialCultivationState(stateSeed),
@@ -69,11 +110,13 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 5;
   }
 
+  // ── V5 → V6: Add alchemy resources and ledger ──
+  // Adds qiPills, dantoxin to resources and the AlchemyState ledger.
   if (migratedData.version === 5) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         qiPills: migratedData.state.resources?.qiPills ?? 0,
         dantoxin: migratedData.state.resources?.dantoxin ?? 0,
       },
@@ -82,6 +125,8 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 6;
   }
 
+  // ── V6 → V7: Add breakthrough ledger ──
+  // BreakthroughState tracks preparation, attempts, failures, and successes.
   if (migratedData.version === 6) {
     migratedData.state = {
       ...migratedData.state,
@@ -90,28 +135,32 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 7;
   }
 
+  // ── V7 → V8: Add stabilizingPowders resource ──
   if (migratedData.version === 7) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         stabilizingPowders: migratedData.state.resources?.stabilizingPowders ?? 0,
       },
     };
     migratedData.version = 8;
   }
 
+  // ── V8 → V9: Add cleansingPills resource ──
   if (migratedData.version === 8) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         cleansingPills: migratedData.state.resources?.cleansingPills ?? 0,
       },
     };
     migratedData.version = 9;
   }
 
+  // ── V9 → V10: Add daoPath, karma, and innerDemon ledgers ──
+  // These subsystems were added in the F1–F3 feature batch.
   if (migratedData.version === 9) {
     migratedData.state = {
       ...migratedData.state,
@@ -122,11 +171,14 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 10;
   }
 
+  // ── V10 → V11: Add pill resources and sect/dwelling/follower ledgers ──
+  // F4–F7 feature batch: meridianCleansingPills, foundationStrengtheningPills,
+  // spiritGatheringPills, sect, dwelling, followers.
   if (migratedData.version === 10) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         meridianCleansingPills: migratedData.state.resources?.meridianCleansingPills ?? 0,
         foundationStrengtheningPills: migratedData.state.resources?.foundationStrengtheningPills ?? 0,
         spiritGatheringPills: migratedData.state.resources?.spiritGatheringPills ?? 0,
@@ -138,6 +190,8 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 11;
   }
 
+  // ── V11 → V12: Add secretRealm and ascension ledgers ──
+  // F8–F9 feature batch: secret realm exploration and ascension system.
   if (migratedData.version === 11) {
     migratedData.state = {
       ...migratedData.state,
@@ -147,11 +201,12 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 12;
   }
 
+  // ── V12 → V13: Add warmFurnacePills and nightSittingPills resources ──
   if (migratedData.version === 12) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         warmFurnacePills: migratedData.state.resources?.warmFurnacePills ?? 0,
         nightSittingPills: migratedData.state.resources?.nightSittingPills ?? 0,
       },
@@ -159,11 +214,13 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 13;
   }
 
+  // ── V13 → V14: Add high-realm pill resources ──
+  // Batch addition of pills for Golden Core through Tribulation realms.
   if (migratedData.version === 13) {
     migratedData.state = {
       ...migratedData.state,
       resources: {
-        ...migratedData.state.resources,
+        ...(migratedData.state.resources ?? {}),
         cloudGatheringPills: migratedData.state.resources?.cloudGatheringPills ?? 0,
         ironBodyPills: migratedData.state.resources?.ironBodyPills ?? 0,
         demonBanePills: migratedData.state.resources?.demonBanePills ?? 0,
