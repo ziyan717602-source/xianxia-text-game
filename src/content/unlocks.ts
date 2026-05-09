@@ -1358,61 +1358,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // New location action unlocks
-  {
-    id: 'unlock_water_meditation',
-    condition: (state) =>
-      state.realm === Realm.QiCondensation && state.currentLocationId === 'stream_valley',
-    effect: (state) => {
-      if (!state.unlockedActions.includes('water_meditation')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'water_meditation'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_water_meditation: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_collect_night_dew',
-    condition: (state) =>
-      state.realm === Realm.QiCondensation && state.resources.herbs >= 3,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('collect_night_dew')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'collect_night_dew'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_collect_night_dew: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_explore_ruins',
-    condition: (state) =>
-      state.currentLocationId === 'abandoned_temple' && state.realm === Realm.QiCondensation,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('explore_ruins')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'explore_ruins'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_explore_ruins: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_read_stone_tablet',
     condition: (state) =>
@@ -1431,78 +1378,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  {
-    id: 'unlock_identify_herb',
-    condition: (state) =>
-      state.currentLocationId === 'herb_slope' && state.resources.herbs >= 2,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('identify_herb')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'identify_herb'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_identify_herb: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_protect_seedling',
-    condition: (state) =>
-      Boolean(state.choices.flags['marked_herb_patch']),
-    effect: (state) => {
-      if (!state.unlockedActions.includes('protect_seedling')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'protect_seedling'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_protect_seedling: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_listen_traveler',
-    condition: (state) =>
-      state.currentLocationId === 'ferry_crossing',
-    effect: (state) => {
-      if (!state.unlockedActions.includes('listen_traveler')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'listen_traveler'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_listen_traveler: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_hire_boat',
-    condition: (state) =>
-      state.currentLocationId === 'ferry_crossing' && state.resources.coins >= 5,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('hire_boat')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'hire_boat'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_hire_boat: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   // New alchemy unlocks: warm furnace pill
   {
     id: 'unlock_study_warm_furnace_formula',
@@ -1731,47 +1608,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // === New location action unlocks ===
-  // Spirit Field actions
-  {
-    id: 'unlock_spirit_field_actions',
-    condition: (state) =>
-      state.currentLocationId === 'spirit_field',
-    effect: (state) => {
-      const actionsToAdd = ['plant_herb', 'harvest_herb', 'tend_field'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_spirit_field_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  // Pill Hall actions
-  {
-    id: 'unlock_pill_hall_actions',
-    condition: (state) =>
-      state.currentLocationId === 'pill_hall',
-    effect: (state) => {
-      const actionsToAdd = ['use_furnace'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_pill_hall_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_study_advanced_formula',
     condition: (state) =>
@@ -1792,66 +1630,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // Sword Pavilion actions
-  {
-    id: 'unlock_sword_pavilion_actions',
-    condition: (state) =>
-      state.currentLocationId === 'sword_pavilion',
-    effect: (state) => {
-      const actionsToAdd = ['practice_sword'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_sword_pavilion_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_observe_sword_intent',
-    condition: (state) =>
-      state.realm === Realm.FoundationEstablishment &&
-      state.currentLocationId === 'sword_pavilion' &&
-      (state.choices.qualities['action_practice_sword_count'] || 0) >= 3,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('observe_sword_intent')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'observe_sword_intent'],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_observe_sword_intent: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  // Sect Hall actions
-  {
-    id: 'unlock_sect_hall_actions',
-    condition: (state) =>
-      state.currentLocationId === 'sect_hall',
-    effect: (state) => {
-      const actionsToAdd = ['attend_ceremony'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_sect_hall_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_receive_mission',
     condition: (state) =>
@@ -1871,47 +1651,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // Deep Temple actions
-  {
-    id: 'unlock_deep_temple_actions',
-    condition: (state) =>
-      state.realm === Realm.FoundationEstablishment &&
-      state.currentLocationId === 'deep_temple',
-    effect: (state) => {
-      const actionsToAdd = ['search_altar', 'meditate_dark'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_deep_temple_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  // Mountain Cave actions
-  {
-    id: 'unlock_mountain_cave_actions',
-    condition: (state) =>
-      state.currentLocationId === 'mountain_cave',
-    effect: (state) => {
-      const actionsToAdd = ['mine_crystal'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_mountain_cave_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_explore_depths',
     condition: (state) =>
@@ -1932,46 +1673,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // Tea House actions
-  {
-    id: 'unlock_tea_house_actions',
-    condition: (state) =>
-      state.currentLocationId === 'tea_house',
-    effect: (state) => {
-      const actionsToAdd = ['drink_tea', 'listen_rumor', 'gamble_dice'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_tea_house_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
-  // Demonic Forest actions
-  {
-    id: 'unlock_demonic_forest_actions',
-    condition: (state) =>
-      state.currentLocationId === 'demonic_forest',
-    effect: (state) => {
-      const actionsToAdd = ['gather_demonic_herb', 'set_trap'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_demonic_forest_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_hunt_beast',
     condition: (state) =>
@@ -1992,27 +1695,7 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // Celestial Cliff actions
-  {
-    id: 'unlock_celestial_cliff_actions',
-    condition: (state) =>
-      state.realm === Realm.FoundationEstablishment &&
-      state.currentLocationId === 'celestial_cliff',
-    effect: (state) => {
-      const actionsToAdd = ['cliff_meditation', 'face_heavenly_wind'].filter((actionId) => !state.unlockedActions.includes(actionId));
-      if (actionsToAdd.length > 0) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, ...actionsToAdd],
-          choices: {
-            ...state.choices,
-            flags: { ...state.choices.flags, unlocked_celestial_cliff_actions: true }
-          }
-        };
-      }
-      return state;
-    }
-  },
+
   // === New alchemy unlocks: cloud gathering pill ===
   {
     id: 'unlock_study_cloud_gathering_formula',
@@ -2710,63 +2393,7 @@ export const UNLOCKS: UnlockRule[] = [
     }
   },
 
-  // Fix 1: High-realm practice unlocks
-  {
-    id: 'unlock_spirit_transformation_practice',
-    condition: (state) => state.realm === Realm.SpiritTransformation,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('spirit_transformation_practice')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'spirit_transformation_practice'],
-          choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_spirit_transformation_practice: true } }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_integration_practice',
-    condition: (state) => state.realm === Realm.Integration,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('integration_practice')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'integration_practice'],
-          choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_integration_practice: true } }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_mahayana_practice',
-    condition: (state) => state.realm === Realm.Mahayana,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('mahayana_practice')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'mahayana_practice'],
-          choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_mahayana_practice: true } }
-        };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_tribulation_practice',
-    condition: (state) => state.realm === Realm.Tribulation,
-    effect: (state) => {
-      if (!state.unlockedActions.includes('tribulation_practice')) {
-        return {
-          ...state,
-          unlockedActions: [...state.unlockedActions, 'tribulation_practice'],
-          choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_tribulation_practice: true } }
-        };
-      }
-      return state;
-    }
-  },
+
   // Fix 1: High-realm breakthrough unlocks
   {
     id: 'unlock_breakthrough_spirit_transformation',
@@ -3027,18 +2654,7 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  // Fix 2: Location action unlocks (add to unlockedActions)
-  {
-    id: 'unlock_spirit_field_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_spirit_field']),
-    effect: (state) => {
-      const actionsToAdd = ['plant_herb', 'harvest_herb', 'tend_spirit_field'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_spirit_field_actions: true } } };
-      }
-      return state;
-    }
-  },
+
   {
     id: 'unlock_alchemy_room_actions',
     condition: (state) => Boolean(state.choices.flags['unlocked_alchemy_room']),
@@ -3050,39 +2666,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  {
-    id: 'unlock_sword_pavilion_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_sword_pavilion']),
-    effect: (state) => {
-      const actionsToAdd = ['practice_sword', 'observe_sword_intent'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_sword_pavilion_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_sect_hall_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_sect_hall']),
-    effect: (state) => {
-      const actionsToAdd = ['attend_ceremony', 'receive_sect_task'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_sect_hall_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_deep_temple_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_deep_temple']),
-    effect: (state) => {
-      const actionsToAdd = ['explore_altar', 'meditate_dark_shrine'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_deep_temple_actions: true } } };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_cave_crystal_actions',
     condition: (state) => Boolean(state.choices.flags['unlocked_cave_crystal']),
@@ -3094,39 +2679,8 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  {
-    id: 'unlock_tea_house_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_tea_house']),
-    effect: (state) => {
-      const actionsToAdd = ['drink_tea', 'listen_rumor', 'gamble_dice'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_tea_house_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_demonic_forest_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_demonic_forest']),
-    effect: (state) => {
-      const actionsToAdd = ['hunt_beast', 'gather_demonic_herb', 'set_trap'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_demonic_forest_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_celestial_cliff_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_celestial_cliff']),
-    effect: (state) => {
-      const actionsToAdd = ['cliff_meditation', 'face_heavenly_wind'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_celestial_cliff_actions: true } } };
-      }
-      return state;
-    }
-  },
+
+
   {
     id: 'unlock_core_peak_actions',
     condition: (state) => Boolean(state.choices.flags['unlocked_core_peak']),
@@ -3138,105 +2692,7 @@ export const UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-  {
-    id: 'unlock_spirit_lake_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_spirit_lake']),
-    effect: (state) => {
-      const actionsToAdd = ['spirit_lake_meditation', 'dive_for_treasure'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_spirit_lake_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_thunder_peak_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_thunder_peak']),
-    effect: (state) => {
-      const actionsToAdd = ['face_tribulation', 'thunder_cultivation'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_thunder_peak_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_ancient_battlefield_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_ancient_battlefield']),
-    effect: (state) => {
-      const actionsToAdd = ['search_battlefield', 'commune_with_remnants'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_ancient_battlefield_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_void_rift_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_void_rift']),
-    effect: (state) => {
-      const actionsToAdd = ['explore_void', 'gather_void_essence'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_void_rift_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_celestial_pavilion_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_celestial_pavilion']),
-    effect: (state) => {
-      const actionsToAdd = ['study_celestial_script', 'meditate_on_dao'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_celestial_pavilion_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_demon_seal_ground_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_demon_seal_ground']),
-    effect: (state) => {
-      const actionsToAdd = ['patrol_seal', 'gather_demonic_material'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_demon_seal_ground_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_spirit_mountain_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_spirit_mountain']),
-    effect: (state) => {
-      const actionsToAdd = ['spirit_mountain_retreat', 'comprehend_dao'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_spirit_mountain_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_tribulation_platform_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_tribulation_platform']),
-    effect: (state) => {
-      const actionsToAdd = ['face_heavenly_tribulation', 'stabilize_dao_foundation'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_tribulation_platform_actions: true } } };
-      }
-      return state;
-    }
-  },
-  {
-    id: 'unlock_immortal_garden_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_immortal_garden']),
-    effect: (state) => {
-      const actionsToAdd = ['gather_immortal_herb', 'meditate_garden'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_immortal_garden_actions: true } } };
-      }
-      return state;
-    }
-  },
+
 
   // High-realm pill unlock rules: study/brew/take patterns
   // GoldenCore tier

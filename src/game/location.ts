@@ -9,44 +9,9 @@ export interface MoveResult {
 }
 
 /**
- * Actions available at ALL locations, regardless of the location's availableActions list.
- * The location's availableActions are additive (location-specific), not exclusive.
- * For universal actions, the requiredLocation condition is skipped — they can be done anywhere.
- */
-export const UNIVERSAL_ACTION_IDS: string[] = [
-  'kuzuo',
-  'tuna',
-  'tiaoxi',
-  'meditate_detox',
-  'stabilize_bottleneck',
-  'rike_tuna',
-  'short_retreat',
-  'breakthrough_qi_2',
-  'breakthrough_qi_3',
-  'breakthrough_qi_4',
-  'breakthrough_qi_5',
-  'breakthrough_qi_6',
-  'breakthrough_qi_7',
-  'breakthrough_qi_8',
-  'breakthrough_qi_9',
-  'breakthrough_foundation',
-  'breakthrough_golden_core',
-  'breakthrough_nascent_soul',
-  'breakthrough_spirit_transformation',
-  'breakthrough_integration',
-  'breakthrough_mahayana',
-  'breakthrough_tribulation',
-  'confront_demon',
-  'suppress_demon',
-  'ignore_demon',
-];
-
-const UNIVERSAL_SET = new Set(UNIVERSAL_ACTION_IDS);
-
-/**
  * Check whether an actionId passes all condition checks.
  * If skipLocationCheck is true, the requiredLocation condition is ignored
- * (used for universal actions which are available everywhere).
+ * (used for global actions which are available everywhere).
  */
 function isActionAvailable(actionId: string, state: GameState, skipLocationCheck: boolean): boolean {
   if (!state.unlockedActions.includes(actionId)) return false;
@@ -106,7 +71,7 @@ export function moveToLocation(state: GameState, locationId: string): MoveResult
  * 会同时过滤掉玩家尚未解锁的行动
  *
  * 返回地点专属行动与全局行动的并集。
- * 全局行动（UNIVERSAL_ACTION_IDS）忽略 requiredLocation 条件，可在任何地点执行。
+ * 全局行动（action.isGlobalAction === true）忽略 requiredLocation 条件，可在任何地点执行。
  */
 export function getAvailableActionsAtLocation(state: GameState): string[] {
   const loc = LOCATIONS[state.currentLocationId];
@@ -117,10 +82,12 @@ export function getAvailableActionsAtLocation(state: GameState): string[] {
     isActionAvailable(actionId, state, false),
   );
 
-  // Universal actions: skip requiredLocation check (they're available everywhere)
-  const universalActions = UNIVERSAL_ACTION_IDS.filter((actionId) =>
-    isActionAvailable(actionId, state, true),
-  );
+  // Global actions: actions with isGlobalAction flag that skip requiredLocation check
+  const globalActions = state.unlockedActions.filter((actionId) => {
+    const action = ACTIONS[actionId];
+    if (!action || !action.isGlobalAction) return false;
+    return isActionAvailable(actionId, state, true);
+  });
 
   // Return union, deduplicating while preserving order (location actions first)
   const seen = new Set<string>();
@@ -131,7 +98,7 @@ export function getAvailableActionsAtLocation(state: GameState): string[] {
       result.push(id);
     }
   }
-  for (const id of universalActions) {
+  for (const id of globalActions) {
     if (!seen.has(id)) {
       seen.add(id);
       result.push(id);

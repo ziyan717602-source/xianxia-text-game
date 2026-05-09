@@ -411,6 +411,36 @@ describe('performAction', () => {
     expect(result.success).toBe(false);
     expect(result.log).toContain('境界');
   });
+
+  // P1-8: Karmic weight must be updated even when dao path is revealed
+  it('should update karmic weight even when dao path is revealed', () => {
+    let state = createInitialState();
+    state.resources.essence = 100;
+    // Set up conditions so that performing kuzuo will trigger a dao path reveal.
+    // The 'hermit' path weights: quiet_cultivation:4. We need quiet_cultivation >= 4 to hit threshold 15.
+    // Actually threshold is 15, and hermit weight = quiet_cultivation * 4,
+    // so quiet_cultivation >= 4 gives 16 >= 15 => reveal.
+    state.choices.qualities.quiet_cultivation = 4;
+    // Add a karmic source so we can verify karmic weight is non-zero after action
+    state.choices.qualities.reckless_breakthrough = 3;
+
+    const result = performAction(state, 'kuzuo');
+    expect(result.success).toBe(true);
+    // Dao path should have been revealed (hermit with score >= 15)
+    expect(result.state.daoPath.currentPath).toBeTruthy();
+    // Karmic weight must still be updated even though dao path revealed via early return
+    expect(result.state.karma.karmicWeight).toBeGreaterThan(0);
+  });
+
+  it('should update karmic weight on normal actions without dao path reveal', () => {
+    let state = createInitialState();
+    state.resources.essence = 100;
+    // No karmic sources, no dao path reveal
+    const result = performAction(state, 'kuzuo');
+    expect(result.success).toBe(true);
+    // Karmic weight should still be computed (even if 0)
+    expect(typeof result.state.karma.karmicWeight).toBe('number');
+  });
 });
 
 describe('ACTION_ROUTE_QUALITIES', () => {

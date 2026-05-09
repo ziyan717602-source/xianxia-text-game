@@ -279,6 +279,8 @@ export interface Action {
     requiredLocation?: string;
     requiredRealm?: Realm;
   };
+  /** If true, this action ignores requiredLocation and is available at all locations. */
+  isGlobalAction?: boolean;
 }
 
 /**

@@ -61,6 +61,7 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 5,
     riskProbability: 0,
     conditions: {},
+    isGlobalAction: true, // Basic cultivation — available everywhere
   },
   tuna: {
     id: 'tuna',
@@ -70,6 +71,7 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 5,
     riskProbability: 0,
     conditions: {},
+    isGlobalAction: true, // Basic cultivation — available everywhere
   },
   caiyao: {
     id: 'caiyao',
@@ -202,6 +204,7 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 10,
     riskProbability: 0,
     conditions: {},
+    isGlobalAction: true, // Basic recovery — available everywhere
   },
   yinqi: {
     id: 'yinqi',
@@ -412,6 +415,7 @@ export const ACTIONS: Record<string, Action> = {
     riskProbability: 0,
     conditions: {
     },
+    isGlobalAction: true, // Internal cultivation state — not location-dependent
   },
   breakthrough_qi_2: {
     id: 'breakthrough_qi_2',
@@ -426,6 +430,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_3: {
     id: 'breakthrough_qi_3',
@@ -440,6 +445,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_4: {
     id: 'breakthrough_qi_4',
@@ -454,6 +460,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_5: {
     id: 'breakthrough_qi_5',
@@ -468,6 +475,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_6: {
     id: 'breakthrough_qi_6',
@@ -482,6 +490,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_7: {
     id: 'breakthrough_qi_7',
@@ -496,6 +505,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_8: {
     id: 'breakthrough_qi_8',
@@ -510,6 +520,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_qi_9: {
     id: 'breakthrough_qi_9',
@@ -524,6 +535,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_foundation: {
     id: 'breakthrough_foundation',
@@ -538,6 +550,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   rike_tuna: {
     id: 'rike_tuna',
@@ -549,6 +562,7 @@ export const ACTIONS: Record<string, Action> = {
     conditions: {
       requiredLocation: 'home',
     },
+    isGlobalAction: true, // Daily practice — can be done anywhere
   },
   short_retreat: {
     id: 'short_retreat',
@@ -561,6 +575,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
+    isGlobalAction: true, // Retreat — internal cultivation, not location-bound
   },
   foundation_daily_practice: {
     id: 'foundation_daily_practice',
@@ -946,6 +961,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredFlags: ['entered_qi_condensation'],
       forbiddenFlags: [],
     },
+    isGlobalAction: true, // Detox — internal body process, not location-bound
   },
   // F9: Ascension actions
   attempt_ascension: {
@@ -996,6 +1012,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.FoundationEstablishment,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_nascent_soul: {
     id: 'breakthrough_nascent_soul',
@@ -1010,6 +1027,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.GoldenCore,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   // New realm practice actions
   spirit_transformation_practice: {
@@ -1070,6 +1088,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.NascentSoul,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_integration: {
     id: 'breakthrough_integration',
@@ -1084,6 +1103,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.SpiritTransformation,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_mahayana: {
     id: 'breakthrough_mahayana',
@@ -1098,6 +1118,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.Integration,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   breakthrough_tribulation: {
     id: 'breakthrough_tribulation',
@@ -1112,6 +1133,7 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
       requiredRealm: Realm.Mahayana,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
   // New location actions
   water_meditation: {
@@ -2231,6 +2253,7 @@ export const ACTIONS: Record<string, Action> = {
     conditions: {
       requiredLocation: 'home',
     },
+    isGlobalAction: true, // Inner demon — internal mental state, not location-bound
   },
   suppress_demon: {
     id: 'suppress_demon',
@@ -2242,6 +2265,7 @@ export const ACTIONS: Record<string, Action> = {
     conditions: {
       requiredLocation: 'home',
     },
+    isGlobalAction: true, // Inner demon — internal mental state, not location-bound
   },
   ignore_demon: {
     id: 'ignore_demon',
@@ -2251,6 +2275,7 @@ export const ACTIONS: Record<string, Action> = {
     cooldown: 5,
     riskProbability: 0,
     conditions: {},
+    isGlobalAction: true, // Inner demon — internal mental state, not location-bound
   },
 
   // High-realm pill actions: GoldenCore tier

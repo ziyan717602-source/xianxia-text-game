@@ -1599,6 +1599,9 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   newState = recordActionInWorld(newState, actionId);
   newState = spendTicks(newState, action.cooldown);
 
+  // Universal post-action ledger updates — always execute regardless of special paths
+  newState = updateKarmicWeight(newState);
+
   // Update dao path affinity and check for reveal
   const pathResult = revealDaoPath(newState);
   newState = pathResult.state;
@@ -1615,9 +1618,6 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       success: true,
     };
   }
-
-  // Update karmic weight
-  newState = updateKarmicWeight(newState);
 
   return {
     state: newState,
