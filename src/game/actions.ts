@@ -1528,15 +1528,15 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   }
 
   if (actionId === 'nascent_soul_practice') {
-    customLog = '元婴日课毕。元神出窍，天地灵气俯首。';
+    customLog = '元婴日课毕。元神渐出，灵气顺行。';
   }
 
   if (actionId === 'spirit_transformation_practice') {
-    customLog = '化神日课毕。元神通明，天地万物皆入灵识。';
+    customLog = '化神日课毕。灵识所及，渐有不同。';
   }
 
   if (actionId === 'integration_practice') {
-    customLog = '合体日课毕。元神与肉身合一，天地灵气如臂使指。';
+    customLog = '合体日课毕。灵气运转渐自如。';
   }
 
   if (actionId === 'mahayana_practice') {

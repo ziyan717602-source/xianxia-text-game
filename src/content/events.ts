@@ -1899,7 +1899,7 @@ export const EVENTS: ActiveEvent[] = [
   // F9: Ascension events
   {
     id: 'ascension_threshold',
-    text: '天地灵气忽然涌来，你感受到一股前所未有的牵引。天门，似乎就在上方。',
+    text: '灵气忽然涌来，你感到一股牵引。天门，似乎就在上方。',
     condition: (state) => shouldShowAscensionThreshold(state),
     weight: () => 100,
     choices: [
@@ -1934,7 +1934,7 @@ export const EVENTS: ActiveEvent[] = [
         },
       },
       {
-        text: '超脱（重入轮回，保留部分造化）',
+        text: '超脱（重入轮回，保留部分所得）',
         effect: (state, random) => {
           const result = executeAscension(state, 'transcend');
           return { state: result.state, log: result.log };
@@ -3237,7 +3237,7 @@ export const EVENTS: ActiveEvent[] = [
   },
   {
     id: 'golden_core_thunder',
-    text: '晴天一道闷雷从天际滚过，不是雷雨。你丹田一紧，冥冥中感到天地在注视你。金丹雷劫的前兆？',
+    text: '晴天一道闷雷从天际滚过，不是雷雨。你丹田一紧，冥冥中有所感应。金丹雷劫的前兆？',
     condition: (state) =>
       state.realm === Realm.FoundationEstablishment &&
       state.resources.qi >= 120 &&
@@ -3250,7 +3250,7 @@ export const EVENTS: ActiveEvent[] = [
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
           newState = setFlag(newState, 'sensed_thunder_omen');
-          return { state: newState, log: '你感应天地之意。雷劫尚远，但天道的轮廓已隐约可辨。见闻涨五分。' };
+          return { state: newState, log: '你凝神感应。雷劫尚远，但法则的轮廓已隐约可辨。见闻涨五分。' };
         },
       },
       {
@@ -3258,7 +3258,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = { ...newState.resources, dantoxin: Math.max(0, newState.resources.dantoxin - 3) };
-          return { state: newState, log: '你将心绪压回丹田。丹毒退了三分，天地复归寂静。' };
+          return { state: newState, log: '你将心绪压回丹田。丹毒退了三分，四周复归寂静。' };
         },
       },
     ],
@@ -3388,7 +3388,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'breakthrough_sky_sign_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
-          return { state: newState, log: '你盯着异光消散的方向。天地间似有一丝道理留在那里，见闻涨了三分。' };
+          return { state: newState, log: '你盯着异光消散的方向。那里似有一丝道理残留，见闻涨了三分。' };
         },
       },
       {
@@ -3467,7 +3467,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'rival_cultivator_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
-          return { state: newState, log: '你退了一步。灵脉是天地之物，争也无益。' };
+          return { state: newState, log: '你退了一步。灵脉非你之物，争也无益。' };
         },
       },
       {
@@ -3597,7 +3597,7 @@ export const EVENTS: ActiveEvent[] = [
           let newState = setFlag(state, 'lost_inheritance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5, qi: newState.resources.qi + 5, essence: Math.max(0, newState.resources.essence - 20) };
           newState = setFlag(newState, 'received_lost_inheritance');
-          return { state: newState, log: '你以神识触及传承。真气多了五缕，见闻涨了五分，精元折了二十。古修的一丝造化落在你身上。' };
+          return { state: newState, log: '你以神识触及传承。真气多了五缕，见闻涨了五分，精元折了二十。古修的一丝遗泽落在你身上。' };
         },
       },
       {
@@ -3854,7 +3854,7 @@ export const EVENTS: ActiveEvent[] = [
 
   {
     id: 'spring_thunder_awakening',
-    text: '春雷轰鸣，万物惊蛰。天地灵气随雷声震入丹田，周身气脉似乎都醒了过来。',
+    text: '春雷轰鸣，万物惊蛰。灵气随雷声震入丹田，周身气脉似乎都醒了过来。',
     condition: (state) =>
       state.time.season === Season.Spring &&
       realmAtLeast(state, Realm.QiCondensation) &&
@@ -4205,7 +4205,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'underground_palace_chain_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 6, qi: newState.resources.qi + 10, dantoxin: newState.resources.dantoxin + 3 };
-          return { state: newState, log: '你凝视古镜。镜中影子传出一丝造化。见闻暴涨六分，真气多十缕，但丹毒也涨了三分。' };
+          return { state: newState, log: '你凝视古镜。镜中影子传出一丝遗泽。见闻多了六分，真气多十缕，但丹毒也涨了三分。' };
         },
       },
       {
@@ -4231,7 +4231,7 @@ export const EVENTS: ActiveEvent[] = [
   // === GoldenCore events ===
   {
     id: 'golden_core_thunder',
-    text: '丹成之际，天地感应。乌云翻涌，一道金色雷光劈下——金丹雷劫来了。',
+    text: '丹成之际，隐隐有所感应。乌云翻涌，一道金色雷光劈下——金丹雷劫来了。',
     condition: (state) => state.realm === Realm.GoldenCore && !state.choices.flags['golden_core_thunder_seen'],
     weight: () => 20,
     choices: [
@@ -4538,12 +4538,12 @@ export const EVENTS: ActiveEvent[] = [
   // === SpiritTransformation events ===
   {
     id: 'spirit_transform_sign',
-    text: '天地灵气在你周围自行凝聚，形成一圈淡淡的光晕。化神之兆已现——你的神识开始与天地相融。',
+    text: '灵气在你周围自行凝聚，形成一圈淡淡的光晕。化神之兆已现——你的神识开始向外延伸。',
     condition: (state) => state.realm === Realm.SpiritTransformation && !state.choices.flags['spirit_transform_sign_seen'],
     weight: () => 12,
     choices: [
       {
-        text: '引天地灵气入体',
+        text: '引灵气入体',
         effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_sign_seen');
           newState.resources = {
@@ -4552,7 +4552,7 @@ export const EVENTS: ActiveEvent[] = [
             essence: newState.resources.essence - 50,
             insight: newState.resources.insight + 10,
           };
-          return { state: newState, log: '你引天地灵气入体。真气暴涨四十缕，见闻长十分，精元折五十。' };
+          return { state: newState, log: '你引灵气入体。真气多了四十缕，见闻长十分，精元折五十。' };
         },
       },
       {
@@ -4616,12 +4616,12 @@ export const EVENTS: ActiveEvent[] = [
   // === Integration events ===
   {
     id: 'integration_void_call',
-    text: '虚空之中传来一声悠远的呼唤，仿佛天地在召唤你与之合为一体。你的修为已到了与天地共鸣的关口。',
+    text: '虚空之中传来一声悠远的呼唤，仿佛有什么在召唤你与之合为一体。修为已到了与外力共鸣的关口。',
     condition: (state) => state.realm === Realm.Integration && !state.choices.flags['integration_void_call_seen'],
     weight: () => 10,
     choices: [
       {
-        text: '顺应天地',
+        text: '顺应呼唤',
         effect: (state, random) => {
           let newState = setFlag(state, 'integration_void_call_seen');
           newState.resources = {
@@ -4630,7 +4630,7 @@ export const EVENTS: ActiveEvent[] = [
             insight: newState.resources.insight + 20,
             essence: newState.resources.essence - 80,
           };
-          return { state: newState, log: '你顺应天地呼唤。真气暴涨六十缕，见闻长二十分，但精元折了八十。' };
+          return { state: newState, log: '你顺应呼唤。真气多了六十缕，见闻长二十分，但精元折了八十。' };
         },
       },
       {
@@ -4659,12 +4659,12 @@ export const EVENTS: ActiveEvent[] = [
   },
   {
     id: 'void_rift_anomaly',
-    text: '虚空裂隙突然扩张，一股混沌之力从中涌出。空间扭曲，时间仿佛凝固——这是一次罕见的虚空异变。',
+    text: '虚空裂隙突然扩张，一股混茫之力从中涌出。空间扭曲，时间仿佛凝固——这是一次罕见的虚空异变。',
     condition: (state) => state.currentLocationId === 'void_rift' && state.realm === Realm.Integration && !state.choices.flags['void_rift_anomaly_seen'],
     weight: () => 12,
     choices: [
       {
-        text: '吸收混沌之力',
+        text: '吸收混茫之力',
         effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_anomaly_seen');
           newState.resources = {
@@ -4674,7 +4674,7 @@ export const EVENTS: ActiveEvent[] = [
             dantoxin: newState.resources.dantoxin + 10,
             essence: newState.resources.essence - 60,
           };
-          return { state: newState, log: '你吸收混沌之力。真气暴涨八十缕，见闻长二十五分，但丹毒涨十分，精元折六十。' };
+          return { state: newState, log: '你吸收混茫之力。真气多了八十缕，见闻长二十五分，但丹毒涨十分，精元折六十。' };
         },
       },
       {
@@ -4698,7 +4698,7 @@ export const EVENTS: ActiveEvent[] = [
   // === Mahayana events ===
   {
     id: 'mahayana_enlightenment',
-    text: '万道归一。你的修行已至大乘，天地法则在你面前如行云流水般清晰。一次深刻的悟道机缘降临了。',
+    text: '道途渐明。修行已至大乘，法则在你面前渐渐清晰。一次悟道机缘降临了。',
     condition: (state) => state.realm === Realm.Mahayana && !state.choices.flags['mahayana_enlightenment_seen'],
     weight: () => 8,
     choices: [
@@ -4713,7 +4713,7 @@ export const EVENTS: ActiveEvent[] = [
             essence: newState.resources.essence - 100,
             lifespan: Math.max(0, newState.resources.lifespan - 500),
           };
-          return { state: newState, log: '你全力悟道。真气暴涨一百缕，见闻长四十分，但精元折百，寿元少五百刻。' };
+          return { state: newState, log: '你全力悟道。真气多了一百缕，见闻长四十分，但精元折百，寿元少五百刻。' };
         },
       },
       {
@@ -4743,15 +4743,15 @@ export const EVENTS: ActiveEvent[] = [
     weight: () => 10,
     choices: [
       {
-        text: '接受天道',
+        text: '受其意',
         effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_enlightenment_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 80, insight: newState.resources.insight + 30 };
-          return { state: newState, log: '你接受天道灌顶。真气暴涨八十缕，见闻长三十分。' };
+          return { state: newState, log: '你受了灌顶之意。真气多了八十缕，见闻长三十分。' };
         },
       },
       {
-        text: '以己道抗天道',
+        text: '以己意拒之',
         effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_enlightenment_seen');
           newState.resources = {
@@ -4761,7 +4761,7 @@ export const EVENTS: ActiveEvent[] = [
             wounds: newState.resources.wounds + 2,
           };
           newState = adjustQuality(newState, 'reckless_breakthrough', 2);
-          return { state: newState, log: '你以己道抗天道。见闻暴涨五十分，真气多五十缕，但伤了两处。' };
+          return { state: newState, log: '你以己意拒之。见闻多了五十分，真气多五十缕，但伤了两处。' };
         },
       },
       {
@@ -4778,7 +4778,7 @@ export const EVENTS: ActiveEvent[] = [
   // === Tribulation events ===
   {
     id: 'tribulation_thunder',
-    text: '天穹裂开一道巨大的缝隙，九天雷劫蓄势待发。你站在渡劫台上，感受到了前所未有的天地威压。',
+    text: '云层裂开，雷劫蓄势待发。你站在渡劫台上，感受到了隐隐的威压。',
     condition: (state) => state.realm === Realm.Tribulation && !state.choices.flags['tribulation_thunder_seen'],
     weight: () => 6,
     choices: [
@@ -4793,7 +4793,7 @@ export const EVENTS: ActiveEvent[] = [
             wounds: newState.resources.wounds + 3,
             essence: newState.resources.essence - 150,
           };
-          return { state: newState, log: '你以肉身硬抗天雷。真气暴涨一百五十缕，见闻长五十分，但伤了三处，精元折百五十。' };
+          return { state: newState, log: '你以肉身硬抗天雷。真气多了一百五十缕，见闻长五十分，但伤了三处，精元折百五十。' };
         },
       },
       {
@@ -4847,7 +4847,7 @@ export const EVENTS: ActiveEvent[] = [
             wounds: newState.resources.wounds + 2,
           };
           newState = adjustQuality(newState, 'reckless_breakthrough', 2);
-          return { state: newState, log: '你迎接天劫。真气暴涨二百缕，见闻长六十分，但伤了两处。' };
+          return { state: newState, log: '你迎接天劫。真气多了二百缕，见闻长六十分，但伤了两处。' };
         },
       },
       {
@@ -5151,7 +5151,7 @@ export const EVENTS: ActiveEvent[] = [
           };
           newState = setFlag(newState, 'golden_core_spirit_beast_accepted');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
-          return { state: newState, log: '灵兽俯首，你以精元结契。精元折二十，灵兽日后可代你采药。' };
+          return { state: newState, log: '灵兽降伏，你以精元结契。精元折二十，灵兽日后可代你采药。' };
         },
       },
       {
@@ -5179,7 +5179,7 @@ export const EVENTS: ActiveEvent[] = [
   // ─── 元婴事件 ────────────────────────────────────────────
   {
     id: 'nascent_soul_soul_departure',
-    text: '元神忽然自眉心浮出。你第一次以元神之体俯瞰肉身，天地万物在神识中纤毫毕现。',
+    text: '元神忽然自眉心浮出。你第一次以元神之体俯瞰肉身，周遭一切在神识中渐渐分明。',
     condition: (state) =>
       state.realm === Realm.NascentSoul &&
       !state.choices.flags['nascent_soul_soul_departure_seen'],
@@ -5429,7 +5429,7 @@ export const EVENTS: ActiveEvent[] = [
   },
   {
     id: 'spirit_transform_spirit_merge',
-    text: '天地灵气忽然主动朝你汇聚。无需运功，灵气自发涌入经脉，金丹震鸣不止。',
+    text: '灵气忽然主动朝你汇聚。无需运功，灵气自发涌入经脉，金丹震鸣不止。',
     condition: (state) =>
       state.realm === Realm.SpiritTransformation &&
       !state.choices.flags['spirit_transform_spirit_merge_seen'],
@@ -5444,7 +5444,7 @@ export const EVENTS: ActiveEvent[] = [
             qi: newState.resources.qi + 20,
             essence: Math.max(0, newState.resources.essence - 30),
           };
-          return { state: newState, log: '灵气涌入体内。真气多了二十缕，精元折三十。你与天地灵气有了更深的联系。' };
+          return { state: newState, log: '灵气涌入体内。真气多了二十缕，精元折三十。你对灵气的感应更深了。' };
         },
       },
       {
@@ -5532,14 +5532,14 @@ export const EVENTS: ActiveEvent[] = [
   },
   {
     id: 'integration_world_resonance',
-    text: '天地之间忽然一颤。你的呼吸与山川同步，心跳与地脉共振，仿佛你便是这方天地的一部分。',
+    text: '四周忽然一颤。你的呼吸与山川同步，心跳与地脉共振，仿佛你便是此处的一部分。',
     condition: (state) =>
       state.realm === Realm.Integration &&
       !state.choices.flags['integration_world_resonance_seen'],
     weight: () => 8,
     choices: [
       {
-        text: '顺天共振',
+        text: '顺其共振',
         effect: (state, random) => {
           let newState = setFlag(state, 'integration_world_resonance_seen');
           newState.resources = {
@@ -5549,7 +5549,7 @@ export const EVENTS: ActiveEvent[] = [
             lifespan: Math.max(0, newState.resources.lifespan - 30),
           };
           newState = setFlag(newState, 'integration_resonance_achieved');
-          return { state: newState, log: '你顺应天地共振。真气多了十五缕，见闻长了六分。天人合一虽短，已窥大道之门。寿元折三十刻。' };
+          return { state: newState, log: '你顺其共振。真气多了十五缕，见闻长了六分。共振虽短，已有所悟。寿元折三十刻。' };
         },
       },
       {
@@ -5611,14 +5611,14 @@ export const EVENTS: ActiveEvent[] = [
   // ─── 大乘事件 ────────────────────────────────────────────
   {
     id: 'mahayana_heavenly_call',
-    text: '天道意志忽然降临。不是雷霆，不是审判，而是一种深沉的召唤，仿佛天地在问你一个古老的问题。',
+    text: '一股深沉的意志忽然降临。不是雷霆，不是审判，而是一种无声的召唤，仿佛在问你一个古老的问题。',
     condition: (state) =>
       state.realm === Realm.Mahayana &&
       !state.choices.flags['mahayana_heavenly_call_seen'],
     weight: () => 8,
     choices: [
       {
-        text: '回应天道',
+        text: '回应意志',
         effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_heavenly_call_seen');
           newState.resources = {
@@ -5627,7 +5627,7 @@ export const EVENTS: ActiveEvent[] = [
             insight: newState.resources.insight + 8,
           };
           newState = setFlag(newState, 'mahayana_answered_heaven');
-          return { state: newState, log: '你回应了天道意志。精元折六十，但你与天道有了短暂的共鸣，见闻暴涨八分。' };
+          return { state: newState, log: '你回应了那股意志。精元折六十，但有了短暂的共鸣，见闻多了八分。' };
         },
       },
       {
@@ -5635,7 +5635,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_heavenly_call_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
-          return { state: newState, log: '你沉默倾听天道的低语。见闻长了五分，天道的深意仍需参悟。' };
+          return { state: newState, log: '你沉默倾听低语。见闻长了五分，深意仍需参悟。' };
         },
       },
     ],
@@ -5686,7 +5686,7 @@ export const EVENTS: ActiveEvent[] = [
   // ─── 渡劫事件 ────────────────────────────────────────────
   {
     id: 'tribulation_final_tribulation',
-    text: '九天之上，雷云翻涌如墨。最后一道天劫正蓄势待发，这是你修行路上最终的考验。',
+    text: '头顶雷云翻涌如墨。最后一道天劫正蓄势待发，这是修行路上最终的考验。',
     condition: (state) =>
       state.realm === Realm.Tribulation &&
       state.resources.qi >= 200 &&
@@ -5706,7 +5706,7 @@ export const EVENTS: ActiveEvent[] = [
           };
           newState = setFlag(newState, 'tribulation_final_survived');
           newState = adjustQuality(newState, 'quiet_cultivation', 3);
-          return { state: newState, log: '你以身迎劫，天雷贯体。真气折八十，精元折八十，伤添两处。但你挺过了终极天劫，见闻暴涨十分。' };
+          return { state: newState, log: '你以身迎劫，雷贯全身。真气折八十，精元折八十，伤添两处。但你挺过了最后一道天劫，见闻多了十分。' };
         },
       },
       {
@@ -5734,7 +5734,7 @@ export const EVENTS: ActiveEvent[] = [
             insight: newState.resources.insight + 8,
           };
           newState = adjustQuality(newState, 'quiet_cultivation', 4);
-          return { state: newState, log: '你以道心化解天劫。精元折五十，但你与天道有了更深层的默契，见闻长了八分。' };
+          return { state: newState, log: '你以道心化解天劫。精元折五十，但你与法则有了更深层的默契，见闻长了八分。' };
         },
       },
     ],
@@ -6915,7 +6915,7 @@ export const EVENTS: ActiveEvent[] = [
   },
   {
     id: 'thunder_peak_insight',
-    text: '雷峰之上，雷云翻涌。你在雷声中忽有所悟，似对天道之雷有了更深的理解。',
+    text: '雷峰之上，雷云翻涌。你在雷声中忽有所悟，似对雷劫有了更深的理解。',
     condition: (state) =>
       state.currentLocationId === 'thunder_peak' &&
       !state.choices.flags['thunder_peak_insight_seen'],
@@ -6930,7 +6930,7 @@ export const EVENTS: ActiveEvent[] = [
             essence: Math.max(0, newState.resources.essence - 20),
             insight: newState.resources.insight + 5,
           };
-          return { state: newState, log: '你在雷声中静坐。精元折二十，但对天道之雷的感悟暴涨，见闻长了五分。' };
+          return { state: newState, log: '你在雷声中静坐。精元折二十，但对雷劫的感悟更深，见闻长了五分。' };
         },
       },
       {
@@ -7240,7 +7240,7 @@ export const EVENTS: ActiveEvent[] = [
           let newState = discoverRealm(state, 'void_passage');
           newState = { ...newState, choices: { ...newState.choices, flags: { ...newState.choices.flags, discovered_void_passage: true } } };
           newState = { ...newState, resources: { ...newState.resources, insight: newState.resources.insight + 5 } };
-          return { state: newState, log: '裂隙之后是一片混沌虚空，灵气如潮水般涌来。一方秘境已为你敞开。' };
+          return { state: newState, log: '裂隙之后是一片浑茫虚空，灵气如潮水般涌来。一方秘境已为你敞开。' };
         },
       },
       {

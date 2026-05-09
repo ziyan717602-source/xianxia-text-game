@@ -281,6 +281,8 @@ export interface Action {
   };
   /** If true, this action ignores requiredLocation and is available at all locations. */
   isGlobalAction?: boolean;
+  /** Category group for UI display and filtering. */
+  actionGroup?: 'basic' | 'cultivation' | 'alchemy' | 'sect' | 'dwelling' | 'exploration' | 'breakthrough' | 'combat' | 'social';
 }
 
 /**

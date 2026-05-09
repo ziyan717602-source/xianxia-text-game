@@ -405,6 +405,73 @@ h3 {
   margin-top: 2px;
 }
 
+/* Action group collapsible sections */
+.action-group {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.action-group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 0;
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+}
+
+.action-group-header:hover {
+  background: #ecece7;
+}
+
+.action-group-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 6px;
+  line-height: 18px;
+}
+
+.action-group-toggle {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.action-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px 8px;
+}
+
+.action-group-body .action-button {
+  border-left: 3px solid var(--blue-gray);
+}
+
+/* Color accents per group */
+.action-group[data-group="basic"] .action-group-header { border-left: 3px solid var(--green); }
+.action-group[data-group="cultivation"] .action-group-header { border-left: 3px solid #5b7fa5; }
+.action-group[data-group="alchemy"] .action-group-header { border-left: 3px solid #a57e5b; }
+.action-group[data-group="sect"] .action-group-header { border-left: 3px solid #7b5ba5; }
+.action-group[data-group="dwelling"] .action-group-header { border-left: 3px solid #5ba57b; }
+.action-group[data-group="exploration"] .action-group-header { border-left: 3px solid #5ba5a0; }
+.action-group[data-group="breakthrough"] .action-group-header { border-left: 3px solid var(--rust); }
+.action-group[data-group="combat"] .action-group-header { border-left: 3px solid #a55b5b; }
+.action-group[data-group="social"] .action-group-header { border-left: 3px solid #a5a05b; }
+.action-group[data-group="other"] .action-group-header { border-left: 3px solid var(--muted); }
+
 @media (max-width: 860px) {
   .app-shell {
     padding: 18px;

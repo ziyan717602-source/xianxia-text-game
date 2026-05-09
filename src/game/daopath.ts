@@ -53,19 +53,19 @@ export const DAO_PATHS: DaoPathDef[] = [
   {
     id: 'formation_way',
     label: '阵修',
-    description: '以阵入道，天地为局。',
+    description: '以阵入道，布列为局。',
     weights: { alchemy_affinity: 1, quiet_cultivation: 2, sect_trace: 1 },
   },
   {
     id: 'talisman_way',
     label: '符修',
-    description: '丹青入符，借天地之力。',
+    description: '丹青入符，借外力入符。',
     weights: { alchemy_affinity: 2, quiet_cultivation: 2, market_ties: 1 },
   },
   {
     id: 'artifact_way',
     label: '器修',
-    description: '金石铸器，造化为工。',
+    description: '金石铸器，火炼为工。',
     weights: { combat_edge: 1, alchemy_affinity: 2, market_ties: 2 },
   },
   {
@@ -83,7 +83,7 @@ export const DAO_PATHS: DaoPathDef[] = [
   {
     id: 'buddhist_way',
     label: '禅修',
-    description: '明心见性，佛光普照。',
+    description: '明心见性，照见本源。',
     weights: { quiet_cultivation: 4, cowardice: 1, sect_trace: -1 },
   },
   {

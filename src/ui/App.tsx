@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ACTIONS } from '../content/actions';
 import { EVENTS } from '../content/events';
 import { LOCATIONS } from '../content/locations';
@@ -15,9 +15,25 @@ import { getAvailableActionsAtLocation, getVisibleLocations } from '../game/loca
 import { getOriginName, hasSelectedOrigin } from '../game/origins';
 import { getVisibleResourceIds, RESOURCE_LABELS, ResourceId } from '../game/resources';
 import { DAYS_PER_YEAR, TICKS_PER_DAY } from '../game/state';
-import { Realm, Season } from '../game/types';
+import { Action, Realm, Season } from '../game/types';
 import { getRecentSummary } from '../game/world';
 import { useGameLoop } from './useGameLoop';
+
+const ACTION_GROUP_ORDER: Action['actionGroup'][] = [
+  'basic', 'cultivation', 'alchemy', 'sect', 'dwelling', 'exploration', 'breakthrough', 'combat', 'social',
+];
+
+const ACTION_GROUP_LABELS: Record<NonNullable<Action['actionGroup']>, string> = {
+  basic: '基础',
+  cultivation: '修行',
+  alchemy: '炼丹',
+  sect: '宗门',
+  dwelling: '洞府',
+  exploration: '探索',
+  breakthrough: '突破',
+  combat: '斗法',
+  social: '交往',
+};
 
 const SEASON_LABELS: Record<Season, string> = {
   [Season.Spring]: '春',
@@ -118,6 +134,48 @@ function formatRealm(state: { realm: Realm; realmLayer: number }) {
     }
   }
   return REALM_LABELS[state.realm];
+}
+
+function ActionGroupSection({ group, label, actions, onAction, disabled, defaultOpen }: {
+  group: string;
+  label: string;
+  actions: Action[];
+  onAction: (id: string) => void;
+  disabled: boolean;
+  defaultOpen: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  if (actions.length === 0) return null;
+  return (
+    <div className="action-group" data-group={group}>
+      <button
+        className="action-group-header"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        <span>{label}</span>
+        <span className="action-group-count">{actions.length}</span>
+        <span className="action-group-toggle">{open ? '▾' : '▸'}</span>
+      </button>
+      {open && (
+        <div className="action-group-body">
+          {actions.map((action) => (
+            <button
+              className="action-button"
+              key={action.id}
+              onClick={() => onAction(action.id)}
+              disabled={disabled}
+            >
+              <span>{action.name}</span>
+              {formatActionInfo(action) && (
+                <span style={{fontSize: '0.75em', opacity: 0.7, display: 'block'}}>{formatActionInfo(action)}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function App() {
@@ -396,23 +454,53 @@ export function App() {
             {availableActionIds.length === 0 ? (
               <p className="muted">此地暂时无事可做。</p>
             ) : (
-              availableActionIds.map((actionId) => {
-                const action = ACTIONS[actionId];
-                if (!action) return null;
+              (() => {
+                // Group available actions by actionGroup
+                const resolvedActions = availableActionIds
+                  .map((id) => ACTIONS[id])
+                  .filter((a): a is Action => !!a);
+                const grouped = new Map<NonNullable<Action['actionGroup']>, Action[]>();
+                const ungrouped: Action[] = [];
+                for (const action of resolvedActions) {
+                  const g = action.actionGroup;
+                  if (g) {
+                    if (!grouped.has(g)) grouped.set(g, []);
+                    grouped.get(g)!.push(action);
+                  } else {
+                    ungrouped.push(action);
+                  }
+                }
                 return (
-                  <button
-                    className="action-button"
-                    key={actionId}
-                    onClick={() => doAction(actionId)}
-                    disabled={!!activeEventId}
-                  >
-                    <span>{action.name}</span>
-                    {formatActionInfo(action) && (
-                      <span style={{fontSize: '0.75em', opacity: 0.7, display: 'block'}}>{formatActionInfo(action)}</span>
+                  <>
+                    {ACTION_GROUP_ORDER.map((g) => {
+                      if (!g) return null;
+                      const actions = grouped.get(g);
+                      if (!actions || actions.length === 0) return null;
+                      return (
+                        <ActionGroupSection
+                          key={g}
+                          group={g}
+                          label={ACTION_GROUP_LABELS[g]}
+                          actions={actions}
+                          onAction={doAction}
+                          disabled={!!activeEventId}
+                          defaultOpen={g === 'basic'}
+                        />
+                      );
+                    })}
+                    {ungrouped.length > 0 && (
+                      <ActionGroupSection
+                        group="other"
+                        label="其他"
+                        actions={ungrouped}
+                        onAction={doAction}
+                        disabled={!!activeEventId}
+                        defaultOpen={false}
+                      />
                     )}
-                  </button>
+                  </>
                 );
-              })
+              })()
             )}
           </div>
         </section>

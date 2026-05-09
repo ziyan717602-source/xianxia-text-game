@@ -55,6 +55,7 @@ const TRIBULATION_COST = BREAKTHROUGH_RULES.tribulation.requiredResources;
 export const ACTIONS: Record<string, Action> = {
   kuzuo: {
     id: 'kuzuo',
+    actionGroup: 'basic',
     name: '枯坐',
     cost: { essence: 5 },
     output: { insight: 1 },
@@ -65,6 +66,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   tuna: {
     id: 'tuna',
+    actionGroup: 'basic',
     name: '吐纳',
     cost: { essence: 10 },
     output: { qi: 1 },
@@ -75,6 +77,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   caiyao: {
     id: 'caiyao',
+    actionGroup: 'exploration',
     name: '采药',
     cost: { essence: 20 },
     output: { herbs: 1 },
@@ -84,6 +87,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   bianyao: {
     id: 'bianyao',
+    actionGroup: 'exploration',
     name: '辨药',
     cost: { essence: 5, herbs: 1 },
     output: { insight: 1 },
@@ -93,6 +97,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   xunshan: {
     id: 'xunshan',
+    actionGroup: 'exploration',
     name: '巡山',
     cost: { essence: 30 },
     output: { insight: 1, herbs: 2 },
@@ -102,6 +107,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   trade: {
     id: 'trade',
+    actionGroup: 'exploration',
     name: '小买卖',
     cost: { essence: 10 },
     output: { coins: 2 },
@@ -113,6 +119,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   gossip: {
     id: 'gossip',
+    actionGroup: 'exploration',
     name: '听闻',
     cost: { essence: 10 },
     output: { insight: 1 },
@@ -124,6 +131,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sect_chore: {
     id: 'sect_chore',
+    actionGroup: 'sect',
     name: '外门杂务',
     cost: { essence: 20 },
     output: { coins: 1, insight: 1 },
@@ -135,6 +143,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sect_errand: {
     id: 'sect_errand',
+    actionGroup: 'sect',
     name: '领外门短差',
     cost: { essence: 40 },
     output: { coins: 4, herbs: 1, insight: 1 },
@@ -148,6 +157,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sect_supply: {
     id: 'sect_supply',
+    actionGroup: 'sect',
     name: '领外门供给',
     cost: { essence: 20 },
     output: { herbs: 3, coins: 2 },
@@ -161,6 +171,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sect_roll_call: {
     id: 'sect_roll_call',
+    actionGroup: 'sect',
     name: '外门点卯',
     cost: { essence: 10 },
     output: { insight: 1 },
@@ -174,6 +185,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sect_patrol: {
     id: 'sect_patrol',
+    actionGroup: 'sect',
     name: '领外门巡值',
     cost: { essence: 35 },
     output: { coins: 3, herbs: 1, insight: 1 },
@@ -187,6 +199,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   listen_lesson: {
     id: 'listen_lesson',
+    actionGroup: 'sect',
     name: '听课',
     cost: { essence: 15 },
     output: { insight: 1 },
@@ -198,6 +211,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   tiaoxi: {
     id: 'tiaoxi',
+    actionGroup: 'basic',
     name: '调息',
     cost: {},
     output: { essence: 30 },
@@ -208,6 +222,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   yinqi: {
     id: 'yinqi',
+    actionGroup: 'cultivation',
     name: '引气入体',
     cost: { qi: 15, insight: 3, essence: 30 },
     output: {},
@@ -221,6 +236,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   inspect_root: {
     id: 'inspect_root',
+    actionGroup: 'cultivation',
     name: '内视灵根',
     cost: { essence: 20, insight: 1 },
     output: {},
@@ -234,6 +250,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   attune_technique: {
     id: 'attune_technique',
+    actionGroup: 'cultivation',
     name: '按相修订',
     cost: { essence: 20, insight: 2 },
     output: {},
@@ -247,6 +264,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_qi_formula: {
     id: 'study_qi_formula',
+    actionGroup: 'alchemy',
     name: '辨小丹方',
     cost: { essence: 10, herbs: 2, insight: 2 },
     output: {},
@@ -260,6 +278,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_steady_formula: {
     id: 'study_steady_formula',
+    actionGroup: 'alchemy',
     name: '辨稳息方',
     cost: { essence: 15, herbs: 3, insight: 3 },
     output: {},
@@ -274,6 +293,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_qi_pill: {
     id: 'brew_qi_pill',
+    actionGroup: 'alchemy',
     name: '炼小聚气丸',
     cost: SMALL_QI_PILL_COST,
     output: {},
@@ -287,6 +307,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_stabilizing_powder: {
     id: 'brew_stabilizing_powder',
+    actionGroup: 'alchemy',
     name: '炼稳息散',
     cost: STABILIZING_POWDER_COST,
     output: {},
@@ -300,6 +321,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_cleansing_formula: {
     id: 'study_cleansing_formula',
+    actionGroup: 'alchemy',
     name: '辨清躁方',
     cost: { essence: 20, herbs: 3, insight: 4 },
     output: {},
@@ -314,6 +336,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_cleansing_pill: {
     id: 'brew_cleansing_pill',
+    actionGroup: 'alchemy',
     name: '炼清躁丸',
     cost: CLEANSING_PILL_COST,
     output: {},
@@ -327,6 +350,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_qi_pill: {
     id: 'take_qi_pill',
+    actionGroup: 'alchemy',
     name: '服小聚气丸',
     cost: { qiPills: 1 },
     output: {},
@@ -340,6 +364,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_stabilizing_powder: {
     id: 'take_stabilizing_powder',
+    actionGroup: 'alchemy',
     name: '服稳息散',
     cost: { stabilizingPowders: 1 },
     output: {},
@@ -353,6 +378,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_cleansing_pill: {
     id: 'take_cleansing_pill',
+    actionGroup: 'alchemy',
     name: '服清躁丸',
     cost: { cleansingPills: 1 },
     output: {},
@@ -366,6 +392,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   seek_foundation_guardian: {
     id: 'seek_foundation_guardian',
+    actionGroup: 'sect',
     name: '求护法',
     cost: { essence: 20, coins: 8, insight: 2 },
     output: {},
@@ -380,6 +407,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   borrow_foundation_pill: {
     id: 'borrow_foundation_pill',
+    actionGroup: 'exploration',
     name: '借丹筑基',
     cost: { coins: 12, insight: 3 },
     output: { dantoxin: 12 },
@@ -394,6 +422,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   withdraw_foundation: {
     id: 'withdraw_foundation',
+    actionGroup: 'breakthrough',
     name: '筑基收功',
     cost: { essence: 25, qi: 6 },
     output: {},
@@ -408,6 +437,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   stabilize_bottleneck: {
     id: 'stabilize_bottleneck',
+    actionGroup: 'basic',
     name: '稳固关口',
     cost: { essence: 35, qi: 3, insight: 1 },
     output: {},
@@ -419,6 +449,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_2: {
     id: 'breakthrough_qi_2',
+    actionGroup: 'breakthrough',
     name: '冲炼气二层',
     cost: QI_LAYER_2_COST,
     output: {},
@@ -434,6 +465,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_3: {
     id: 'breakthrough_qi_3',
+    actionGroup: 'breakthrough',
     name: '冲炼气三层',
     cost: QI_LAYER_3_COST,
     output: {},
@@ -449,6 +481,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_4: {
     id: 'breakthrough_qi_4',
+    actionGroup: 'breakthrough',
     name: '冲炼气四层',
     cost: QI_LAYER_4_COST,
     output: {},
@@ -464,6 +497,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_5: {
     id: 'breakthrough_qi_5',
+    actionGroup: 'breakthrough',
     name: '冲炼气五层',
     cost: QI_LAYER_5_COST,
     output: {},
@@ -479,6 +513,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_6: {
     id: 'breakthrough_qi_6',
+    actionGroup: 'breakthrough',
     name: '冲炼气六层',
     cost: QI_LAYER_6_COST,
     output: {},
@@ -494,6 +529,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_7: {
     id: 'breakthrough_qi_7',
+    actionGroup: 'breakthrough',
     name: '冲炼气七层',
     cost: QI_LAYER_7_COST,
     output: {},
@@ -509,6 +545,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_8: {
     id: 'breakthrough_qi_8',
+    actionGroup: 'breakthrough',
     name: '冲炼气八层',
     cost: QI_LAYER_8_COST,
     output: {},
@@ -524,6 +561,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_qi_9: {
     id: 'breakthrough_qi_9',
+    actionGroup: 'breakthrough',
     name: '冲炼气九层',
     cost: QI_LAYER_9_COST,
     output: {},
@@ -539,6 +577,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_foundation: {
     id: 'breakthrough_foundation',
+    actionGroup: 'breakthrough',
     name: '冲筑基',
     cost: FOUNDATION_COST,
     output: {},
@@ -554,6 +593,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   rike_tuna: {
     id: 'rike_tuna',
+    actionGroup: 'cultivation',
     name: '日课吐纳',
     cost: { essence: 60 },
     output: { qi: 8 },
@@ -566,6 +606,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   short_retreat: {
     id: 'short_retreat',
+    actionGroup: 'cultivation',
     name: '三日闭关',
     cost: { essence: 90, qi: 2 },
     output: { qi: 26 },
@@ -579,6 +620,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   foundation_daily_practice: {
     id: 'foundation_daily_practice',
+    actionGroup: 'cultivation',
     name: '筑基日课',
     cost: { essence: 25 },
     output: { qi: 6, insight: 1 },
@@ -592,6 +634,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   inner_gate_rumor: {
     id: 'inner_gate_rumor',
+    actionGroup: 'cultivation',
     name: '内门传闻',
     cost: { essence: 10 },
     output: { insight: 3 },
@@ -604,6 +647,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   foundation_meditation: {
     id: 'foundation_meditation',
+    actionGroup: 'cultivation',
     name: '筑基静修',
     cost: { essence: 50, herbs: 2 },
     output: { qi: 12, insight: 2 },
@@ -616,6 +660,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_meridian_cleansing_formula: {
     id: 'study_meridian_cleansing_formula',
+    actionGroup: 'alchemy',
     name: '辨通脉方',
     cost: { essence: 25, herbs: 4, insight: 5 },
     output: {},
@@ -629,6 +674,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_meridian_cleansing_pill: {
     id: 'brew_meridian_cleansing_pill',
+    actionGroup: 'alchemy',
     name: '炼通脉丸',
     cost: MERIDIAN_CLEANSING_PILL_COST,
     output: {},
@@ -642,6 +688,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_meridian_cleansing_pill: {
     id: 'take_meridian_cleansing_pill',
+    actionGroup: 'alchemy',
     name: '服通脉丸',
     cost: { meridianCleansingPills: 1 },
     output: {},
@@ -655,6 +702,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_foundation_strengthening_formula: {
     id: 'study_foundation_strengthening_formula',
+    actionGroup: 'alchemy',
     name: '辨固基方',
     cost: { essence: 20, herbs: 3, insight: 4 },
     output: {},
@@ -668,6 +716,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_foundation_strengthening_pill: {
     id: 'brew_foundation_strengthening_pill',
+    actionGroup: 'alchemy',
     name: '炼固基丹',
     cost: FOUNDATION_STRENGTHENING_PILL_COST,
     output: {},
@@ -681,6 +730,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_foundation_strengthening_pill: {
     id: 'take_foundation_strengthening_pill',
+    actionGroup: 'alchemy',
     name: '服固基丹',
     cost: { foundationStrengtheningPills: 1 },
     output: {},
@@ -694,6 +744,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_spirit_gathering_formula: {
     id: 'study_spirit_gathering_formula',
+    actionGroup: 'alchemy',
     name: '辨聚灵方',
     cost: { essence: 20, herbs: 3, insight: 4 },
     output: {},
@@ -707,6 +758,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_spirit_gathering_pill: {
     id: 'brew_spirit_gathering_pill',
+    actionGroup: 'alchemy',
     name: '炼聚灵丸',
     cost: SPIRIT_GATHERING_PILL_COST,
     output: {},
@@ -720,6 +772,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_spirit_gathering_pill: {
     id: 'take_spirit_gathering_pill',
+    actionGroup: 'alchemy',
     name: '服聚灵丸',
     cost: { spiritGatheringPills: 1 },
     output: {},
@@ -734,6 +787,7 @@ export const ACTIONS: Record<string, Action> = {
   // F4: Sect deepening actions
   inner_gate_task: {
     id: 'inner_gate_task',
+    actionGroup: 'sect',
     name: '领内门任务',
     cost: { essence: 30 },
     output: { coins: 2, insight: 1 },
@@ -747,6 +801,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   report_task_completion: {
     id: 'report_task_completion',
+    actionGroup: 'sect',
     name: '复命',
     cost: { essence: 10 },
     output: {},
@@ -759,6 +814,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   attend_sect_ceremony: {
     id: 'attend_sect_ceremony',
+    actionGroup: 'sect',
     name: '参加宗门典礼',
     cost: { essence: 15 },
     output: { insight: 5 },
@@ -773,6 +829,7 @@ export const ACTIONS: Record<string, Action> = {
   // F5: Dwelling actions
   establish_dwelling: {
     id: 'establish_dwelling',
+    actionGroup: 'dwelling',
     name: '开辟洞府',
     cost: { coins: 20, herbs: 5 },
     output: {},
@@ -784,6 +841,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   upgrade_dwelling: {
     id: 'upgrade_dwelling',
+    actionGroup: 'dwelling',
     name: '扩建洞府',
     cost: { coins: 50, herbs: 10, insight: 5 },
     output: {},
@@ -795,6 +853,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   install_formation: {
     id: 'install_formation',
+    actionGroup: 'dwelling',
     name: '布阵',
     cost: { coins: 30, insight: 8 },
     output: {},
@@ -807,6 +866,7 @@ export const ACTIONS: Record<string, Action> = {
   // F6: Market deeper actions
   open_market_stall: {
     id: 'open_market_stall',
+    actionGroup: 'exploration',
     name: '开摊',
     cost: { coins: 10, herbs: 5 },
     output: { coins: 8, insight: 1 },
@@ -819,6 +879,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   buy_rare_herbs: {
     id: 'buy_rare_herbs',
+    actionGroup: 'exploration',
     name: '买珍药',
     cost: { coins: 15 },
     output: { herbs: 5 },
@@ -832,6 +893,7 @@ export const ACTIONS: Record<string, Action> = {
   // F7: Follower actions
   recruit_servant: {
     id: 'recruit_servant',
+    actionGroup: 'social',
     name: '招杂役',
     cost: { coins: 15 },
     output: {},
@@ -844,6 +906,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   recruit_disciple: {
     id: 'recruit_disciple',
+    actionGroup: 'social',
     name: '收弟子',
     cost: { coins: 25, insight: 3 },
     output: {},
@@ -857,6 +920,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   recruit_guard: {
     id: 'recruit_guard',
+    actionGroup: 'social',
     name: '招护卫',
     cost: { coins: 20 },
     output: {},
@@ -869,6 +933,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   assign_herb_gathering: {
     id: 'assign_herb_gathering',
+    actionGroup: 'social',
     name: '派采药',
     cost: {},
     output: {},
@@ -881,6 +946,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   assign_patrol_duty: {
     id: 'assign_patrol_duty',
+    actionGroup: 'social',
     name: '派巡山',
     cost: {},
     output: {},
@@ -893,6 +959,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   collect_follower_income: {
     id: 'collect_follower_income',
+    actionGroup: 'social',
     name: '收杂役成果',
     cost: {},
     output: {},
@@ -906,6 +973,7 @@ export const ACTIONS: Record<string, Action> = {
   // F8: Secret Realm actions
   explore_secret_realm: {
     id: 'explore_secret_realm',
+    actionGroup: 'exploration',
     name: '探索秘境',
     cost: { essence: 50 },
     output: {},
@@ -918,6 +986,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   continue_exploration: {
     id: 'continue_exploration',
+    actionGroup: 'exploration',
     name: '深入探索',
     cost: { essence: 30, qi: 5 },
     output: {},
@@ -929,6 +998,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   claim_exploration_loot: {
     id: 'claim_exploration_loot',
+    actionGroup: 'exploration',
     name: '收取探索成果',
     cost: {},
     output: {},
@@ -940,6 +1010,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   abandon_exploration: {
     id: 'abandon_exploration',
+    actionGroup: 'exploration',
     name: '放弃探索',
     cost: {},
     output: {},
@@ -951,6 +1022,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   meditate_detox: {
     id: 'meditate_detox',
+    actionGroup: 'basic',
     name: '静坐逼毒',
     cost: { essence: 40 },
     output: { dantoxin: -3 },
@@ -966,6 +1038,7 @@ export const ACTIONS: Record<string, Action> = {
   // F9: Ascension actions
   attempt_ascension: {
     id: 'attempt_ascension',
+    actionGroup: 'breakthrough',
     name: '尝试飞升',
     cost: { qi: 200 },
     output: {},
@@ -978,6 +1051,7 @@ export const ACTIONS: Record<string, Action> = {
   // F9: GoldenCore and NascentSoul practice
   golden_core_practice: {
     id: 'golden_core_practice',
+    actionGroup: 'cultivation',
     name: '金丹日课',
     cost: { essence: 30 },
     output: { qi: 10, insight: 2 },
@@ -989,6 +1063,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   nascent_soul_practice: {
     id: 'nascent_soul_practice',
+    actionGroup: 'cultivation',
     name: '元婴日课',
     cost: { essence: 40 },
     output: { qi: 15, insight: 3 },
@@ -1001,6 +1076,7 @@ export const ACTIONS: Record<string, Action> = {
   // F9: GoldenCore and NascentSoul breakthrough actions
   breakthrough_golden_core: {
     id: 'breakthrough_golden_core',
+    actionGroup: 'breakthrough',
     name: '冲金丹',
     cost: GOLDEN_CORE_COST,
     output: {},
@@ -1016,6 +1092,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_nascent_soul: {
     id: 'breakthrough_nascent_soul',
+    actionGroup: 'breakthrough',
     name: '冲元婴',
     cost: NASCENT_SOUL_COST,
     output: {},
@@ -1032,6 +1109,7 @@ export const ACTIONS: Record<string, Action> = {
   // New realm practice actions
   spirit_transformation_practice: {
     id: 'spirit_transformation_practice',
+    actionGroup: 'cultivation',
     name: '化神日课',
     cost: { essence: 50 },
     output: { qi: 20, insight: 4 },
@@ -1043,6 +1121,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   integration_practice: {
     id: 'integration_practice',
+    actionGroup: 'cultivation',
     name: '合体日课',
     cost: { essence: 60 },
     output: { qi: 25, insight: 5 },
@@ -1054,6 +1133,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   mahayana_practice: {
     id: 'mahayana_practice',
+    actionGroup: 'cultivation',
     name: '大乘日课',
     cost: { essence: 70 },
     output: { qi: 30, insight: 6 },
@@ -1065,6 +1145,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   tribulation_practice: {
     id: 'tribulation_practice',
+    actionGroup: 'cultivation',
     name: '渡劫日课',
     cost: { essence: 80 },
     output: { qi: 40, insight: 8 },
@@ -1077,6 +1158,7 @@ export const ACTIONS: Record<string, Action> = {
   // New realm breakthrough actions
   breakthrough_spirit_transformation: {
     id: 'breakthrough_spirit_transformation',
+    actionGroup: 'breakthrough',
     name: '冲化神',
     cost: SPIRIT_TRANSFORMATION_COST,
     output: {},
@@ -1092,6 +1174,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_integration: {
     id: 'breakthrough_integration',
+    actionGroup: 'breakthrough',
     name: '冲合体',
     cost: INTEGRATION_COST,
     output: {},
@@ -1107,6 +1190,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_mahayana: {
     id: 'breakthrough_mahayana',
+    actionGroup: 'breakthrough',
     name: '冲大乘',
     cost: MAHAYANA_COST,
     output: {},
@@ -1122,6 +1206,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   breakthrough_tribulation: {
     id: 'breakthrough_tribulation',
+    actionGroup: 'breakthrough',
     name: '冲渡劫',
     cost: TRIBULATION_COST,
     output: {},
@@ -1138,6 +1223,7 @@ export const ACTIONS: Record<string, Action> = {
   // New location actions
   water_meditation: {
     id: 'water_meditation',
+    actionGroup: 'cultivation',
     name: '溪边静坐',
     cost: { essence: 15 },
     output: { qi: 2, insight: 1 },
@@ -1149,6 +1235,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   collect_night_dew: {
     id: 'collect_night_dew',
+    actionGroup: 'exploration',
     name: '收夜露',
     cost: { essence: 10 },
     output: { herbs: 2 },
@@ -1160,6 +1247,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   explore_ruins: {
     id: 'explore_ruins',
+    actionGroup: 'exploration',
     name: '探查废观',
     cost: { essence: 20 },
     output: { insight: 2 },
@@ -1171,6 +1259,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   sweep_temple: {
     id: 'sweep_temple',
+    actionGroup: 'exploration',
     name: '清扫殿宇',
     cost: { essence: 10 },
     output: { insight: 1 },
@@ -1182,6 +1271,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   read_stone_tablet: {
     id: 'read_stone_tablet',
+    actionGroup: 'exploration',
     name: '读石碑',
     cost: { essence: 15, insight: 2 },
     output: {},
@@ -1194,6 +1284,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   identify_herb: {
     id: 'identify_herb',
+    actionGroup: 'exploration',
     name: '辨药性',
     cost: { essence: 5, herbs: 2 },
     output: { insight: 2 },
@@ -1205,6 +1296,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   protect_seedling: {
     id: 'protect_seedling',
+    actionGroup: 'exploration',
     name: '护苗',
     cost: { essence: 10, herbs: 1 },
     output: {},
@@ -1217,6 +1309,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   listen_traveler: {
     id: 'listen_traveler',
+    actionGroup: 'exploration',
     name: '听客谈',
     cost: { essence: 10 },
     output: { insight: 2 },
@@ -1228,6 +1321,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   hire_boat: {
     id: 'hire_boat',
+    actionGroup: 'exploration',
     name: '雇船出行',
     cost: { coins: 5, essence: 20 },
     output: { insight: 3 },
@@ -1240,6 +1334,7 @@ export const ACTIONS: Record<string, Action> = {
   // New alchemy actions: warm furnace pill
   study_warm_furnace_formula: {
     id: 'study_warm_furnace_formula',
+    actionGroup: 'alchemy',
     name: '辨暖炉方',
     cost: { essence: 20, herbs: 3, insight: 3 },
     output: {},
@@ -1253,6 +1348,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_warm_furnace_pill: {
     id: 'brew_warm_furnace_pill',
+    actionGroup: 'alchemy',
     name: '炼暖炉丹',
     cost: WARM_FURNACE_PILL_COST,
     output: {},
@@ -1266,6 +1362,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_warm_furnace_pill: {
     id: 'take_warm_furnace_pill',
+    actionGroup: 'alchemy',
     name: '服暖炉丹',
     cost: { warmFurnacePills: 1 },
     output: {},
@@ -1280,6 +1377,7 @@ export const ACTIONS: Record<string, Action> = {
   // New alchemy actions: night sitting pill
   study_night_sitting_formula: {
     id: 'study_night_sitting_formula',
+    actionGroup: 'alchemy',
     name: '辨夜坐方',
     cost: { essence: 25, herbs: 4, insight: 5 },
     output: {},
@@ -1293,6 +1391,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_night_sitting_pill: {
     id: 'brew_night_sitting_pill',
+    actionGroup: 'alchemy',
     name: '炼夜坐丸',
     cost: NIGHT_SITTING_PILL_COST,
     output: {},
@@ -1306,6 +1405,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_night_sitting_pill: {
     id: 'take_night_sitting_pill',
+    actionGroup: 'alchemy',
     name: '服夜坐丸',
     cost: { nightSittingPills: 1 },
     output: {},
@@ -1321,6 +1421,7 @@ export const ACTIONS: Record<string, Action> = {
   // Spirit Field actions
   plant_herb: {
     id: 'plant_herb',
+    actionGroup: 'exploration',
     name: '种药',
     cost: { herbs: 1, essence: 5 },
     output: { insight: 1 },
@@ -1332,6 +1433,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   harvest_herb: {
     id: 'harvest_herb',
+    actionGroup: 'exploration',
     name: '收药',
     cost: { essence: 5 },
     output: { herbs: 3 },
@@ -1343,6 +1445,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   tend_field: {
     id: 'tend_field',
+    actionGroup: 'exploration',
     name: '照料灵田',
     cost: { essence: 3 },
     output: { herbs: 1, insight: 1 },
@@ -1355,6 +1458,7 @@ export const ACTIONS: Record<string, Action> = {
   // Pill Hall actions
   use_furnace: {
     id: 'use_furnace',
+    actionGroup: 'exploration',
     name: '借炉炼丹',
     cost: { coins: 5, essence: 10 },
     output: { insight: 2 },
@@ -1366,6 +1470,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_advanced_formula: {
     id: 'study_advanced_formula',
+    actionGroup: 'exploration',
     name: '参悟高阶丹方',
     cost: { insight: 3, herbs: 2 },
     output: { insight: 3 },
@@ -1380,6 +1485,7 @@ export const ACTIONS: Record<string, Action> = {
   // Sword Pavilion actions
   practice_sword: {
     id: 'practice_sword',
+    actionGroup: 'exploration',
     name: '练剑',
     cost: { essence: 10, qi: 5 },
     output: { insight: 2 },
@@ -1391,6 +1497,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   observe_sword_intent: {
     id: 'observe_sword_intent',
+    actionGroup: 'exploration',
     name: '观摩剑意',
     cost: { insight: 5 },
     output: { insight: 4 },
@@ -1404,6 +1511,7 @@ export const ACTIONS: Record<string, Action> = {
   // Sect Hall actions
   attend_ceremony: {
     id: 'attend_ceremony',
+    actionGroup: 'sect',
     name: '参加典礼',
     cost: { coins: 3 },
     output: { insight: 2 },
@@ -1416,6 +1524,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   receive_mission: {
     id: 'receive_mission',
+    actionGroup: 'sect',
     name: '领取任务',
     cost: { essence: 5 },
     output: { coins: 3, insight: 1 },
@@ -1429,6 +1538,7 @@ export const ACTIONS: Record<string, Action> = {
   // Deep Temple actions
   search_altar: {
     id: 'search_altar',
+    actionGroup: 'exploration',
     name: '探查祭坛',
     cost: { essence: 15 },
     output: { insight: 3 },
@@ -1441,6 +1551,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   meditate_dark: {
     id: 'meditate_dark',
+    actionGroup: 'exploration',
     name: '冥思暗堂',
     cost: { essence: 10, qi: 5 },
     output: { insight: 4, qi: 3 },
@@ -1454,6 +1565,7 @@ export const ACTIONS: Record<string, Action> = {
   // Mountain Cave actions
   mine_crystal: {
     id: 'mine_crystal',
+    actionGroup: 'exploration',
     name: '采集灵晶',
     cost: { essence: 15 },
     output: { coins: 5, herbs: 2 },
@@ -1465,6 +1577,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   explore_depths: {
     id: 'explore_depths',
+    actionGroup: 'exploration',
     name: '深入探索',
     cost: { essence: 20, qi: 10 },
     output: { insight: 5, coins: 3 },
@@ -1478,6 +1591,7 @@ export const ACTIONS: Record<string, Action> = {
   // Tea House actions
   drink_tea: {
     id: 'drink_tea',
+    actionGroup: 'exploration',
     name: '饮茶',
     cost: { coins: 2 },
     output: { insight: 1, essence: 3 },
@@ -1489,6 +1603,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   listen_rumor: {
     id: 'listen_rumor',
+    actionGroup: 'exploration',
     name: '听传闻',
     cost: {},
     output: { insight: 1 },
@@ -1500,6 +1615,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   gamble_dice: {
     id: 'gamble_dice',
+    actionGroup: 'exploration',
     name: '掷骰赌钱',
     cost: { coins: 3 },
     output: { coins: 5 },
@@ -1512,6 +1628,7 @@ export const ACTIONS: Record<string, Action> = {
   // Demonic Forest actions
   hunt_beast: {
     id: 'hunt_beast',
+    actionGroup: 'exploration',
     name: '猎杀妖兽',
     cost: { essence: 20, qi: 10 },
     output: { coins: 8, herbs: 3 },
@@ -1524,6 +1641,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   gather_demonic_herb: {
     id: 'gather_demonic_herb',
+    actionGroup: 'exploration',
     name: '采集魔药',
     cost: { essence: 10 },
     output: { herbs: 4 },
@@ -1535,6 +1653,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   set_trap: {
     id: 'set_trap',
+    actionGroup: 'exploration',
     name: '设置陷阱',
     cost: { coins: 3, essence: 5 },
     output: { coins: 5, herbs: 2 },
@@ -1547,6 +1666,7 @@ export const ACTIONS: Record<string, Action> = {
   // Celestial Cliff actions
   cliff_meditation: {
     id: 'cliff_meditation',
+    actionGroup: 'cultivation',
     name: '悬崖静坐',
     cost: { essence: 15, qi: 10 },
     output: { qi: 8, insight: 3 },
@@ -1559,6 +1679,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   face_heavenly_wind: {
     id: 'face_heavenly_wind',
+    actionGroup: 'exploration',
     name: '迎天风',
     cost: { qi: 15, essence: 20 },
     output: { qi: 12, insight: 5 },
@@ -1573,6 +1694,7 @@ export const ACTIONS: Record<string, Action> = {
   // Cloud Gathering Pill (聚云丸)
   study_cloud_gathering_formula: {
     id: 'study_cloud_gathering_formula',
+    actionGroup: 'alchemy',
     name: '辨聚云方',
     cost: { essence: 25, herbs: 2, insight: 3 },
     output: {},
@@ -1587,6 +1709,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_cloud_gathering_pill: {
     id: 'brew_cloud_gathering_pill',
+    actionGroup: 'alchemy',
     name: '炼聚云丸',
     cost: CLOUD_GATHERING_PILL_COST,
     output: {},
@@ -1600,6 +1723,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_cloud_gathering_pill: {
     id: 'take_cloud_gathering_pill',
+    actionGroup: 'alchemy',
     name: '服聚云丸',
     cost: { cloudGatheringPills: 1 },
     output: {},
@@ -1614,6 +1738,7 @@ export const ACTIONS: Record<string, Action> = {
   // Iron Body Pill (铁身丹)
   study_iron_body_formula: {
     id: 'study_iron_body_formula',
+    actionGroup: 'alchemy',
     name: '辨铁身方',
     cost: { essence: 30, herbs: 2, insight: 4 },
     output: {},
@@ -1628,6 +1753,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_iron_body_pill: {
     id: 'brew_iron_body_pill',
+    actionGroup: 'alchemy',
     name: '炼铁身丹',
     cost: IRON_BODY_PILL_COST,
     output: {},
@@ -1641,6 +1767,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_iron_body_pill: {
     id: 'take_iron_body_pill',
+    actionGroup: 'alchemy',
     name: '服铁身丹',
     cost: { ironBodyPills: 1 },
     output: {},
@@ -1655,6 +1782,7 @@ export const ACTIONS: Record<string, Action> = {
   // Demon Bane Pill (驱魔丹)
   study_demon_bane_formula: {
     id: 'study_demon_bane_formula',
+    actionGroup: 'alchemy',
     name: '辨驱魔方',
     cost: { essence: 35, herbs: 2, insight: 5 },
     output: {},
@@ -1669,6 +1797,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_demon_bane_pill: {
     id: 'brew_demon_bane_pill',
+    actionGroup: 'alchemy',
     name: '炼驱魔丹',
     cost: DEMON_BANE_PILL_COST,
     output: {},
@@ -1682,6 +1811,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_demon_bane_pill: {
     id: 'take_demon_bane_pill',
+    actionGroup: 'alchemy',
     name: '服驱魔丹',
     cost: { demonBanePills: 1 },
     output: {},
@@ -1696,6 +1826,7 @@ export const ACTIONS: Record<string, Action> = {
   // Foundation Explosion Pill (破基丹)
   study_foundation_explosion_formula: {
     id: 'study_foundation_explosion_formula',
+    actionGroup: 'alchemy',
     name: '辨破基方',
     cost: { essence: 40, herbs: 2, insight: 6 },
     output: {},
@@ -1710,6 +1841,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_foundation_explosion_pill: {
     id: 'brew_foundation_explosion_pill',
+    actionGroup: 'alchemy',
     name: '炼破基丹',
     cost: FOUNDATION_EXPLOSION_PILL_COST,
     output: {},
@@ -1723,6 +1855,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_foundation_explosion_pill: {
     id: 'take_foundation_explosion_pill',
+    actionGroup: 'alchemy',
     name: '服破基丹',
     cost: { foundationExplosionPills: 1 },
     output: {},
@@ -1737,6 +1870,7 @@ export const ACTIONS: Record<string, Action> = {
   // Spirit Vein Pill (通灵丸)
   study_spirit_vein_formula: {
     id: 'study_spirit_vein_formula',
+    actionGroup: 'alchemy',
     name: '辨通灵方',
     cost: { essence: 30, herbs: 2, insight: 4 },
     output: {},
@@ -1751,6 +1885,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_spirit_vein_pill: {
     id: 'brew_spirit_vein_pill',
+    actionGroup: 'alchemy',
     name: '炼通灵丸',
     cost: SPIRIT_VEIN_PILL_COST,
     output: {},
@@ -1764,6 +1899,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_spirit_vein_pill: {
     id: 'take_spirit_vein_pill',
+    actionGroup: 'alchemy',
     name: '服通灵丸',
     cost: { spiritVeinPills: 1 },
     output: {},
@@ -1778,6 +1914,7 @@ export const ACTIONS: Record<string, Action> = {
   // Shadow Escape Pill (影遁丸)
   study_shadow_escape_formula: {
     id: 'study_shadow_escape_formula',
+    actionGroup: 'alchemy',
     name: '辨影遁方',
     cost: { essence: 30, herbs: 2, insight: 4 },
     output: {},
@@ -1792,6 +1929,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_shadow_escape_pill: {
     id: 'brew_shadow_escape_pill',
+    actionGroup: 'alchemy',
     name: '炼影遁丸',
     cost: SHADOW_ESCAPE_PILL_COST,
     output: {},
@@ -1805,6 +1943,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_shadow_escape_pill: {
     id: 'take_shadow_escape_pill',
+    actionGroup: 'alchemy',
     name: '服影遁丸',
     cost: { shadowEscapePills: 1 },
     output: {},
@@ -1819,6 +1958,7 @@ export const ACTIONS: Record<string, Action> = {
   // Longevity Pill (延寿丹)
   study_longevity_formula: {
     id: 'study_longevity_formula',
+    actionGroup: 'alchemy',
     name: '辨延寿方',
     cost: { essence: 50, herbs: 2, insight: 8 },
     output: {},
@@ -1832,6 +1972,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_longevity_pill: {
     id: 'brew_longevity_pill',
+    actionGroup: 'alchemy',
     name: '炼延寿丹',
     cost: LONGEVITY_PILL_COST,
     output: {},
@@ -1845,6 +1986,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_longevity_pill: {
     id: 'take_longevity_pill',
+    actionGroup: 'alchemy',
     name: '服延寿丹',
     cost: { longevityPills: 1 },
     output: {},
@@ -1859,6 +2001,7 @@ export const ACTIONS: Record<string, Action> = {
   // Fire Furnace Pill (火炉丹)
   study_fire_furnace_formula: {
     id: 'study_fire_furnace_formula',
+    actionGroup: 'alchemy',
     name: '辨火炉方',
     cost: { essence: 30, herbs: 2, insight: 3 },
     output: {},
@@ -1873,6 +2016,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_fire_furnace_pill: {
     id: 'brew_fire_furnace_pill',
+    actionGroup: 'alchemy',
     name: '炼火炉丹',
     cost: FIRE_FURNACE_PILL_COST,
     output: {},
@@ -1886,6 +2030,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_fire_furnace_pill: {
     id: 'take_fire_furnace_pill',
+    actionGroup: 'alchemy',
     name: '服火炉丹',
     cost: { fireFurnacePills: 1 },
     output: {},
@@ -1900,6 +2045,7 @@ export const ACTIONS: Record<string, Action> = {
   // Nine Turn Foundation Pill (重炉筑基丹)
   study_nine_turn_foundation_formula: {
     id: 'study_nine_turn_foundation_formula',
+    actionGroup: 'alchemy',
     name: '辨重炉筑基方',
     cost: { essence: 60, herbs: 2, insight: 10 },
     output: {},
@@ -1914,6 +2060,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_nine_turn_foundation_pill: {
     id: 'brew_nine_turn_foundation_pill',
+    actionGroup: 'alchemy',
     name: '炼重炉筑基丹',
     cost: NINE_TURN_FOUNDATION_PILL_COST,
     output: {},
@@ -1927,6 +2074,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_nine_turn_foundation_pill: {
     id: 'take_nine_turn_foundation_pill',
+    actionGroup: 'alchemy',
     name: '服重炉筑基丹',
     cost: { nineTurnFoundationPills: 1 },
     output: {},
@@ -1941,6 +2089,7 @@ export const ACTIONS: Record<string, Action> = {
   // Buddha Heart Pill (定神丸)
   study_buddha_heart_formula: {
     id: 'study_buddha_heart_formula',
+    actionGroup: 'alchemy',
     name: '辨定神方',
     cost: { essence: 35, herbs: 2, insight: 5 },
     output: {},
@@ -1955,6 +2104,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_buddha_heart_pill: {
     id: 'brew_buddha_heart_pill',
+    actionGroup: 'alchemy',
     name: '炼定神丸',
     cost: BUDDHA_HEART_PILL_COST,
     output: {},
@@ -1968,6 +2118,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_buddha_heart_pill: {
     id: 'take_buddha_heart_pill',
+    actionGroup: 'alchemy',
     name: '服定神丸',
     cost: { buddhaHeartPills: 1 },
     output: {},
@@ -1983,6 +2134,7 @@ export const ACTIONS: Record<string, Action> = {
   // Core Gate actions (GoldenCore+)
   core_gate_cultivation: {
     id: 'core_gate_cultivation',
+    actionGroup: 'cultivation',
     name: '核心峰修炼',
     cost: { essence: 30, qi: 5 },
     output: { qi: 15, insight: 3 },
@@ -1995,6 +2147,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   core_gate_exchange: {
     id: 'core_gate_exchange',
+    actionGroup: 'sect',
     name: '核心峰兑换',
     cost: { coins: 20 },
     output: { herbs: 8, insight: 2 },
@@ -2007,6 +2160,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   seek_elder_guidance: {
     id: 'seek_elder_guidance',
+    actionGroup: 'sect',
     name: '求教长老',
     cost: { essence: 25, coins: 10 },
     output: { insight: 5, qi: 5 },
@@ -2021,6 +2175,7 @@ export const ACTIONS: Record<string, Action> = {
   // Spirit Lake actions
   spirit_lake_meditation: {
     id: 'spirit_lake_meditation',
+    actionGroup: 'cultivation',
     name: '灵湖静修',
     cost: { essence: 20 },
     output: { qi: 8, insight: 2 },
@@ -2032,6 +2187,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   dive_for_treasure: {
     id: 'dive_for_treasure',
+    actionGroup: 'exploration',
     name: '潜湖寻宝',
     cost: { essence: 30, qi: 10 },
     output: { coins: 10, herbs: 5 },
@@ -2045,6 +2201,7 @@ export const ACTIONS: Record<string, Action> = {
   // Thunder Peak actions (NascentSoul+)
   face_tribulation: {
     id: 'face_tribulation',
+    actionGroup: 'exploration',
     name: '引雷淬体',
     cost: { essence: 50, qi: 20 },
     output: { qi: 30, insight: 8 },
@@ -2057,6 +2214,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   thunder_cultivation: {
     id: 'thunder_cultivation',
+    actionGroup: 'cultivation',
     name: '雷修日课',
     cost: { essence: 40, qi: 15 },
     output: { qi: 25, insight: 5 },
@@ -2070,6 +2228,7 @@ export const ACTIONS: Record<string, Action> = {
   // Ancient Battlefield actions (SpiritTransformation+)
   search_battlefield: {
     id: 'search_battlefield',
+    actionGroup: 'exploration',
     name: '搜索战场遗迹',
     cost: { essence: 40, qi: 15 },
     output: { coins: 15, herbs: 5, insight: 3 },
@@ -2082,6 +2241,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   commune_with_remnants: {
     id: 'commune_with_remnants',
+    actionGroup: 'cultivation',
     name: '感应残灵',
     cost: { essence: 30, qi: 20, insight: 5 },
     output: { insight: 10, qi: 10 },
@@ -2095,6 +2255,7 @@ export const ACTIONS: Record<string, Action> = {
   // Void Rift actions (Integration+)
   explore_void: {
     id: 'explore_void',
+    actionGroup: 'exploration',
     name: '探查虚空',
     cost: { essence: 60, qi: 30 },
     output: { qi: 40, insight: 15 },
@@ -2107,6 +2268,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   gather_void_essence: {
     id: 'gather_void_essence',
+    actionGroup: 'exploration',
     name: '采集虚灵',
     cost: { essence: 40, qi: 20 },
     output: { qi: 25, herbs: 8 },
@@ -2120,6 +2282,7 @@ export const ACTIONS: Record<string, Action> = {
   // Celestial Pavilion actions (NascentSoul+)
   study_celestial_script: {
     id: 'study_celestial_script',
+    actionGroup: 'exploration',
     name: '参悟天书',
     cost: { essence: 30, insight: 5 },
     output: { insight: 8, qi: 10 },
@@ -2132,6 +2295,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   meditate_on_dao: {
     id: 'meditate_on_dao',
+    actionGroup: 'cultivation',
     name: '悟道',
     cost: { essence: 50, qi: 25 },
     output: { qi: 20, insight: 12 },
@@ -2145,6 +2309,7 @@ export const ACTIONS: Record<string, Action> = {
   // Demon Seal Ground actions (GoldenCore+)
   patrol_seal: {
     id: 'patrol_seal',
+    actionGroup: 'exploration',
     name: '巡守封印',
     cost: { essence: 25 },
     output: { coins: 8, insight: 2 },
@@ -2157,6 +2322,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   gather_demonic_material: {
     id: 'gather_demonic_material',
+    actionGroup: 'exploration',
     name: '采集魔材',
     cost: { essence: 20 },
     output: { herbs: 6 },
@@ -2170,6 +2336,7 @@ export const ACTIONS: Record<string, Action> = {
   // Spirit Mountain actions (Mahayana+)
   spirit_mountain_retreat: {
     id: 'spirit_mountain_retreat',
+    actionGroup: 'exploration',
     name: '灵山闭关',
     cost: { essence: 80, qi: 40 },
     output: { qi: 60, insight: 20 },
@@ -2182,6 +2349,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   comprehend_dao: {
     id: 'comprehend_dao',
+    actionGroup: 'cultivation',
     name: '参道',
     cost: { essence: 60, qi: 30, insight: 10 },
     output: { qi: 30, insight: 25 },
@@ -2195,6 +2363,7 @@ export const ACTIONS: Record<string, Action> = {
   // Tribulation Platform actions (Tribulation realm)
   face_heavenly_tribulation: {
     id: 'face_heavenly_tribulation',
+    actionGroup: 'exploration',
     name: '迎天劫',
     cost: { essence: 100, qi: 50 },
     output: { qi: 80, insight: 30 },
@@ -2207,6 +2376,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   stabilize_dao_foundation: {
     id: 'stabilize_dao_foundation',
+    actionGroup: 'exploration',
     name: '稳固道基',
     cost: { essence: 60, qi: 30 },
     output: { qi: 20 },
@@ -2220,6 +2390,7 @@ export const ACTIONS: Record<string, Action> = {
   // Immortal Garden actions (NascentSoul+)
   gather_immortal_herb: {
     id: 'gather_immortal_herb',
+    actionGroup: 'exploration',
     name: '采仙草',
     cost: { essence: 20 },
     output: { herbs: 8, insight: 1 },
@@ -2232,6 +2403,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   meditate_garden: {
     id: 'meditate_garden',
+    actionGroup: 'cultivation',
     name: '仙园悟道',
     cost: { essence: 30, qi: 10 },
     output: { qi: 15, insight: 5 },
@@ -2245,6 +2417,7 @@ export const ACTIONS: Record<string, Action> = {
   // Inner demon actions
   confront_demon: {
     id: 'confront_demon',
+    actionGroup: 'combat',
     name: '直面心魔',
     cost: { essence: 20, qi: 5 },
     output: {},
@@ -2257,6 +2430,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   suppress_demon: {
     id: 'suppress_demon',
+    actionGroup: 'combat',
     name: '压制心魔',
     cost: { essence: 10 },
     output: {},
@@ -2269,6 +2443,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   ignore_demon: {
     id: 'ignore_demon',
+    actionGroup: 'combat',
     name: '无视心魔',
     cost: {},
     output: {},
@@ -2281,6 +2456,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: GoldenCore tier
   study_golden_core_formation_formula: {
     id: 'study_golden_core_formation_formula',
+    actionGroup: 'alchemy',
     name: '辨凝丹方',
     cost: { essence: 30, herbs: 5, insight: 6 },
     output: {},
@@ -2294,6 +2470,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_golden_core_formation_pill: {
     id: 'brew_golden_core_formation_pill',
+    actionGroup: 'alchemy',
     name: '炼凝丹丸',
     cost: GOLDEN_CORE_FORMATION_PILL_COST,
     output: {},
@@ -2307,6 +2484,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_golden_core_formation_pill: {
     id: 'take_golden_core_formation_pill',
+    actionGroup: 'alchemy',
     name: '服凝丹丸',
     cost: { goldenCorePills: 1 },
     output: {},
@@ -2320,6 +2498,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_golden_core_strengthening_formula: {
     id: 'study_golden_core_strengthening_formula',
+    actionGroup: 'alchemy',
     name: '辨固丹方',
     cost: { essence: 30, herbs: 5, insight: 6 },
     output: {},
@@ -2333,6 +2512,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_golden_core_strengthening_pill: {
     id: 'brew_golden_core_strengthening_pill',
+    actionGroup: 'alchemy',
     name: '炼固丹丸',
     cost: GOLDEN_CORE_STRENGTHENING_PILL_COST,
     output: {},
@@ -2346,6 +2526,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_golden_core_strengthening_pill: {
     id: 'take_golden_core_strengthening_pill',
+    actionGroup: 'alchemy',
     name: '服固丹丸',
     cost: { goldenCorePills: 1 },
     output: {},
@@ -2359,6 +2540,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_golden_core_fire_formula: {
     id: 'study_golden_core_fire_formula',
+    actionGroup: 'alchemy',
     name: '辨烈丹方',
     cost: { essence: 35, herbs: 6, insight: 7 },
     output: {},
@@ -2372,6 +2554,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_golden_core_fire_pill: {
     id: 'brew_golden_core_fire_pill',
+    actionGroup: 'alchemy',
     name: '炼烈丹丸',
     cost: GOLDEN_CORE_FIRE_PILL_COST,
     output: {},
@@ -2385,6 +2568,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_golden_core_fire_pill: {
     id: 'take_golden_core_fire_pill',
+    actionGroup: 'alchemy',
     name: '服烈丹丸',
     cost: { goldenCorePills: 1 },
     output: {},
@@ -2399,6 +2583,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: NascentSoul tier
   study_nascent_soul_nurturing_formula: {
     id: 'study_nascent_soul_nurturing_formula',
+    actionGroup: 'alchemy',
     name: '辨培婴方',
     cost: { essence: 40, herbs: 7, insight: 8 },
     output: {},
@@ -2412,6 +2597,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_nascent_soul_nurturing_pill: {
     id: 'brew_nascent_soul_nurturing_pill',
+    actionGroup: 'alchemy',
     name: '炼培婴丹',
     cost: NASCENT_SOUL_NURTURING_PILL_COST,
     output: {},
@@ -2425,6 +2611,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_nascent_soul_nurturing_pill: {
     id: 'take_nascent_soul_nurturing_pill',
+    actionGroup: 'alchemy',
     name: '服培婴丹',
     cost: { nascentSoulPills: 1 },
     output: {},
@@ -2438,6 +2625,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_nascent_soul_separation_formula: {
     id: 'study_nascent_soul_separation_formula',
+    actionGroup: 'alchemy',
     name: '辨出窍方',
     cost: { essence: 45, herbs: 8, insight: 9 },
     output: {},
@@ -2451,6 +2639,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_nascent_soul_separation_pill: {
     id: 'brew_nascent_soul_separation_pill',
+    actionGroup: 'alchemy',
     name: '炼出窍丹',
     cost: NASCENT_SOUL_SEPARATION_PILL_COST,
     output: {},
@@ -2464,6 +2653,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_nascent_soul_separation_pill: {
     id: 'take_nascent_soul_separation_pill',
+    actionGroup: 'alchemy',
     name: '服出窍丹',
     cost: { nascentSoulPills: 1 },
     output: {},
@@ -2477,6 +2667,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_nascent_soul_protection_formula: {
     id: 'study_nascent_soul_protection_formula',
+    actionGroup: 'alchemy',
     name: '辨护婴方',
     cost: { essence: 40, herbs: 7, insight: 8 },
     output: {},
@@ -2490,6 +2681,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_nascent_soul_protection_pill: {
     id: 'brew_nascent_soul_protection_pill',
+    actionGroup: 'alchemy',
     name: '炼护婴丹',
     cost: NASCENT_SOUL_PROTECTION_PILL_COST,
     output: {},
@@ -2503,6 +2695,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_nascent_soul_protection_pill: {
     id: 'take_nascent_soul_protection_pill',
+    actionGroup: 'alchemy',
     name: '服护婴丹',
     cost: { nascentSoulPills: 1 },
     output: {},
@@ -2517,6 +2710,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: SpiritTransformation tier
   study_spirit_transform_formula: {
     id: 'study_spirit_transform_formula',
+    actionGroup: 'alchemy',
     name: '辨化神丹方',
     cost: { essence: 50, herbs: 9, insight: 10 },
     output: {},
@@ -2530,6 +2724,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_spirit_transform_pill: {
     id: 'brew_spirit_transform_pill',
+    actionGroup: 'alchemy',
     name: '炼化神丹',
     cost: SPIRIT_TRANSFORM_PILL_COST,
     output: {},
@@ -2543,6 +2738,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_spirit_transform_pill: {
     id: 'take_spirit_transform_pill',
+    actionGroup: 'alchemy',
     name: '服化神丹',
     cost: { spiritTransformPills: 1 },
     output: {},
@@ -2556,6 +2752,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_spirit_transform_fire_formula: {
     id: 'study_spirit_transform_fire_formula',
+    actionGroup: 'alchemy',
     name: '辨化火丹方',
     cost: { essence: 55, herbs: 10, insight: 12 },
     output: {},
@@ -2569,6 +2766,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_spirit_transform_fire_pill: {
     id: 'brew_spirit_transform_fire_pill',
+    actionGroup: 'alchemy',
     name: '炼化火丹',
     cost: SPIRIT_TRANSFORM_FIRE_PILL_COST,
     output: {},
@@ -2582,6 +2780,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_spirit_transform_fire_pill: {
     id: 'take_spirit_transform_fire_pill',
+    actionGroup: 'alchemy',
     name: '服化火丹',
     cost: { spiritTransformPills: 1 },
     output: {},
@@ -2596,6 +2795,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: Integration tier
   study_integration_formula: {
     id: 'study_integration_formula',
+    actionGroup: 'alchemy',
     name: '辨合体丹方',
     cost: { essence: 60, herbs: 12, insight: 14 },
     output: {},
@@ -2609,6 +2809,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_integration_pill: {
     id: 'brew_integration_pill',
+    actionGroup: 'alchemy',
     name: '炼合体丹',
     cost: INTEGRATION_PILL_COST,
     output: {},
@@ -2622,6 +2823,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_integration_pill: {
     id: 'take_integration_pill',
+    actionGroup: 'alchemy',
     name: '服合体丹',
     cost: { integrationPills: 1 },
     output: {},
@@ -2635,6 +2837,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_integration_body_formula: {
     id: 'study_integration_body_formula',
+    actionGroup: 'alchemy',
     name: '辨归体丹方',
     cost: { essence: 65, herbs: 13, insight: 15 },
     output: {},
@@ -2648,6 +2851,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_integration_body_pill: {
     id: 'brew_integration_body_pill',
+    actionGroup: 'alchemy',
     name: '炼归体丹',
     cost: INTEGRATION_BODY_PILL_COST,
     output: {},
@@ -2661,6 +2865,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_integration_body_pill: {
     id: 'take_integration_body_pill',
+    actionGroup: 'alchemy',
     name: '服归体丹',
     cost: { integrationPills: 1 },
     output: {},
@@ -2675,6 +2880,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: Mahayana tier
   study_mahayana_formula: {
     id: 'study_mahayana_formula',
+    actionGroup: 'alchemy',
     name: '辨大乘丹方',
     cost: { essence: 70, herbs: 15, insight: 18 },
     output: {},
@@ -2688,6 +2894,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_mahayana_pill: {
     id: 'brew_mahayana_pill',
+    actionGroup: 'alchemy',
     name: '炼大乘丹',
     cost: MAHAYANA_PILL_COST,
     output: {},
@@ -2701,6 +2908,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_mahayana_pill: {
     id: 'take_mahayana_pill',
+    actionGroup: 'alchemy',
     name: '服大乘丹',
     cost: { mahayanaPills: 1 },
     output: {},
@@ -2714,6 +2922,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_mahayana_enlightenment_formula: {
     id: 'study_mahayana_enlightenment_formula',
+    actionGroup: 'alchemy',
     name: '辨悟道丹方',
     cost: { essence: 80, herbs: 18, insight: 22 },
     output: {},
@@ -2727,6 +2936,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_mahayana_enlightenment_pill: {
     id: 'brew_mahayana_enlightenment_pill',
+    actionGroup: 'alchemy',
     name: '炼悟道丹',
     cost: MAHAYANA_ENLIGHTENMENT_PILL_COST,
     output: {},
@@ -2740,6 +2950,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_mahayana_enlightenment_pill: {
     id: 'take_mahayana_enlightenment_pill',
+    actionGroup: 'alchemy',
     name: '服悟道丹',
     cost: { mahayanaPills: 1 },
     output: {},
@@ -2754,6 +2965,7 @@ export const ACTIONS: Record<string, Action> = {
   // High-realm pill actions: Tribulation tier
   study_tribulation_protection_formula: {
     id: 'study_tribulation_protection_formula',
+    actionGroup: 'alchemy',
     name: '辨护劫丹方',
     cost: { essence: 80, herbs: 20, insight: 25 },
     output: {},
@@ -2767,6 +2979,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_tribulation_protection_pill: {
     id: 'brew_tribulation_protection_pill',
+    actionGroup: 'alchemy',
     name: '炼护劫丹',
     cost: TRIBULATION_PROTECTION_PILL_COST,
     output: {},
@@ -2780,6 +2993,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_tribulation_protection_pill: {
     id: 'take_tribulation_protection_pill',
+    actionGroup: 'alchemy',
     name: '服护劫丹',
     cost: { tribulationPills: 1 },
     output: {},
@@ -2793,6 +3007,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_heavenly_tribulation_formula: {
     id: 'study_heavenly_tribulation_formula',
+    actionGroup: 'alchemy',
     name: '辨天劫丹方',
     cost: { essence: 100, herbs: 25, insight: 30 },
     output: {},
@@ -2806,6 +3021,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_heavenly_tribulation_pill: {
     id: 'brew_heavenly_tribulation_pill',
+    actionGroup: 'alchemy',
     name: '炼天劫丹',
     cost: HEAVENLY_TRIBULATION_PILL_COST,
     output: {},
@@ -2819,6 +3035,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_heavenly_tribulation_pill: {
     id: 'take_heavenly_tribulation_pill',
+    actionGroup: 'alchemy',
     name: '服天劫丹',
     cost: { heavenlyTribulationPills: 1 },
     output: {},
@@ -2832,6 +3049,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   study_tribulation_soul_formula: {
     id: 'study_tribulation_soul_formula',
+    actionGroup: 'alchemy',
     name: '辨安魂丹方',
     cost: { essence: 90, herbs: 22, insight: 28 },
     output: {},
@@ -2845,6 +3063,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_tribulation_soul_pill: {
     id: 'brew_tribulation_soul_pill',
+    actionGroup: 'alchemy',
     name: '炼安魂丹',
     cost: TRIBULATION_SOUL_PILL_COST,
     output: {},
@@ -2858,6 +3077,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_tribulation_soul_pill: {
     id: 'take_tribulation_soul_pill',
+    actionGroup: 'alchemy',
     name: '服安魂丹',
     cost: { tribulationPills: 1 },
     output: {},

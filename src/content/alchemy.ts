@@ -503,7 +503,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
   },
   chaos_lotus: {
     id: 'chaos_lotus',
-    name: '混沌莲',
+    name: '沉渊莲',
     nature: 'neutral',
     flavor: 'sweet',
     phase: Element.Earth,
@@ -511,7 +511,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
     toxicity: 'heavy',
     habitats: ['mountain_cave'],
     seasons: [Season.Summer],
-    use: '混沌之力蕴莲，合体辅修。',
+    use: '渊力蕴莲，合体辅修。',
   },
   heavenly_dew_grass: {
     id: 'heavenly_dew_grass',
@@ -539,7 +539,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
   },
   primordial_ginseng: {
     id: 'primordial_ginseng',
-    name: '太初参',
+    name: '古髓参',
     nature: 'warm',
     flavor: 'sweet',
     phase: Element.Earth,
@@ -547,7 +547,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
     toxicity: 'heavy',
     habitats: ['mountain_cave'],
     seasons: [Season.Autumn],
-    use: '太初灵气所化，渡劫极品辅材。',
+    use: '古气所化，渡劫上品辅材。',
   },
   phoenix_feather_fern: {
     id: 'phoenix_feather_fern',
@@ -1129,7 +1129,7 @@ export const PILL_RECIPES: Record<string, PillRecipe> = {
   mahayana_pill: {
     id: 'mahayana_pill',
     name: '大乘丹',
-    summary: '凉甘而浮，水土相济。服后大乘境界大开，修为暴涨。',
+    summary: '凉甘而浮，水土相济。服后大乘境界渐开，修为增长。',
     mainHerbId: 'heavenly_dew_grass',
     assistantHerbId: 'primordial_ginseng',
     nature: 'cool',

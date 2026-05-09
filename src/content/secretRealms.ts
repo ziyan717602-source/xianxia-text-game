@@ -39,7 +39,7 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   ancient_ruins: {
     id: 'ancient_ruins',
     name: '古修遗迹',
-    description: '山腹中空，石壁上有残缺阵纹。前人留下的洞府，可能仍有造化。',
+    description: '山腹中空，石壁上有残缺阵纹。前人留下的洞府，可能仍有遗物。',
     requiredRealm: Realm.FoundationEstablishment,
     requiredFlags: ['sect_rank_inner'],
     dangerLevel: 3,
@@ -69,7 +69,7 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   heavenly_peak: {
     id: 'heavenly_peak',
     name: '天柱峰',
-    description: '山巅直入云霄，天地灵气在此汇聚。唯有金丹以上修士方可涉足。',
+    description: '山巅直入云霄，灵气在此汇聚。唯有金丹以上修士方可涉足。',
     requiredRealm: Realm.GoldenCore,
     dangerLevel: 5,
     qiReward: 50,
@@ -125,8 +125,8 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   },
   underground_palace: {
     id: 'underground_palace',
-    name: '地下仙府',
-    description: '山腹溶洞深处发现古修仙府，阵法犹在，宝物与禁制并存。',
+    name: '地下古府',
+    description: '山腹溶洞深处发现古修洞府，阵法犹在，宝物与禁制并存。',
     requiredRealm: Realm.GoldenCore,
     dangerLevel: 5,
     qiReward: 60,
@@ -140,7 +140,7 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   thunder_tribulation_realm: {
     id: 'thunder_tribulation_realm',
     name: '天雷秘境',
-    description: '雷峰之上，天雷汇聚成域。雷光中蕴含天劫真意，唯有元婴修士方可承受其威。',
+    description: '雷峰之上，天雷汇聚成域。雷光中蕴含雷劫真意，唯有元婴修士方可承受其威。',
     requiredRealm: Realm.NascentSoul,
     dangerLevel: 5,
     qiReward: 80,
@@ -168,7 +168,7 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   integration_void: {
     id: 'integration_void',
     name: '合体虚空',
-    description: '虚空裂隙深处的异度空间，时空法则紊乱。合体期修士方可在此稳固自身，参悟天地合一之理。',
+    description: '虚空裂隙深处的异度空间，时空法则紊乱。合体期修士方可在此稳固自身，参悟内外合一之理。',
     requiredRealm: Realm.Integration,
     dangerLevel: 5,
     qiReward: 200,
@@ -181,8 +181,8 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   },
   mahayana_sanctum: {
     id: 'mahayana_sanctum',
-    name: '大乘圣殿',
-    description: '灵山之巅的太古圣殿，大乘期前辈留下的道韵犹存。唯有大乘修士方可入内承受道压。',
+    name: '大乘旧殿',
+    description: '灵山之巅的太古旧殿，大乘期前辈留下的道韵犹存。唯有大乘修士方可入内承受道压。',
     requiredRealm: Realm.Mahayana,
     dangerLevel: 5,
     qiReward: 350,
@@ -195,8 +195,8 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   },
   tribulation_heaven: {
     id: 'tribulation_heaven',
-    name: '渡劫天域',
-    description: '渡劫台之上的天域，天劫之力凝聚为界。渡劫期修士方可踏入，直面天道考验。',
+    name: '渡劫雷域',
+    description: '渡劫台之上的雷域，天劫之力凝聚为界。渡劫期修士方可踏入，直面考验。',
     requiredRealm: Realm.Tribulation,
     dangerLevel: 5,
     qiReward: 500,
