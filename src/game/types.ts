@@ -62,8 +62,8 @@ export interface Resources {
   shadowEscapePills: number; // 影遁丸
   longevityPills: number; // 延寿丹
   fireFurnacePills: number; // 火炉丹
-  nineTurnFoundationPills: number; // 九转筑基丹
-  buddhaHeartPills: number; // 佛心丹
+  nineTurnFoundationPills: number; // 重炉筑基丹
+  buddhaHeartPills: number; // 定神丸
   goldenCorePills: number;        // 凝丹丸
   nascentSoulPills: number;       // 培婴丹
   spiritTransformPills: number;   // 化神丹

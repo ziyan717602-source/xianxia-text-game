@@ -4870,7 +4870,7 @@ export const EVENTS: ActiveEvent[] = [
   // === Misc higher-realm events ===
   {
     id: 'dragon_palace_hint',
-    text: '有人在谈论海底龙宫的传说——据传那里藏有上古龙族的丹药和功法，只有金丹以上修士才能涉足。',
+    text: '有人在谈论灵湖深处伏潮旧宫的传说——据传那里藏有上古遗址的丹药和功法，只有金丹以上修士才能涉足。',
     condition: (state) => state.realm === Realm.GoldenCore && !state.choices.flags['heard_dragon_palace_hint'] && (state.currentLocationId === 'tea_house' || state.currentLocationId === 'market'),
     weight: () => 12,
     choices: [
@@ -4879,7 +4879,7 @@ export const EVENTS: ActiveEvent[] = [
         effect: (state) => {
           let newState = setFlag(state, 'heard_dragon_palace_hint');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
-          return { state: newState, log: '你记下龙宫传闻。见闻长了三分，也许日后能去探一探。' };
+          return { state: newState, log: '你记下伏潮旧宫传闻。见闻长了三分，也许日后能去探一探。' };
         },
       },
       {

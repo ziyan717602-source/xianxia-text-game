@@ -1875,10 +1875,10 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
     },
   },
-  // Nine Turn Foundation Pill (九转筑基丹)
+  // Nine Turn Foundation Pill (重炉筑基丹)
   study_nine_turn_foundation_formula: {
     id: 'study_nine_turn_foundation_formula',
-    name: '辨九转筑基方',
+    name: '辨重炉筑基方',
     cost: { essence: 60, herbs: 2, insight: 10 },
     output: {},
     cooldown: 0,
@@ -1892,7 +1892,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_nine_turn_foundation_pill: {
     id: 'brew_nine_turn_foundation_pill',
-    name: '炼九转筑基丹',
+    name: '炼重炉筑基丹',
     cost: NINE_TURN_FOUNDATION_PILL_COST,
     output: {},
     cooldown: 3,
@@ -1905,7 +1905,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_nine_turn_foundation_pill: {
     id: 'take_nine_turn_foundation_pill',
-    name: '服九转筑基丹',
+    name: '服重炉筑基丹',
     cost: { nineTurnFoundationPills: 1 },
     output: {},
     cooldown: 5,
@@ -1916,10 +1916,10 @@ export const ACTIONS: Record<string, Action> = {
       requiredLocation: 'home',
     },
   },
-  // Buddha Heart Pill (佛心丹)
+  // Buddha Heart Pill (定神丸)
   study_buddha_heart_formula: {
     id: 'study_buddha_heart_formula',
-    name: '辨佛心方',
+    name: '辨定神方',
     cost: { essence: 35, herbs: 2, insight: 5 },
     output: {},
     cooldown: 0,
@@ -1933,7 +1933,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   brew_buddha_heart_pill: {
     id: 'brew_buddha_heart_pill',
-    name: '炼佛心丹',
+    name: '炼定神丸',
     cost: BUDDHA_HEART_PILL_COST,
     output: {},
     cooldown: 3,
@@ -1946,7 +1946,7 @@ export const ACTIONS: Record<string, Action> = {
   },
   take_buddha_heart_pill: {
     id: 'take_buddha_heart_pill',
-    name: '服佛心丹',
+    name: '服定神丸',
     cost: { buddhaHeartPills: 1 },
     output: {},
     cooldown: 5,

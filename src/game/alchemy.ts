@@ -628,11 +628,11 @@ export function getAlchemySummary(state: GameState): string[] {
   }
 
   if (state.resources.nineTurnFoundationPills > 0 || state.choices.flags.has_nine_turn_foundation_pill) {
-    lines.push(`丹药：九转筑基丹 ${state.resources.nineTurnFoundationPills.toFixed(0)} 粒`);
+    lines.push(`丹药：重炉筑基丹 ${state.resources.nineTurnFoundationPills.toFixed(0)} 粒`);
   }
 
   if (state.resources.buddhaHeartPills > 0 || state.choices.flags.has_buddha_heart_pill) {
-    lines.push(`丹药：佛心丹 ${state.resources.buddhaHeartPills.toFixed(0)} 粒`);
+    lines.push(`丹药：定神丸 ${state.resources.buddhaHeartPills.toFixed(0)} 粒`);
   }
 
   if (state.choices.flags.guarded_breakthrough) {

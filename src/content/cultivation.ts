@@ -111,7 +111,7 @@ export const TECHNIQUES: Record<string, CultivationTechnique> = {
   },
   qingyun_method: {
     id: 'qingyun_method',
-    name: '青云诀',
+    name: '清息诀',
     phase: Element.Wood,
     description: '修行根基之法，青木养气。',
     grade: TechniqueGrade.Mortal,

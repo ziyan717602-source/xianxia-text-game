@@ -6,9 +6,9 @@
 
 ## 调研来源
 
-- [鬼谷八荒 / Tale of Immortal](https://store.steampowered.com/app/1468810/_Tale_of_Immortal/)
-- [了不起的修仙模拟器 / Amazing Cultivation Simulator](https://store.steampowered.com/app/955900/Amazing_Cultivation_Simulator/)
-- [太吾绘卷 / The Scroll of Taiwu](https://store.steampowered.com/app/838350/The_Scroll_Of_Taiwu/)
+- [同类修仙开放世界游戏](https://store.steampowered.com/app/1468810/_Tale_of_Immortal/)
+- [同类修仙模拟经营游戏 / Amazing Cultivation Simulator](https://store.steampowered.com/app/955900/Amazing_Cultivation_Simulator/)
+- [同类武侠/修仙沙盒游戏](https://store.steampowered.com/app/838350/The_Scroll_Of_Taiwu/)
 - [Fallen London](https://www.failbettergames.com/games/fallen-london)
 - [Twine](https://twinery.org/)
 - [ink](https://www.inklestudios.com/ink/)
@@ -34,7 +34,7 @@
 
 ### 世界模拟比主线剧情更重要
 
-`Amazing Cultivation Simulator` 强调宗门、NPC 互动、世界探索、NPC 宗门互相影响和不断变化的修仙世界；`The Scroll of Taiwu` 强调随机地图、NPC 关系、衰老、生病和死亡。对本项目来说，世界不应只是一组按钮，而应至少有轻量状态：
+同类修仙模拟经营游戏强调宗门、NPC 互动、世界探索、NPC 宗门互相影响和不断变化的修仙世界；同类武侠/修仙沙盒游戏强调随机地图、NPC 关系、衰老、生病和死亡。对本项目来说，世界不应只是一组按钮，而应至少有轻量状态：
 
 - 地点。
 - 季节。

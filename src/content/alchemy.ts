@@ -341,7 +341,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
   },
   buddha_heart_leaf: {
     id: 'buddha_heart_leaf',
-    name: '佛心叶',
+    name: '镇意叶',
     nature: 'neutral',
     flavor: 'sweet',
     phase: Element.Earth,
@@ -353,7 +353,7 @@ export const HERB_PROFILES: Record<string, HerbProfile> = {
   },
   nine_turn_ginseng: {
     id: 'nine_turn_ginseng',
-    name: '九转参',
+    name: '厚壤参',
     nature: 'warm',
     flavor: 'sweet',
     phase: Element.Earth,
@@ -902,7 +902,7 @@ export const PILL_RECIPES: Record<string, PillRecipe> = {
   },
   nine_turn_foundation_pill: {
     id: 'nine_turn_foundation_pill',
-    name: '九转筑基丹',
+    name: '重炉筑基丹',
     summary: '温甘而升，土土相固。稀世丹药，筑基成功率大增，代价亦高。',
     mainHerbId: 'nine_turn_ginseng',
     assistantHerbId: 'earthheart_stone_powder',
@@ -920,7 +920,7 @@ export const PILL_RECIPES: Record<string, PillRecipe> = {
   },
   buddha_heart_pill: {
     id: 'buddha_heart_pill',
-    name: '佛心丹',
+    name: '定神丸',
     summary: '平淡而沉，土土相守。服后心境清明，心魔压制效果极好。',
     mainHerbId: 'buddha_heart_leaf',
     assistantHerbId: 'white_stone_lift',

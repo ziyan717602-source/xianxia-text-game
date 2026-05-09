@@ -209,8 +209,8 @@ export const SECRET_REALMS: Record<string, SecretRealmDef> = {
   },
   dragon_palace: {
     id: 'dragon_palace',
-    name: '龙宫',
-    description: '灵湖深处通往的远古龙族遗址，龙气充沛，奇珍遍布。需得龙宫线索方可寻得入口。',
+    name: '伏潮旧宫',
+    description: '灵湖深处通往的远古遗址，潮气充沛，奇珍遍布。需得伏潮旧宫线索方可寻得入口。',
     requiredRealm: Realm.GoldenCore,
     requiredFlags: ['heard_dragon_palace_hint'],
     dangerLevel: 4,
