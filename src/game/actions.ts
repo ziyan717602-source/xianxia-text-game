@@ -1240,7 +1240,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
         },
       },
     };
-    customLog = '点名应到，外门点过名。规矩记了一笔。';
+    customLog = '点名应到。规矩记了一笔。';
   }
 
   if (actionId === 'sect_patrol') {
@@ -1265,7 +1265,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
         },
       },
     };
-    customLog = '巡值一圈，外门巡值无异常。';
+    customLog = '巡值一圈，无异常。';
   }
 
   if (actionId === 'sect_errand') {
@@ -1280,7 +1280,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
         },
       },
     };
-    customLog = '你跑完了一趟外门短差。';
+    customLog = '你跑完了一趟差事。';
   }
 
   if (actionId === 'sect_supply') {

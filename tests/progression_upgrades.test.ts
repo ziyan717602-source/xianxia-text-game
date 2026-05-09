@@ -37,7 +37,7 @@ describe('Progression upgrades', () => {
     state = errand.state;
 
     expect(errand.success).toBe(true);
-    expect(errand.log).toContain('外门短差');
+    expect(errand.log).toContain('差事');
     expect(state.resources.coins).toBe(4);
     expect(state.resources.herbs).toBe(1);
     expect(state.resources.insight).toBe(1);
@@ -69,7 +69,7 @@ describe('Progression upgrades', () => {
     state = rollCall.state;
 
     expect(rollCall.success).toBe(true);
-    expect(rollCall.log).toContain('外门点过名');
+    expect(rollCall.log).toContain('点名应到');
     expect(state.resources.essence).toBe(90);
     expect(state.resources.insight).toBe(1);
     expect(state.choices.flags.attended_outer_gate_roll_call).toBe(true);
@@ -81,7 +81,7 @@ describe('Progression upgrades', () => {
     state = patrol.state;
 
     expect(patrol.success).toBe(true);
-    expect(patrol.log).toContain('外门巡值');
+    expect(patrol.log).toContain('巡值一圈');
     expect(state.resources.essence).toBe(55);
     expect(state.resources.coins).toBe(3);
     expect(state.resources.herbs).toBe(1);
