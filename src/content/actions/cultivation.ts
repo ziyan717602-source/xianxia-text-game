@@ -41,6 +41,9 @@ rike_tuna: {
       requiredLocation: 'home',
     },
     isGlobalAction: true, // Daily practice — can be done anywhere
+    upgradeTier: 'daily',
+    upgradedFrom: 'tuna',
+    upgradeCondition: { realm: Realm.FoundationEstablishment },
   },
 short_retreat: {
     id: 'short_retreat',
@@ -55,6 +58,9 @@ short_retreat: {
       requiredRealm: Realm.QiCondensation,
     },
     isGlobalAction: true, // Retreat — internal cultivation, not location-bound
+    upgradeTier: 'retreat',
+    upgradedFrom: 'rike_tuna',
+    upgradeCondition: { flag: 'dwelling_level_1' },
   },
 foundation_daily_practice: {
     id: 'foundation_daily_practice',
@@ -69,6 +75,9 @@ foundation_daily_practice: {
       requiredFlags: ['foundation_morning_seen'],
       forbiddenFlags: [],
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'rike_tuna',
+    upgradeCondition: { realm: Realm.GoldenCore },
   },
 inner_gate_rumor: {
     id: 'inner_gate_rumor',

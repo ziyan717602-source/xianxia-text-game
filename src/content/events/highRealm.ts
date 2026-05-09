@@ -112,7 +112,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'golden_core_thunder',
     text: '丹成之际，隐隐有所感应。乌云翻涌，一道金色雷光劈下——金丹雷劫来了。',
-    condition: (state) => state.realm === Realm.GoldenCore && !state.choices.flags['golden_core_thunder_seen'],
+    condition: (state) => state.realm === Realm.GoldenCore && !state.choices.flags['golden_core_thunder_seen'] && Boolean(state.choices.flags['sensed_thunder_omen']),
     weight: () => 20,
     choices: [
       {
@@ -461,7 +461,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'ancient_battlefield_remnant',
     text: '古战场深处，一道残魂拦住了你的去路。它曾是上古修士，死于此役，残留执念至今不散。',
-    condition: (state) => state.currentLocationId === 'ancient_battlefield' && state.realm === Realm.SpiritTransformation && !state.choices.flags['battlefield_remnant_seen'],
+    condition: (state) => state.currentLocationId === 'ancient_battlefield' && state.realm === Realm.SpiritTransformation && !state.choices.flags['battlefield_remnant_seen'] && state.karma.karmicWeight >= 5,
     weight: () => 14,
     choices: [
       {
@@ -494,7 +494,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'integration_void_call',
     text: '虚空之中传来一声悠远的呼唤，仿佛有什么在召唤你与之合为一体。修为已到了与外力共鸣的关口。',
-    condition: (state) => state.realm === Realm.Integration && !state.choices.flags['integration_void_call_seen'],
+    condition: (state) => state.realm === Realm.Integration && !state.choices.flags['integration_void_call_seen'] && state.karma.karmicWeight >= 3,
     weight: () => 10,
     choices: [
       {
@@ -575,7 +575,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'mahayana_enlightenment',
     text: '道途渐明。修行已至大乘，法则在你面前渐渐清晰。一次悟道机缘降临了。',
-    condition: (state) => state.realm === Realm.Mahayana && !state.choices.flags['mahayana_enlightenment_seen'],
+    condition: (state) => state.realm === Realm.Mahayana && !state.choices.flags['mahayana_enlightenment_seen'] && (state.choices.qualities['quiet_cultivation'] ?? 0) >= 5,
     weight: () => 8,
     choices: [
       {
@@ -615,7 +615,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'spirit_mountain_enlightenment',
     text: '灵山之巅，云海翻涌。一束金光从天际直落你身——灵山赐道，顿悟降临。',
-    condition: (state) => state.currentLocationId === 'spirit_mountain' && state.realm === Realm.Mahayana && !state.choices.flags['spirit_mountain_enlightenment_seen'],
+    condition: (state) => state.currentLocationId === 'spirit_mountain' && state.realm === Realm.Mahayana && !state.choices.flags['spirit_mountain_enlightenment_seen'] && (state.choices.qualities['quiet_cultivation'] ?? 0) >= 8,
     weight: () => 10,
     choices: [
       {
@@ -654,8 +654,8 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'tribulation_thunder',
     text: '云层裂开，雷劫蓄势待发。你站在渡劫台上，感受到了隐隐的威压。',
-    condition: (state) => state.realm === Realm.Tribulation && !state.choices.flags['tribulation_thunder_seen'],
-    weight: () => 6,
+    condition: (state) => state.realm === Realm.Tribulation && state.karma.karmicWeight >= 5 && !state.choices.flags['tribulation_thunder_seen'],
+    weight: (state) => 6 + Math.min(15, Math.floor(state.karma.karmicWeight / 3)),
     choices: [
       {
         text: '以肉身迎劫',
@@ -708,8 +708,8 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'tribulation_platform_breakthrough',
     text: '渡劫台上的雷纹开始共鸣，天劫似乎即将降临。这是飞升前的最后一道坎。',
-    condition: (state) => state.currentLocationId === 'tribulation_platform' && state.realm === Realm.Tribulation && state.resources.qi >= 300 && !state.choices.flags['tribulation_platform_breakthrough_seen'],
-    weight: () => 5,
+    condition: (state) => state.currentLocationId === 'tribulation_platform' && state.realm === Realm.Tribulation && state.resources.qi >= 300 && state.karma.karmicWeight >= 8 && !state.choices.flags['tribulation_platform_breakthrough_seen'],
+    weight: (state) => 5 + Math.min(10, Math.floor(state.karma.karmicWeight / 5)),
     choices: [
       {
         text: '迎接天劫',
@@ -768,7 +768,7 @@ export const HIGHREALM_EVENTS: ActiveEvent[] = [
 {
     id: 'demon_seal_breach',
     text: '镇魔地的封印终于崩裂！一股狂暴的魔气从中冲出，化为一个模糊的魔影。它似乎并未完全苏醒，但已经非常危险。',
-    condition: (state) => state.currentLocationId === 'demon_seal_ground' && Boolean(state.choices.flags['demon_seal_weakening_seen']) && !state.choices.flags['demon_seal_breach_seen'],
+    condition: (state) => state.currentLocationId === 'demon_seal_ground' && Boolean(state.choices.flags['demon_seal_weakening_seen']) && !state.choices.flags['demon_seal_breach_seen'] && (state.choices.qualities['combat_edge'] ?? 0) >= 3,
     weight: () => 10,
     choices: [
       {

@@ -12,6 +12,8 @@ sect_chore: {
     conditions: {
       requiredLocation: 'outer_gate',
     },
+    upgradeTier: 'daily',
+    upgradeCondition: { flag: 'completed_sect_errand' },
   },
 sect_errand: {
     id: 'sect_errand',
@@ -40,6 +42,9 @@ sect_supply: {
       requiredLocation: 'outer_gate',
       requiredRealm: Realm.QiCondensation,
     },
+    upgradeTier: 'automated',
+    upgradedFrom: 'sect_chore',
+    upgradeCondition: { flag: 'sect_rank_inner' },
   },
 sect_roll_call: {
     id: 'sect_roll_call',

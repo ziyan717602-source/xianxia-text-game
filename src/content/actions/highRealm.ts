@@ -13,6 +13,9 @@ golden_core_practice: {
     conditions: {
       requiredRealm: Realm.GoldenCore,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'foundation_daily_practice',
+    upgradeCondition: { realm: Realm.NascentSoul },
   },
 nascent_soul_practice: {
     id: 'nascent_soul_practice',
@@ -25,6 +28,9 @@ nascent_soul_practice: {
     conditions: {
       requiredRealm: Realm.NascentSoul,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'golden_core_practice',
+    upgradeCondition: { realm: Realm.SpiritTransformation },
   },
 breakthrough_golden_core: {
     id: 'breakthrough_golden_core',
@@ -69,6 +75,9 @@ spirit_transformation_practice: {
     conditions: {
       requiredRealm: Realm.SpiritTransformation,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'nascent_soul_practice',
+    upgradeCondition: { realm: Realm.Integration },
   },
 integration_practice: {
     id: 'integration_practice',
@@ -81,6 +90,9 @@ integration_practice: {
     conditions: {
       requiredRealm: Realm.Integration,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'spirit_transformation_practice',
+    upgradeCondition: { realm: Realm.Mahayana },
   },
 mahayana_practice: {
     id: 'mahayana_practice',
@@ -93,6 +105,9 @@ mahayana_practice: {
     conditions: {
       requiredRealm: Realm.Mahayana,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'integration_practice',
+    upgradeCondition: { realm: Realm.Tribulation },
   },
 tribulation_practice: {
     id: 'tribulation_practice',
@@ -105,6 +120,8 @@ tribulation_practice: {
     conditions: {
       requiredRealm: Realm.Tribulation,
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'mahayana_practice',
   },
 breakthrough_spirit_transformation: {
     id: 'breakthrough_spirit_transformation',
@@ -182,6 +199,9 @@ core_gate_cultivation: {
       requiredRealm: Realm.GoldenCore,
       requiredLocation: 'core_gate',
     },
+    upgradeTier: 'daily',
+    upgradedFrom: 'golden_core_practice',
+    upgradeCondition: { flag: 'sect_rank_core' },
   },
 core_gate_exchange: {
     id: 'core_gate_exchange',
@@ -220,6 +240,8 @@ spirit_mountain_retreat: {
       requiredRealm: Realm.Mahayana,
       requiredLocation: 'spirit_mountain',
     },
+    upgradeTier: 'retreat',
+    upgradedFrom: 'short_retreat',
   },
 study_golden_core_formation_formula: {
     id: 'study_golden_core_formation_formula',

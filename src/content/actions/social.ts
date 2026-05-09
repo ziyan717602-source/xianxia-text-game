@@ -53,6 +53,9 @@ assign_herb_gathering: {
       requiredLocation: 'home',
       requiredFlags: ['has_follower'],
     },
+    upgradeTier: 'automated',
+    upgradedFrom: 'caiyao',
+    upgradeCondition: { flag: 'dwelling_level_2' },
   },
 assign_patrol_duty: {
     id: 'assign_patrol_duty',
@@ -66,6 +69,8 @@ assign_patrol_duty: {
       requiredLocation: 'home',
       requiredFlags: ['has_follower', 'sect_rank_outer'],
     },
+    upgradeTier: 'automated',
+    upgradedFrom: 'xunshan',
   },
 collect_follower_income: {
     id: 'collect_follower_income',
@@ -79,5 +84,7 @@ collect_follower_income: {
       requiredLocation: 'home',
       requiredFlags: ['has_follower'],
     },
+    upgradeTier: 'automated',
+    upgradedFrom: 'assign_herb_gathering',
   }
 };

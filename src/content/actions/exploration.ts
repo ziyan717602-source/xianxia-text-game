@@ -10,6 +10,8 @@ caiyao: {
     cooldown: 10,
     riskProbability: 0.1,
     conditions: {},
+    upgradeTier: 'manual',
+    upgradeCondition: { flag: 'has_follower' },
   },
 bianyao: {
     id: 'bianyao',
@@ -42,6 +44,8 @@ trade: {
     conditions: {
       requiredLocation: 'market',
     },
+    upgradeTier: 'manual',
+    upgradeCondition: { realm: Realm.FoundationEstablishment },
   },
 gossip: {
     id: 'gossip',

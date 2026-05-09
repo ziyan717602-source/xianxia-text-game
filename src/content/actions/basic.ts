@@ -1,4 +1,4 @@
-import { Action } from '../../game/types';
+import { Action, Realm } from '../../game/types';
 
 export const BASIC_ACTIONS: Record<string, Action> = {
 kuzuo: {
@@ -11,6 +11,7 @@ kuzuo: {
     riskProbability: 0,
     conditions: {},
     isGlobalAction: true, // Basic cultivation — available everywhere
+    upgradeTier: 'manual',
   },
 tuna: {
     id: 'tuna',
@@ -22,6 +23,8 @@ tuna: {
     riskProbability: 0,
     conditions: {},
     isGlobalAction: true, // Basic cultivation — available everywhere
+    upgradeTier: 'manual',
+    upgradeCondition: { realm: Realm.QiCondensation },
   },
 tiaoxi: {
     id: 'tiaoxi',
@@ -33,5 +36,6 @@ tiaoxi: {
     riskProbability: 0,
     conditions: {},
     isGlobalAction: true, // Basic recovery — available everywhere
+    upgradeTier: 'manual',
   }
 };

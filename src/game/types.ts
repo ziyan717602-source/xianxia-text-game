@@ -263,6 +263,27 @@ export interface AscensionState {
 }
 
 /**
+ * 行动升格层级
+ * manual:   手动操作，玩家每次点击执行 (e.g. 枯坐、采药)
+ * daily:    日课/批量，周期性自动触发，玩家只需确认 (e.g. 日课吐纳、筑基日课)
+ * retreat:  闭关/阵法/洞府，长时间批量结算 (e.g. 三日闭关、灵山闭关)
+ * automated:全自动化，洞府收益/宗门供给/弟子代行，无需玩家操作 (e.g. 宗门供给、收杂役成果)
+ */
+export type UpgradeTier = 'manual' | 'daily' | 'retreat' | 'automated';
+
+/**
+ * 行动升格条件 — 满足条件后，低级行动可被高级行动替代
+ */
+export interface UpgradeCondition {
+  /** 需要的 flag (e.g. 'dwelling_level_1', 'sect_rank_inner') */
+  flag?: string;
+  /** 需要达到的境界 */
+  realm?: Realm;
+  /** 需要的资源门槛 */
+  resource?: Partial<Resources>;
+}
+
+/**
  * 行动定义 (静态配置)
  */
 export interface Action {
@@ -283,6 +304,12 @@ export interface Action {
   isGlobalAction?: boolean;
   /** Category group for UI display and filtering. */
   actionGroup?: 'basic' | 'cultivation' | 'alchemy' | 'sect' | 'dwelling' | 'exploration' | 'breakthrough' | 'combat' | 'social';
+  /** 升格层级：manual -> daily -> retreat -> automated，标记此行动在升格路径中的位置 */
+  upgradeTier?: UpgradeTier;
+  /** 升格来源：标记此行动替代了哪个低级行动 (e.g. 'rike_tuna' 替代了 'tuna') */
+  upgradedFrom?: string;
+  /** 升格条件：满足后 UI 可提示"此行动可升格为 XXX" */
+  upgradeCondition?: UpgradeCondition;
 }
 
 /**

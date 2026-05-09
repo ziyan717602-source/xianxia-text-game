@@ -12,6 +12,8 @@ establish_dwelling: {
     conditions: {
       requiredRealm: Realm.FoundationEstablishment,
     },
+    upgradeTier: 'retreat',
+    upgradeCondition: { flag: 'dwelling_level_1' },
   },
 upgrade_dwelling: {
     id: 'upgrade_dwelling',
@@ -24,6 +26,8 @@ upgrade_dwelling: {
     conditions: {
       requiredFlags: ['dwelling_level_1'],
     },
+    upgradeTier: 'retreat',
+    upgradeCondition: { flag: 'dwelling_level_2' },
   },
 install_formation: {
     id: 'install_formation',
@@ -36,5 +40,8 @@ install_formation: {
     conditions: {
       requiredFlags: ['dwelling_level_2'],
     },
+    upgradeTier: 'automated',
+    upgradedFrom: 'upgrade_dwelling',
+    upgradeCondition: { flag: 'dwelling_level_3' },
   }
 };
