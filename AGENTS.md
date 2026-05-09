@@ -154,12 +154,54 @@ agent-ctx/       Agent 上下文记录（阶段性工作文档）
 | `docs/dev-environment.md` | 当前 Linux 开发环境记录 |
 | `docs/dev-environment-pc.md` | 历史 Windows 开发环境记录（归档） |
 
-## 10. Git 与协作
+## 10. Git 分支与提交规则
 
-- `main` 保持可运行；实验玩法用 `feature/` 前缀分支或用户指定分支。
-- 提交粒度按"一个可解释的产品变化"组织，不混入无关重构。
+### 10.1 分支策略
+
+| 分支 | 用途 | 权限 |
+| --- | --- | --- |
+| `main` | Codex 维护的稳定主线 | **禁止提交、禁止 push** |
+| `glm/v0.2.0-snapshot` | GLM v0.2.0 的原样快照 | **只读留档，禁止继续提交** |
+| `glm/dev` | GLM Agent 的开发分支 | 所有 GLM 开发在此进行 |
+
+**硬性规则**：
+1. 所有开发在 `glm/dev` 分支进行，禁止在 `main` 上直接提交。
+2. 禁止 push 到 `main`，禁止将 `glm/dev` 合并到 `main`。
+3. 不要直接 merge `main`；如需吸收 `main` 新内容，先说明再操作。
+4. 每次开发前必须确认当前在 `glm/dev` 分支。
+
+### 10.2 开发前准备
+
+```bash
+git fetch origin
+git switch glm/dev
+git pull --ff-only
+npm ci
+```
+
+### 10.3 开发后提交
+
+```bash
+npm test
+npm run build
+git status --short
+git add <本次修改的文件>
+git commit -m "feat: ..."   # 或 fix:/docs:/refactor:/test:/chore:
+git push origin glm/dev
+```
+
+### 10.4 提交规范
+
+- **不要提交**：`node_modules`、`dist`、`.env`、token、本地存档、浏览器缓存。
+- 每个提交只做一个清楚的功能或修复。
+- 新玩法要补测试。
+- 改了玩法、计划或项目状态，要同步 `README.md`、`PLAN.md`、`docs/project-status.md` 等文档。
+- Commit message 格式：`<type>: <简述>`，type 可选 `feat`/`fix`/`docs`/`refactor`/`test`/`chore`。
+
+### 10.5 多工具协作
+
 - 工作树可能有他人改动；不要回滚未亲自修改的内容。
-- 多工具协作时，Cursor、Copilot 等项目指令应引用本文件，避免多份规则漂移。
+- Cursor、Copilot 等项目指令应引用本文件，避免多份规则漂移。
 - 当前环境 Git 可用但未配置 `gh` CLI；使用 `git` 命令进行推送和拉取。
 
 ## 11. 规则迭代
