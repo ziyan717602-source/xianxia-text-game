@@ -4,9 +4,9 @@ import { ALCHEMY_UNLOCKS } from './alchemy';
 import { SECT_UNLOCKS } from './sect';
 import { BREAKTHROUGH_UNLOCKS } from './breakthrough';
 import { HIGHREALM_UNLOCKS } from './highRealm';
-import { UnlockRule } from './_types';
+import type { UnlockRule } from './_types';
 
-export { UnlockRule } from './_types';
+export type { UnlockRule } from './_types';
 
 export const UNLOCKS: UnlockRule[] = [
   ...CORE_UNLOCKS,

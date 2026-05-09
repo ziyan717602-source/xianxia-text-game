@@ -12,7 +12,8 @@ import { discoverRealm } from '../../game/secretRealm';
 import { shouldShowAscensionThreshold, executeAscension } from '../../game/ascension';
 
 // Re-export all dependencies for domain files
-export { GameState, Realm, Season } from '../../game/types';
+export type { GameState } from '../../game/types';
+export { Realm, Season } from '../../game/types';
 export { adjustQuality, removeTag, setFlag, setTag } from '../../game/choices';
 export { resolveCombatEvent } from '../../game/combat';
 export { addRelationship, updateRelationship } from '../../game/relationships';
@@ -169,6 +170,9 @@ export function recordFoundationGuardian(
  * GameEvent 需要支持更动态的条件和效果，扩展 types.ts 里的静态定义。
  * 这里使用更强类型的函数定义以便在代码中执行。
  */
+// Note: ActiveEvent and EventChoice are also re-exported from index.ts
+// using `export type` to satisfy rolldown's tree-shaking.
+// They must also be exported here as regular exports for the domain files.
 export interface ActiveEvent {
   id: string;
   text: string | ((state: GameState) => string);

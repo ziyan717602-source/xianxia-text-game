@@ -351,8 +351,11 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   if (action.conditions.requiredLocation && state.currentLocationId !== action.conditions.requiredLocation) {
     return { state, log: `此地无法进行${action.name}`, success: false };
   }
-  if (action.conditions.requiredRealm && state.realm !== action.conditions.requiredRealm) {
-    return { state, log: `当前境界无法进行${action.name}`, success: false };
+  if (action.conditions.requiredRealm) {
+    const REALM_ORDER = [Realm.Mortal, Realm.QiCondensation, Realm.FoundationEstablishment, Realm.GoldenCore, Realm.NascentSoul, Realm.SpiritTransformation, Realm.Integration, Realm.Mahayana, Realm.Tribulation];
+    if (REALM_ORDER.indexOf(state.realm) < REALM_ORDER.indexOf(action.conditions.requiredRealm)) {
+      return { state, log: `当前境界无法进行${action.name}`, success: false };
+    }
   }
 
   // Deduct costs
@@ -1592,7 +1595,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       ...newState.choices.qualities,
       [countKey]: (newState.choices.qualities[countKey] || 0) + 1,
       ...(routeQuality
-        ? { [routeQuality]: (newState.choices.qualities[routeQuality] || 0) + 1 }
+        ? { [routeQuality]: (newState.choices.qualities[routeQuality] || 0) + 0.2 }
         : {}),
     }
   };

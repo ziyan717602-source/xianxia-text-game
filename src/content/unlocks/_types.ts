@@ -1,4 +1,5 @@
-import { GameState, Realm } from '../../game/types';
+import type { GameState } from '../../game/types';
+import { Realm } from '../../game/types';
 import { getNextBreakthroughRule } from '../../game/breakthrough';
 
 export interface UnlockRule {
@@ -7,4 +8,5 @@ export interface UnlockRule {
   effect: (state: GameState) => GameState;
 }
 
-export { getNextBreakthroughRule, Realm };
+export { getNextBreakthroughRule };
+export { Realm };

@@ -5,9 +5,9 @@ import { ALCHEMY_EVENTS } from './alchemy';
 import { EXPLORATION_EVENTS } from './exploration';
 import { COMBAT_EVENTS } from './combat';
 import { HIGHREALM_EVENTS } from './highRealm';
-import { ActiveEvent, EventChoice } from './_helpers';
+import type { ActiveEvent, EventChoice } from './_helpers';
 
-export { ActiveEvent, EventChoice } from './_helpers';
+export type { ActiveEvent, EventChoice } from './_helpers';
 
 export const EVENTS: ActiveEvent[] = [
   ...CORE_EVENTS,

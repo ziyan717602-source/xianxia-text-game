@@ -21,7 +21,7 @@ describe('Progression upgrades', () => {
     expect(state.resources.essence).toBe(10);
     expect(state.time.tick).toBe(150);
     expect(state.choices.flags.completed_short_retreat).toBe(true);
-    expect(state.choices.qualities.quiet_cultivation).toBe(1);
+    expect(state.choices.qualities.quiet_cultivation).toBeCloseTo(0.2);
   });
 
   it('should perform outer gate errands and unlock supply-like support', () => {
@@ -42,7 +42,7 @@ describe('Progression upgrades', () => {
     expect(state.resources.herbs).toBe(1);
     expect(state.resources.insight).toBe(1);
     expect(state.choices.flags.completed_sect_errand).toBe(true);
-    expect(state.choices.qualities.sect_trace).toBe(1);
+    expect(state.choices.qualities.sect_trace).toBeCloseTo(0.2);
 
     state.resources.essence = 100;
     const supply = performAction(state, 'sect_supply');
@@ -53,7 +53,7 @@ describe('Progression upgrades', () => {
     expect(state.resources.coins).toBe(6);
     expect(state.resources.herbs).toBe(4);
     expect(state.choices.flags.completed_sect_supply).toBe(true);
-    expect(state.choices.qualities.sect_trace).toBe(2);
+    expect(state.choices.qualities.sect_trace).toBeCloseTo(0.4);
   });
 
   it('should perform outer gate roll call and patrol as a rule-bound task chain', () => {
@@ -75,7 +75,7 @@ describe('Progression upgrades', () => {
     expect(state.choices.flags.attended_outer_gate_roll_call).toBe(true);
     expect(state.choices.tags.sect_status).toBe('roll_called');
     expect(state.choices.qualities.sect_discipline).toBe(1);
-    expect(state.choices.qualities.sect_trace).toBe(1);
+    expect(state.choices.qualities.sect_trace).toBeCloseTo(0.2);
 
     const patrol = performAction(state, 'sect_patrol');
     state = patrol.state;
@@ -90,6 +90,6 @@ describe('Progression upgrades', () => {
     expect(state.choices.tags.sect_status).toBe('patrol');
     expect(state.choices.qualities.sect_contribution).toBe(1);
     expect(state.choices.qualities.sect_discipline).toBe(2);
-    expect(state.choices.qualities.sect_trace).toBe(2);
+    expect(state.choices.qualities.sect_trace).toBeCloseTo(0.4);
   });
 });

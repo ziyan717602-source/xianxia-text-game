@@ -19,7 +19,7 @@ describe('World ledger', () => {
     state = performAction(state, 'kuzuo').state;
 
     expect(state.world.recentActions.kuzuo).toBe(1);
-    expect(state.choices.qualities.quiet_cultivation).toBe(1);
+    expect(state.choices.qualities.quiet_cultivation).toBeCloseTo(0.2);
     expect(getRecentSummary(state)).toContain('近十日：枯坐1次。');
   });
 

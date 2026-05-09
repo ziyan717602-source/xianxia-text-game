@@ -33,13 +33,11 @@ rike_tuna: {
     id: 'rike_tuna',
     actionGroup: 'cultivation',
     name: '日课吐纳',
-    cost: { essence: 60 },
-    output: { qi: 8 },
+    cost: { essence: 30 },
+    output: { qi: 8, insight: 1 },
     cooldown: 50,
     riskProbability: 0,
-    conditions: {
-      requiredLocation: 'home',
-    },
+    conditions: {},
     isGlobalAction: true, // Daily practice — can be done anywhere
     upgradeTier: 'daily',
     upgradedFrom: 'tuna',
@@ -54,7 +52,6 @@ short_retreat: {
     cooldown: 150,
     riskProbability: 0,
     conditions: {
-      requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
     isGlobalAction: true, // Retreat — internal cultivation, not location-bound

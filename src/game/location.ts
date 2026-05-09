@@ -23,7 +23,7 @@ function isActionAvailable(actionId: string, state: GameState, skipLocationCheck
     return false;
   }
 
-  if (action.conditions.requiredRealm && action.conditions.requiredRealm !== state.realm) {
+  if (action.conditions.requiredRealm && !realmAtLeast(state, action.conditions.requiredRealm)) {
     return false;
   }
 

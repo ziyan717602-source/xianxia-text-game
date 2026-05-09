@@ -53,7 +53,7 @@ describe('Origin system', () => {
 
     expect(result.success).toBe(true);
     expect(result.state.resources.coins).toBe(10);
-    expect(result.state.choices.qualities.market_ties).toBe(3);
+    expect(result.state.choices.qualities.market_ties).toBeCloseTo(2.2);
   });
 
   it('should let outer child touch sect systems without entering a sect path', () => {
@@ -71,7 +71,7 @@ describe('Origin system', () => {
 
     expect(result.success).toBe(true);
     expect(result.state.resources.insight).toBe(2);
-    expect(result.state.choices.qualities.sect_trace).toBe(3);
+    expect(result.state.choices.qualities.sect_trace).toBeCloseTo(2.2);
 
     state.realm = Realm.QiCondensation;
     state.realmLayer = 1;

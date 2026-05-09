@@ -278,8 +278,8 @@ describe('Inner Demon System', () => {
 
     expect(result.state.innerDemon.activeDemon).toBeNull();
     expect(result.state.innerDemon.demonProgress).toBe(0);
-    // Suppress does NOT add to suppressedDemons
-    expect(result.state.innerDemon.suppressedDemons).not.toContain('demon_of_rashness');
+    // Suppress now adds to suppressedDemons to prevent immediate re-trigger
+    expect(result.state.innerDemon.suppressedDemons).toContain('demon_of_rashness');
     expect(result.state.resources.lifespan).toBe(originalLifespan - 80);
   });
 

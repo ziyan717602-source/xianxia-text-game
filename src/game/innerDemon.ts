@@ -236,7 +236,7 @@ export function suppressDemon(state: GameState): { state: GameState; log: string
       ...state.innerDemon,
       activeDemon: null,
       demonProgress: 0,
-      // 压制不加入 suppressedDemons — 心魔可以再次出现
+      suppressedDemons: [...state.innerDemon.suppressedDemons, demonId],
     },
   };
 

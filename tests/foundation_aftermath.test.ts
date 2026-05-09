@@ -444,7 +444,7 @@ describe('Post-Foundation Actions', () => {
       const result = performAction(state, 'foundation_daily_practice');
 
       expect(result.success).toBe(true);
-      expect(result.state.choices.qualities.quiet_cultivation).toBeGreaterThanOrEqual(1);
+      expect(result.state.choices.qualities.quiet_cultivation).toBeGreaterThanOrEqual(0.2);
     });
   });
 
@@ -484,7 +484,7 @@ describe('Post-Foundation Actions', () => {
       const result = performAction(state, 'inner_gate_rumor');
 
       expect(result.success).toBe(true);
-      expect(result.state.choices.qualities.sect_trace).toBeGreaterThanOrEqual(1);
+      expect(result.state.choices.qualities.sect_trace).toBeGreaterThanOrEqual(0.2);
     });
   });
 
@@ -548,7 +548,7 @@ describe('Post-Foundation Actions', () => {
       const result = performAction(state, 'foundation_meditation', () => 0.99);
 
       expect(result.success).toBe(true);
-      expect(result.state.choices.qualities.quiet_cultivation).toBeGreaterThanOrEqual(1);
+      expect(result.state.choices.qualities.quiet_cultivation).toBeGreaterThanOrEqual(0.2);
     });
   });
 

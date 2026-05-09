@@ -1,1 +1,2 @@
-export { performAction, ACTIONS, ACTION_ROUTE_QUALITIES, ActionResult } from './_all';
+export { performAction, ACTIONS, ACTION_ROUTE_QUALITIES } from './_all';
+export type { ActionResult } from './_all';

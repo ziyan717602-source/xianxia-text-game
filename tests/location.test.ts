@@ -73,7 +73,8 @@ describe('Location System', () => {
     state.realm = Realm.QiCondensation;
     state.realmLayer = 1;
 
-    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    // With realmAtLeast check, QiCondensation can still use Mortal-realm actions like yinqi
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
     expect(getAvailableActionsAtLocation(state)).toContain('inspect_root');
 
     state.choices.flags.root_known = true;

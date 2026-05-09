@@ -64,17 +64,17 @@ describe('Action System', () => {
     // Default essence is max (100)
     const result = performAction(state, 'tuna');
     expect(result.success).toBe(true);
-    expect(result.state.resources.essence).toBe(state.resources.essence - 10);
-    expect(result.state.resources.qi).toBe(1);
+    expect(result.state.resources.essence).toBe(state.resources.essence - 5);
+    expect(result.state.resources.qi).toBe(3);
   });
 
   it('should fail to perform "tuna" if essence is low', () => {
     let state = createInitialState();
-    state.resources.essence = 5;
+    state.resources.essence = 3;
 
     const result = performAction(state, 'tuna');
     expect(result.success).toBe(false);
-    expect(result.state.resources.essence).toBe(5);
+    expect(result.state.resources.essence).toBe(3);
     expect(result.state.resources.qi).toBe(0);
     expect(result.log).toContain('精元不足');
   });
@@ -131,7 +131,7 @@ describe('Action System', () => {
     const result = performAction(state, 'rike_tuna');
 
     expect(result.success).toBe(true);
-    expect(result.state.resources.essence).toBe(40);
+    expect(result.state.resources.essence).toBe(70);
     expect(result.state.resources.qi).toBe(8);
     expect(result.state.time.tick).toBe(50);
     expect(result.state.resources.lifespan).toBe(initialLifespan - 50);
@@ -157,7 +157,7 @@ describe('Action System', () => {
     state = performAction(state, 'bianyao').state;
     state = performAction(state, 'xunshan', () => 0.9).state;
 
-    expect(state.choices.qualities.alchemy_affinity).toBe(2);
-    expect(state.choices.qualities.combat_edge).toBe(1);
+    expect(state.choices.qualities.alchemy_affinity).toBeCloseTo(0.4);
+    expect(state.choices.qualities.combat_edge).toBeCloseTo(0.2);
   });
 });

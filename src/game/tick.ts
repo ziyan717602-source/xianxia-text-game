@@ -5,6 +5,7 @@ import { applyDantoxinConsequences } from './alchemy';
 import { getDwellingAutoIncome } from './dwelling';
 import { followerTick } from './follower';
 import { checkDemonTrigger, applyDemonConsequence, DEMON_DEFS } from './innerDemon';
+import { getSecretRealmDef } from './secretRealm';
 import { updateKarmicWeight } from './karma';
 
 export const TICK_INTERVAL_MS = 1000; // 1 real second = 1 tick
@@ -127,6 +128,21 @@ function processTicks(state: GameState, ticks: number): GameState {
     if (nextState.innerDemon.activeDemon !== null && nextState.innerDemon.demonProgress >= 100) {
       const consequence = applyDemonConsequence(nextState);
       nextState = consequence.state;
+    }
+  }
+
+  // Advance secret realm exploration
+  if (nextState.secretRealm.activeExploration) {
+    const realmDef = getSecretRealmDef(nextState.secretRealm.activeExploration);
+    if (realmDef) {
+      const progressPerTick = 2 / realmDef.dangerLevel;
+      nextState = {
+        ...nextState,
+        secretRealm: {
+          ...nextState.secretRealm,
+          explorationProgress: Math.min(100, nextState.secretRealm.explorationProgress + progressPerTick),
+        },
+      };
     }
   }
 

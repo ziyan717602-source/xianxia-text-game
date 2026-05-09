@@ -37,7 +37,7 @@ export const CORE_UNLOCKS: UnlockRule[] = [
   },
 {
     id: 'unlock_rike_tuna',
-    condition: (state) => (state.choices.qualities['action_tuna_count'] || 0) >= 10,
+    condition: (state) => (state.choices.qualities['action_tuna_count'] || 0) >= 5,
     effect: (state) => {
       if (!state.choices.flags['unlocked_rike_tuna']) {
         return {

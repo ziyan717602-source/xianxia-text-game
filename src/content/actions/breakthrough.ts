@@ -12,9 +12,9 @@ yinqi: {
     riskProbability: 0,
     conditions: {
       requiredFlags: ['completed_rike_tuna'],
-      requiredLocation: 'home',
       requiredRealm: Realm.Mortal,
     },
+    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
   },
 withdraw_foundation: {
     id: 'withdraw_foundation',

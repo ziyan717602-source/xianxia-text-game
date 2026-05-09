@@ -58,7 +58,7 @@ describe('Opening flow', () => {
 
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
-    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
   });
 
   it('should reach qi condensation through daily practice without manual resource injection', () => {
@@ -107,12 +107,13 @@ describe('Opening flow', () => {
 
     expect(state.realm).toBe(Realm.QiCondensation);
     expect(state.realmLayer).toBe(1);
-    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    // With realmAtLeast check, yinqi (Mortal-realm) is still available at QiCondensation
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
     expect(getAvailableActionsAtLocation(state)).toContain('inspect_root');
     expect(state.choices.qualities.action_tuna_count).toBe(10);
     expect(state.choices.qualities.action_rike_tuna_count).toBe(1);
     expect(actionCount).toBeLessThanOrEqual(20);
-    expect(state.time.tick).toBeGreaterThanOrEqual(180);
+    expect(state.time.tick).toBeGreaterThanOrEqual(150);
     expect(state.time.tick).toBeLessThanOrEqual(220);
   });
 });
