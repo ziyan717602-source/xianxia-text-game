@@ -1,6 +1,6 @@
 # 技术路线
 
-更新时间：2026-05-07
+更新时间：2026-05-09
 
 ## 目标
 
@@ -17,7 +17,7 @@
 - Playwright：浏览器烟测。
 - PWA：后续加入 service worker 和 manifest，支持离线与安装。
 
-Vite 官方文档说明它面向现代 Web 项目，提供开发服务器和生产构建；当前 Vite 要求 Node.js `20.19+` 或 `22.12+`。本机已安装 Node.js `24.15.0`，满足要求。
+Vite 官方文档说明它面向现代 Web 项目，提供开发服务器和生产构建；当前 Vite 要求 Node.js `20.19+` 或 `22.12+`。Windows 工作电脑已安装 Node.js `24.15.0`，Linux 服务器已安装 Node.js `v24.14.1`，均满足要求。
 
 ## 架构边界
 
@@ -33,27 +33,28 @@ UI 不保存权威状态。所有关键状态都来自 `src/game`。
 
 ## 当前实现状态
 
-截至 2026-05-07，项目已实现：
+截至 2026-05-09，项目已实现：
 
 - Vite + React + TypeScript 工程。
-- `src/game` 纯逻辑骨架。
-- `src/content` 事件、地点、解锁配置。
-- `src/storage/save.ts` localStorage 存档和迁移入口。
-- `src/ui` 主界面和 game loop hook。
-- Vitest 基础测试。
-- Edge/CDP 无依赖浏览器烟测脚本 `npm run smoke`。
+- `src/game` 纯逻辑：tick、资源、行动、事件、境界、地点、关系、道途、因果、心魔、宗门、洞府、弟子、秘境、飞升。
+- `src/content` 事件（186）、地点（29）、解锁配置（136+）、功法（51）、丹方（38）、草药（45）、秘境（14）、道途（12）、心魔（8）。
+- `src/storage/save.ts` localStorage 存档和迁移入口（版本 14）。
+- `src/ui` 主界面和 game loop hook，渐进揭示所有系统面板。
+- Vitest 466 个测试用例，30 个测试文件。
+- Playwright 浏览器烟测脚本 `npm run smoke`。
 
 当前架构缺口：
 
 - 事件仍只保存 `activeEventId`，后续动态 NPC/敌人/地点参数需要 `activeEventContext`。
 - UI 已统一到单份 CSS，但还未拆分 `ResourcePanel`、`ActionPanel`、`LogPanel`、`EventModal`。
 - 离线收益已做基础批量 tick，后续事件抽样、日课、闭关仍需要更细的批量结算规则。
+- PWA 离线能力、静态部署、云存档评估尚未启动。
 
 ## 状态模型
 
 第一版就应显式建模：
 
-- 资源：气、体力、药、钱、见闻、寿元、伤。
+- 资源：气、精元、药、钱、见闻/神识、寿元、伤。
 - 地点账本：地点 id、行动、事件权重、危险度、物价、灵气、季节修正。
 - 关系账本：对象 id、身份、关系标签、最近交互、债/人情/仇怨、存活/离开/坐化状态。
 - 选择状态：flags、tags、qualities，供后续事件和日志读取。

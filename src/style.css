@@ -329,6 +329,82 @@ h3 {
   text-align: left;
 }
 
+/* Progress bar */
+.progress-bar {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  margin: 6px 0 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.demon-warning .progress-fill {
+  background: var(--rust);
+}
+
+/* Exploration block in action panel */
+.exploration-block {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.exploration-block p {
+  color: var(--muted);
+}
+
+/* Ascension overlay */
+.ascension-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(246, 247, 243, 0.92);
+}
+
+.ascension-dialog {
+  width: min(480px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  box-shadow: 0 30px 90px rgba(20, 22, 16, 0.15);
+  padding: 28px;
+  text-align: center;
+}
+
+.ascension-dialog .eyebrow {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+/* Details/summary for dao path affinity */
+.ledger-block details {
+  margin-top: 6px;
+}
+
+.ledger-block summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  user-select: none;
+}
+
+.ledger-block details p {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
 @media (max-width: 860px) {
   .app-shell {
     padding: 18px;

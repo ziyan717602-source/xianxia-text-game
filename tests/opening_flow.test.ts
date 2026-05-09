@@ -33,7 +33,7 @@ describe('Opening flow', () => {
     expect(state.unlockedActions).toEqual(['kuzuo', 'tuna', 'tiaoxi', 'caiyao', 'xunshan']);
     expect(getAvailableActionsAtLocation(state)).toEqual(['kuzuo', 'tuna', 'tiaoxi']);
     state.currentLocationId = 'mountain_path';
-    expect(getAvailableActionsAtLocation(state)).toEqual(['caiyao', 'xunshan']);
+    expect(getAvailableActionsAtLocation(state)).toEqual(['caiyao', 'xunshan', 'kuzuo', 'tuna', 'tiaoxi']);
     state.currentLocationId = 'home';
     expect(getVisibleResourceIds(state)).toEqual(['essence', 'insight', 'qi']);
 

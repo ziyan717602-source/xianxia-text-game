@@ -8,13 +8,16 @@ import { Realm } from '../src/game/types';
 import { checkUnlocks } from '../src/game/unlock';
 
 describe('Origin system', () => {
-  it('should expose five selectable ordinary origins', () => {
+  it('should expose eight selectable ordinary origins', () => {
     expect(SELECTABLE_ORIGINS.map((origin) => origin.id)).toEqual([
       'mountain_dweller',
       'village_scholar',
       'market_helper',
       'outer_child',
       'wandering_roots',
+      'herbalist_apprentice',
+      'orphan_of_war',
+      'temple_ward',
     ]);
   });
 
@@ -44,7 +47,7 @@ describe('Origin system', () => {
     state = applyOrigin(state, 'market_helper');
 
     expect(state.currentLocationId).toBe('market');
-    expect(getAvailableActionsAtLocation(state)).toEqual(['trade', 'gossip']);
+    expect(getAvailableActionsAtLocation(state)).toEqual(['trade', 'gossip', 'kuzuo']);
 
     const result = performAction(state, 'trade');
 
@@ -62,7 +65,7 @@ describe('Origin system', () => {
     expect(state.choices.flags.heard_outer_gate_rules).toBe(true);
     expect(state.choices.flags.outer_gate_registered).toBe(true);
     expect(state.choices.tags.sect_trace).toBe('outer_registered');
-    expect(getAvailableActionsAtLocation(state)).toEqual(['sect_chore', 'listen_lesson']);
+    expect(getAvailableActionsAtLocation(state)).toEqual(['sect_chore', 'listen_lesson', 'kuzuo']);
 
     const result = performAction(state, 'listen_lesson');
 

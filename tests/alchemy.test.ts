@@ -7,6 +7,13 @@ import {
   getDantoxinStageLabel,
   SMALL_QI_PILL_RECIPE_ID,
   STABILIZING_POWDER_RECIPE_ID,
+  WARM_FURNACE_PILL_RECIPE_ID,
+  DEMON_BANE_PILL_RECIPE_ID,
+  FOUNDATION_STRENGTHENING_PILL_RECIPE_ID,
+  NIGHT_SITTING_PILL_RECIPE_ID,
+  brewRecipe,
+  consumePill,
+  learnRecipe,
 } from '../src/game/alchemy';
 import { getAvailableActionsAtLocation } from '../src/game/location';
 import { createInitialState } from '../src/game/state';
@@ -182,5 +189,170 @@ describe('Alchemy system', () => {
     expect(clean.resources.essence).toBe(100);
     expect(toxic.resources.essence).toBe(90);
     expect(getDantoxinStageLabel(30)).toBe('药气冲突');
+  });
+
+  // --- New higher-tier pill tests ---
+
+  describe('Warm Furnace Pill', () => {
+    it('should learn, brew, and consume warm furnace pill', () => {
+      let state = createQiAlchemyState();
+      state.resources.essence = 200;
+      state.resources.herbs = 20;
+      state.resources.insight = 10;
+
+      // Learn the recipe directly
+      const learnResult = learnRecipe(state, WARM_FURNACE_PILL_RECIPE_ID);
+      state = learnResult.state;
+      expect(state.alchemy.knownRecipeIds).toContain(WARM_FURNACE_PILL_RECIPE_ID);
+
+      // Brew the pill (force success)
+      const brewResult = brewRecipe(state, WARM_FURNACE_PILL_RECIPE_ID, () => 0.1);
+      state = brewResult.state;
+      expect(state.resources.warmFurnacePills).toBe(1);
+      expect(brewResult.log).toContain('丹成');
+
+      // Consume the pill - note: consumePill doesn't deduct the pill from inventory;
+      // that's handled by performAction's cost deduction
+      const consumeResult = consumePill(state, WARM_FURNACE_PILL_RECIPE_ID);
+      state = consumeResult.state;
+      expect(state.choices.flags.tasted_warm_furnace_pill).toBe(true);
+      expect(consumeResult.log).toContain('暖炉丹');
+    });
+  });
+
+  describe('Demon Bane Pill', () => {
+    it('should learn, brew, and consume demon bane pill', () => {
+      let state = createQiAlchemyState();
+      state.resources.essence = 200;
+      state.resources.herbs = 30;
+      state.resources.insight = 15;
+
+      const learnResult = learnRecipe(state, DEMON_BANE_PILL_RECIPE_ID);
+      state = learnResult.state;
+      expect(state.alchemy.knownRecipeIds).toContain(DEMON_BANE_PILL_RECIPE_ID);
+
+      const brewResult = brewRecipe(state, DEMON_BANE_PILL_RECIPE_ID, () => 0.1);
+      state = brewResult.state;
+      expect(state.resources.demonBanePills).toBe(1);
+
+      // Demon bane pill should reduce dantoxin
+      state.resources.dantoxin = 20;
+      const consumeResult = consumePill(state, DEMON_BANE_PILL_RECIPE_ID);
+      state = consumeResult.state;
+      // Demon bane pill reduces dantoxin by 10, plus recipe dantoxin adds 2
+      expect(state.resources.dantoxin).toBeLessThan(20);
+      expect(state.choices.flags.tasted_demon_bane_pill).toBe(true);
+      expect(consumeResult.log).toContain('驱魔丹');
+    });
+  });
+
+  describe('Foundation Strengthening Pill', () => {
+    it('should learn, brew, and consume foundation strengthening pill', () => {
+      let state = createQiAlchemyState();
+      state.realm = Realm.FoundationEstablishment;
+      state.realmLayer = 1;
+      state.resources.essence = 200;
+      state.resources.herbs = 20;
+      state.resources.insight = 10;
+      state.resources.coins = 20;
+
+      const learnResult = learnRecipe(state, FOUNDATION_STRENGTHENING_PILL_RECIPE_ID);
+      state = learnResult.state;
+      expect(state.alchemy.knownRecipeIds).toContain(FOUNDATION_STRENGTHENING_PILL_RECIPE_ID);
+
+      const brewResult = brewRecipe(state, FOUNDATION_STRENGTHENING_PILL_RECIPE_ID, () => 0.1);
+      state = brewResult.state;
+      expect(state.resources.foundationStrengtheningPills).toBe(1);
+
+      const beforeQi = state.resources.qi;
+      const consumeResult = consumePill(state, FOUNDATION_STRENGTHENING_PILL_RECIPE_ID);
+      state = consumeResult.state;
+      expect(state.resources.qi).toBeGreaterThan(beforeQi);
+      expect(state.choices.flags.tasted_foundation_strengthening_pill).toBe(true);
+      expect(consumeResult.log).toContain('固基丹');
+    });
+  });
+
+  describe('Night Sitting Pill', () => {
+    it('should learn, brew, and consume night sitting pill', () => {
+      let state = createQiAlchemyState();
+      state.resources.essence = 200;
+      state.resources.herbs = 20;
+      state.resources.insight = 15;
+
+      const learnResult = learnRecipe(state, NIGHT_SITTING_PILL_RECIPE_ID);
+      state = learnResult.state;
+      expect(state.alchemy.knownRecipeIds).toContain(NIGHT_SITTING_PILL_RECIPE_ID);
+
+      const brewResult = brewRecipe(state, NIGHT_SITTING_PILL_RECIPE_ID, () => 0.1);
+      state = brewResult.state;
+      expect(state.resources.nightSittingPills).toBe(1);
+
+      const consumeResult = consumePill(state, NIGHT_SITTING_PILL_RECIPE_ID);
+      state = consumeResult.state;
+      expect(state.choices.flags.tasted_night_sitting_pill).toBe(true);
+      expect(consumeResult.log).toContain('夜坐丸');
+    });
+  });
+
+  describe('Brew failure cases', () => {
+    it('should fail to brew when recipe is not known', () => {
+      const state = createQiAlchemyState();
+      const result = brewRecipe(state, SMALL_QI_PILL_RECIPE_ID, () => 0.1);
+      expect(result.log).toContain('丹方未明');
+    });
+
+    it('should fail to brew with unknown recipe ID', () => {
+      const state = createQiAlchemyState();
+      const result = brewRecipe(state, 'nonexistent_recipe', () => 0.1);
+      expect(result.log).toContain('炉上无此丹方');
+    });
+
+    it('should fail to consume with unknown recipe ID', () => {
+      const state = createQiAlchemyState();
+      const result = consumePill(state, 'nonexistent_recipe');
+      expect(result.log).toContain('丹药无名');
+    });
+
+    it('should fail to learn with unknown recipe ID', () => {
+      const state = createQiAlchemyState();
+      const result = learnRecipe(state, 'nonexistent_recipe');
+      expect(result.log).toContain('丹方无名');
+    });
+
+    it('should not re-add a known recipe', () => {
+      let state = createQiAlchemyState();
+      state = learnRecipe(state, SMALL_QI_PILL_RECIPE_ID).state;
+      const beforeCount = state.alchemy.knownRecipeIds.length;
+
+      const result = learnRecipe(state, SMALL_QI_PILL_RECIPE_ID);
+      expect(result.state.alchemy.knownRecipeIds.length).toBe(beforeCount);
+      expect(result.log).toContain('又温了一遍');
+    });
+  });
+
+  describe('Failed brew effects', () => {
+    it('should add dantoxin and insight on brew failure', () => {
+      let state = createQiAlchemyState();
+      state = learnRecipe(state, SMALL_QI_PILL_RECIPE_ID).state;
+
+      // Force failure
+      const result = brewRecipe(state, SMALL_QI_PILL_RECIPE_ID, () => 0.99);
+      expect(result.state.resources.qiPills).toBe(0);
+      expect(result.state.resources.dantoxin).toBeGreaterThan(0);
+      expect(result.state.resources.insight).toBeGreaterThan(0);
+      expect(result.log).toContain('炉火偏了');
+    });
+  });
+
+  describe('Dantoxin stage labels', () => {
+    it('should return correct stage labels for dantoxin levels', () => {
+      expect(getDantoxinStageLabel(0)).toBe('无');
+      expect(getDantoxinStageLabel(5)).toBe('微有药滞');
+      expect(getDantoxinStageLabel(10)).toBe('气息浑浊');
+      expect(getDantoxinStageLabel(30)).toBe('药气冲突');
+      expect(getDantoxinStageLabel(60)).toBe('丹毒入脉');
+      expect(getDantoxinStageLabel(100)).toBe('药毒蚀脉');
+    });
   });
 });

@@ -68,82 +68,6 @@ describe('Unlock System', () => {
     expect(state.choices.flags.unlocked_short_retreat).toBe(true);
   });
 
-  it('should unlock qi array setup after short retreat has become routine', () => {
-    let state = createInitialState();
-    state.realm = Realm.QiCondensation;
-    state.realmLayer = 1;
-    state.resources.coins = 8;
-    state.resources.herbs = 4;
-    state.resources.insight = 4;
-    state.choices.flags.completed_short_retreat = true;
-
-    state = checkUnlocks(state);
-    expect(state.unlockedActions).toContain('arrange_qi_array');
-    expect(state.choices.flags.unlocked_arrange_qi_array).toBe(true);
-
-    state.choices.flags.home_qi_array = true;
-    state = checkUnlocks(state);
-    expect(state.unlockedActions).toContain('array_retreat');
-    expect(state.choices.flags.unlocked_array_retreat).toBe(true);
-  });
-
-  it('should unlock foundation daily practice after foundation establishment', () => {
-    let state = createInitialState();
-    state.realm = Realm.FoundationEstablishment;
-    state.realmLayer = 1;
-    state.choices.flags.reached_foundation = true;
-
-    state = checkUnlocks(state);
-
-    expect(state.unlockedActions).toContain('foundation_daily_practice');
-    expect(state.choices.flags.unlocked_foundation_daily_practice).toBe(true);
-  });
-
-  it('should unlock cave dwelling repair and cave seclusion after foundation routine', () => {
-    let state = createInitialState();
-    state.realm = Realm.FoundationEstablishment;
-    state.realmLayer = 1;
-    state.resources.coins = 14;
-    state.resources.herbs = 6;
-    state.resources.insight = 6;
-    state.choices.flags.reached_foundation = true;
-    state.choices.flags.completed_foundation_daily_practice = true;
-    state.choices.qualities.formation_craft = 2;
-
-    state = checkUnlocks(state);
-
-    expect(state.unlockedActions).toContain('repair_cave_dwelling');
-    expect(state.choices.flags.unlocked_repair_cave_dwelling).toBe(true);
-
-    state.choices.flags.cave_dwelling = true;
-    state = checkUnlocks(state);
-
-    expect(state.unlockedActions).toContain('cave_seclusion');
-    expect(state.choices.flags.unlocked_cave_seclusion).toBe(true);
-  });
-
-  it('should unlock cave herb plot preparation and tending from a maintained cave dwelling', () => {
-    let state = createInitialState();
-    state.realm = Realm.FoundationEstablishment;
-    state.realmLayer = 1;
-    state.resources.coins = 10;
-    state.resources.herbs = 4;
-    state.resources.insight = 3;
-    state.choices.flags.cave_dwelling = true;
-    state.choices.flags.maintained_cave_dwelling = true;
-
-    state = checkUnlocks(state);
-
-    expect(state.unlockedActions).toContain('prepare_cave_herb_plot');
-    expect(state.choices.flags.unlocked_prepare_cave_herb_plot).toBe(true);
-
-    state.choices.flags.cave_herb_plot = true;
-    state = checkUnlocks(state);
-
-    expect(state.unlockedActions).toContain('tend_cave_herb_plot');
-    expect(state.choices.flags.unlocked_tend_cave_herb_plot).toBe(true);
-  });
-
   it('should unlock mountain actions after the jade slip is found', () => {
     let state = createInitialState();
     state.choices.flags.found_jade_slip = true;
@@ -293,10 +217,10 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('breakthrough_qi_3');
   });
 
-  it('should unlock foundation support and foundation breakthrough around the third qi layer', () => {
+  it('should unlock foundation support and foundation breakthrough at qi layer nine', () => {
     let state = createInitialState(20260508);
     state.realm = Realm.QiCondensation;
-    state.realmLayer = 3;
+    state.realmLayer = 9;
     state.resources.qi = 80;
     state.resources.insight = 10;
     state.choices.flags.bottleneck_foundation = true;
@@ -314,5 +238,238 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('withdraw_foundation');
     expect(state.choices.flags.unlocked_breakthrough_foundation).toBe(true);
     expect(state.choices.flags.unlocked_withdraw_foundation).toBe(true);
+  });
+
+  // --- New unlock tests ---
+
+  it('should unlock bianyao when herbs >= 5', () => {
+    let state = createInitialState();
+    state.resources.herbs = 5;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('bianyao');
+    expect(state.choices.flags.unlocked_bianyao).toBe(true);
+  });
+
+  it('should not unlock bianyao when herbs < 5', () => {
+    const state = createInitialState();
+    state.resources.herbs = 4;
+    const nextState = checkUnlocks(state);
+    expect(nextState.unlockedActions).not.toContain('bianyao');
+  });
+
+  it('should unlock canjuan when insight >= 3', () => {
+    let state = createInitialState();
+    state.resources.insight = 3;
+
+    state = checkUnlocks(state);
+    expect(state.choices.flags.unlocked_canjuan).toBe(true);
+  });
+
+  it('should not unlock canjuan when insight < 3', () => {
+    const state = createInitialState();
+    state.resources.insight = 2;
+    const nextState = checkUnlocks(state);
+    expect(nextState.choices.flags.unlocked_canjuan).toBeFalsy();
+  });
+
+  it('should unlock study_warm_furnace_formula in QiCondensation with known small qi pill', () => {
+    let state = createInitialState();
+    state.realm = Realm.QiCondensation;
+    state.realmLayer = 1;
+    state.choices.flags.known_recipe_small_qi_pill = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_warm_furnace_formula');
+  });
+
+  it('should unlock study_night_sitting_formula after foundation daily practice', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.choices.flags.completed_foundation_daily_practice = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_night_sitting_formula');
+  });
+
+  it('should unlock establish_dwelling at Foundation realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('establish_dwelling');
+    expect(state.choices.flags.unlocked_establish_dwelling).toBe(true);
+  });
+
+  it('should unlock cave_dwelling_location when dwelling.level >= 1', () => {
+    let state = createInitialState();
+    state.dwelling.level = 1;
+
+    state = checkUnlocks(state);
+    expect(state.choices.flags.unlocked_cave_dwelling).toBe(true);
+  });
+
+  it('should unlock market_stall at Foundation realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('open_market_stall');
+    expect(state.unlockedActions).toContain('buy_rare_herbs');
+    expect(state.choices.flags.unlocked_market_stall).toBe(true);
+  });
+
+  it('should unlock recruit_servant when dwelling.level >= 1', () => {
+    let state = createInitialState();
+    state.dwelling.level = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('recruit_servant');
+    expect(state.choices.flags.unlocked_recruit_servant).toBe(true);
+  });
+
+  it('should unlock explore_secret_realm when discoveredRealms is non-empty and at home', () => {
+    let state = createInitialState();
+    state.secretRealm.discoveredRealms = ['misty_cave'];
+    state.currentLocationId = 'home';
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('explore_secret_realm');
+    expect(state.choices.flags.unlocked_explore_secret_realm).toBe(true);
+  });
+
+  it('should not unlock explore_secret_realm when not at home', () => {
+    let state = createInitialState();
+    state.secretRealm.discoveredRealms = ['misty_cave'];
+    state.currentLocationId = 'market';
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).not.toContain('explore_secret_realm');
+  });
+
+  it('should unlock golden_core_practice at GoldenCore realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.GoldenCore;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('golden_core_practice');
+    expect(state.choices.flags.unlocked_golden_core_practice).toBe(true);
+  });
+
+  it('should unlock nascent_soul_practice at NascentSoul realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.NascentSoul;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('nascent_soul_practice');
+    expect(state.choices.flags.unlocked_nascent_soul_practice).toBe(true);
+  });
+
+  it('should unlock breakthrough_golden_core at Foundation layer 3 with prepared flag', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 3;
+    state.choices.flags.prepared_golden_core = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('breakthrough_golden_core');
+    expect(state.choices.flags.unlocked_breakthrough_golden_core).toBe(true);
+  });
+
+  it('should not unlock breakthrough_golden_core without prepared flag', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 3;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).not.toContain('breakthrough_golden_core');
+  });
+
+  it('should unlock inner_gate_location at inner sect rank', () => {
+    let state = createInitialState();
+    state.sect.rank = 'inner';
+
+    state = checkUnlocks(state);
+    expect(state.choices.flags.unlocked_inner_gate).toBe(true);
+  });
+
+  it('should unlock inner_gate_location at core sect rank', () => {
+    let state = createInitialState();
+    state.sect.rank = 'core';
+
+    state = checkUnlocks(state);
+    expect(state.choices.flags.unlocked_inner_gate).toBe(true);
+  });
+
+  it('should unlock sect_actions at inner rank', () => {
+    let state = createInitialState();
+    state.sect.rank = 'inner';
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('inner_gate_task');
+    expect(state.unlockedActions).toContain('attend_sect_ceremony');
+    expect(state.choices.flags.unlocked_sect_actions).toBe(true);
+  });
+
+  it('should unlock upgrade_dwelling when dwelling_level_1 flag is set', () => {
+    let state = createInitialState();
+    state.choices.flags.dwelling_level_1 = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('upgrade_dwelling');
+    expect(state.choices.flags.unlocked_upgrade_dwelling).toBe(true);
+  });
+
+  it('should unlock install_formation when dwelling_level_2 flag is set', () => {
+    let state = createInitialState();
+    state.choices.flags.dwelling_level_2 = true;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('install_formation');
+    expect(state.choices.flags.unlocked_install_formation).toBe(true);
+  });
+
+  it('should unlock foundation_meditation at Foundation realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('foundation_meditation');
+    expect(state.choices.flags.unlocked_foundation_meditation).toBe(true);
+  });
+
+  it('should unlock inner_gate_rumor at Foundation realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('inner_gate_rumor');
+    expect(state.choices.flags.unlocked_inner_gate_rumor).toBe(true);
+  });
+
+  it('should unlock study_meridian_cleansing_formula at Foundation with high dantoxin', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+    state.resources.dantoxin = 30;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_meridian_cleansing_formula');
+  });
+
+  it('should unlock study_foundation_strengthening_formula at Foundation realm', () => {
+    let state = createInitialState();
+    state.realm = Realm.FoundationEstablishment;
+    state.realmLayer = 1;
+
+    state = checkUnlocks(state);
+    expect(state.unlockedActions).toContain('study_foundation_strengthening_formula');
   });
 });

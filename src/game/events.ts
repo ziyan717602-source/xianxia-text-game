@@ -1,6 +1,7 @@
 import { GameState } from './types';
 import { EVENTS, ActiveEvent } from '../content/events';
 import { LOCATIONS } from '../content/locations';
+import { getKarmicEventWeightModifier } from './karma';
 
 /**
  * 根据权重从事件池中抽取一个事件
@@ -15,12 +16,13 @@ export function rollEvent(state: GameState, random: () => number = Math.random):
     return null;
   }
 
-  // Calculate total weight
+  // Calculate total weight — karmic burden amplifies negative event weights
   let totalWeight = 0;
   const location = LOCATIONS[state.currentLocationId];
+  const karmicModifier = getKarmicEventWeightModifier(state);
   const weightedEvents = possibleEvents.map(event => {
     const locationModifier = location?.eventWeights[event.id] ?? 1;
-    const w = event.weight(state) * locationModifier;
+    const w = event.weight(state) * locationModifier * karmicModifier;
     totalWeight += w;
     return { event, weight: w };
   });

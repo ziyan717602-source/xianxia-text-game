@@ -6,7 +6,10 @@ export type OriginId =
   | 'market_helper'
   | 'outer_child'
   | 'wandering_roots'
-  | 'legacy_path';
+  | 'legacy_path'
+  | 'herbalist_apprentice'
+  | 'orphan_of_war'
+  | 'temple_ward';
 
 export interface OriginOption {
   id: OriginId;
@@ -32,7 +35,7 @@ export const ORIGINS: Record<OriginId, OriginOption> = {
     summary: '识得几味草药，常走山路。',
     description: '早接触草药和山路事件，丹道倾向略深。',
     startingLocationId: 'mountain_path',
-    resources: { herbs: 2 },
+    resources: { herbs: 2, qi: 1 },
     unlockedActions: ['kuzuo', 'caiyao'],
     flags: { origin_mountain_dweller: true },
     tags: { origin: 'mountain_dweller' },
@@ -88,7 +91,7 @@ export const ORIGINS: Record<OriginId, OriginOption> = {
     summary: '无定居处，路上消息杂。',
     description: '早接触巡山风险和路途见闻，事件波动较大。',
     startingLocationId: 'mountain_path',
-    resources: { insight: 1, coins: 3 },
+    resources: { insight: 1, coins: 3, qi: 1 },
     unlockedActions: ['kuzuo', 'xunshan'],
     flags: { origin_wandering_roots: true },
     tags: { origin: 'wandering_roots' },
@@ -109,6 +112,48 @@ export const ORIGINS: Record<OriginId, OriginOption> = {
     qualities: {},
     log: '旧途未改。',
     selectable: false,
+  },
+  herbalist_apprentice: {
+    id: 'herbalist_apprentice',
+    name: '药铺学徒',
+    summary: '跟过老药商，识得几味稀药。',
+    description: '丹道根基深厚，识药辨草信手拈来，但修为起步略慢。',
+    startingLocationId: 'herb_slope',
+    resources: { herbs: 3, qi: 1 },
+    unlockedActions: ['kuzuo', 'identify_herb', 'caiyao'],
+    flags: { origin_herbalist_apprentice: true },
+    tags: { origin: 'herbalist_apprentice' },
+    qualities: { alchemy_affinity: 3 },
+    log: '某年春，药铺关门。你背上药篓，认得山间每一味草。',
+    selectable: true,
+  },
+  orphan_of_war: {
+    id: 'orphan_of_war',
+    name: '战乱遗孤',
+    summary: '幼年流离，见过生死。',
+    description: '苦难磨砺心性，临敌不惧，但身上留有旧伤。',
+    startingLocationId: 'ferry_crossing',
+    resources: { wounds: 1, insight: 2, qi: 1 },
+    unlockedActions: ['kuzuo', 'listen_traveler'],
+    flags: { origin_orphan_of_war: true },
+    tags: { origin: 'orphan_of_war' },
+    qualities: { combat_edge: 2, insight: 2 },
+    log: '某年春，渡口人散。你从乱军中来，身上有旧伤。',
+    selectable: true,
+  },
+  temple_ward: {
+    id: 'temple_ward',
+    name: '道观寄养',
+    summary: '长在道观檐下，听惯经声。',
+    description: '静修根基扎实，悟性出众，但对外界所知甚少。',
+    startingLocationId: 'abandoned_temple',
+    resources: { insight: 2, qi: 1 },
+    unlockedActions: ['kuzuo', 'sweep_temple', 'explore_ruins'],
+    flags: { origin_temple_ward: true },
+    tags: { origin: 'temple_ward' },
+    qualities: { quiet_cultivation: 2, insight: 2 },
+    log: '某年春，观中无人。你在经声里长大，檐下风雨不惊。',
+    selectable: true,
   },
 };
 

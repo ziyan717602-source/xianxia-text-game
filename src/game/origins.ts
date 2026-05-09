@@ -1,7 +1,7 @@
 import { ORIGINS, OriginId, LEGACY_ORIGIN_ID } from '../content/origins';
+import { RESOURCE_KEYS } from './resources';
 import { GameState, Resources } from './types';
 
-const RESOURCE_KEYS = ['qi', 'essence', 'herbs', 'qiPills', 'stabilizingPowders', 'cleansingPills', 'coins', 'insight', 'dantoxin', 'lifespan', 'wounds'] as const;
 const WORLD_LOG_LIMIT = 12;
 
 export function getOriginId(state: GameState): string | undefined {

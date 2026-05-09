@@ -176,4 +176,24 @@ describe('Save and Migration System', () => {
     expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
     expect(migrated.state.resources.cleansingPills).toBe(0);
   });
+
+  it('should migrate V11 saves by adding secretRealm and ascension state', () => {
+    const state = createInitialState(777);
+    const { secretRealm, ascension, ...stateWithoutNew } = state;
+    const migrated = migrateSaveData({
+      version: 11,
+      state: stateWithoutNew,
+      createdAt: 1,
+      updatedAt: 1,
+      seed: 777,
+    });
+
+    expect(migrated.version).toBe(CURRENT_SAVE_VERSION);
+    expect(migrated.state.secretRealm).toBeDefined();
+    expect(migrated.state.secretRealm.discoveredRealms).toEqual([]);
+    expect(migrated.state.secretRealm.activeExploration).toBeNull();
+    expect(migrated.state.ascension).toBeDefined();
+    expect(migrated.state.ascension.ascended).toBe(false);
+    expect(migrated.state.ascension.ascensionCount).toBe(0);
+  });
 });

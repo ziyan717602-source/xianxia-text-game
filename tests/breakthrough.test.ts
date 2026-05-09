@@ -23,14 +23,20 @@ function createReadyQiState() {
 function createReadyFoundationState() {
   let state = createInitialState(20260508);
   state.realm = Realm.QiCondensation;
-  state.realmLayer = 3;
+  state.realmLayer = 9;
   state.currentLocationId = 'home';
-  state.resources.essence = 140;
-  state.resources.qi = 120;
-  state.resources.insight = 18;
+  state.resources.essence = 250;
+  state.resources.qi = 200;
+  state.resources.insight = 30;
   state.resources.coins = 30;
   state.choices.flags.reached_qi_layer_2 = true;
   state.choices.flags.reached_qi_layer_3 = true;
+  state.choices.flags.reached_qi_layer_4 = true;
+  state.choices.flags.reached_qi_layer_5 = true;
+  state.choices.flags.reached_qi_layer_6 = true;
+  state.choices.flags.reached_qi_layer_7 = true;
+  state.choices.flags.reached_qi_layer_8 = true;
+  state.choices.flags.reached_qi_layer_9 = true;
   state.choices.qualities.quiet_cultivation = 8;
   state.choices.qualities.sect_trace = 4;
   state = checkUnlocks(state);
@@ -149,7 +155,7 @@ describe('Breakthrough system', () => {
     expect(state.unlockedActions).toContain('breakthrough_qi_3');
   });
 
-  it('should expose the foundation bottleneck after reaching qi layer three', () => {
+  it('should expose the qi layer 4 bottleneck after reaching qi layer three', () => {
     let state = createReadyQiState();
     state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
     state.resources.essence = 100;
@@ -163,7 +169,7 @@ describe('Breakthrough system', () => {
 
     expect(state.realmLayer).toBe(3);
     expect(getAvailableActionsAtLocation(state)).toContain('stabilize_bottleneck');
-    expect(getBreakthroughSummary(state).join(' / ')).toContain('筑基');
+    expect(getBreakthroughSummary(state).join(' / ')).toContain('炼气四层');
   });
 
   it('should prepare and unlock foundation breakthrough', () => {
@@ -187,8 +193,8 @@ describe('Breakthrough system', () => {
   it('should withdraw from foundation and keep a reduced prepared bottleneck', () => {
     let state = createReadyFoundationState();
     state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
-    state.resources.essence = 140;
-    state.resources.qi = 120;
+    state.resources.essence = 250;
+    state.resources.qi = 200;
     state.resources.dantoxin = 8;
     state.resources.wounds = 1;
     state.choices.flags.foundation_guardian = true;
@@ -264,9 +270,9 @@ describe('Breakthrough system', () => {
   it('should enter foundation establishment on a successful foundation breakthrough', () => {
     let state = createReadyFoundationState();
     state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
-    state.resources.essence = 140;
-    state.resources.qi = 120;
-    state.resources.insight = 18;
+    state.resources.essence = 250;
+    state.resources.qi = 200;
+    state.resources.insight = 30;
     state.choices.flags.foundation_guardian = true;
     state.choices.flags.borrowed_foundation_aid = true;
 
@@ -284,9 +290,9 @@ describe('Breakthrough system', () => {
   it('should leave a foundation scar and larger lifespan loss on failed foundation breakthrough', () => {
     let state = createReadyFoundationState();
     state = checkUnlocks(performAction(state, 'stabilize_bottleneck').state);
-    state.resources.essence = 140;
-    state.resources.qi = 120;
-    state.resources.insight = 18;
+    state.resources.essence = 250;
+    state.resources.qi = 200;
+    state.resources.insight = 30;
     state.choices.flags.foundation_guardian = true;
     state.choices.flags.borrowed_foundation_aid = true;
     const beforeLifespan = state.resources.lifespan;
@@ -295,7 +301,7 @@ describe('Breakthrough system', () => {
 
     expect(result.success).toBe(true);
     expect(result.state.realm).toBe(Realm.QiCondensation);
-    expect(result.state.realmLayer).toBe(3);
+    expect(result.state.realmLayer).toBe(9);
     expect(result.state.choices.flags.failed_foundation).toBe(true);
     expect(result.state.choices.flags.foundation_scar).toBe(true);
     expect(result.state.breakthrough.failures.foundation).toBe(1);

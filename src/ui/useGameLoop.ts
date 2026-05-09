@@ -6,7 +6,7 @@ import { checkUnlocks } from '../game/unlock';
 import { performAction } from '../game/actions';
 import { moveToLocation } from '../game/location';
 import { applyOrigin, hasSelectedOrigin } from '../game/origins';
-import { serializeSave, deserializeSave } from '../storage/save';
+import { serializeSave, deserializeSave, extractCreatedAt } from '../storage/save';
 import { rollEvent } from '../game/events';
 import { EVENTS } from '../content/events';
 import { ORIGINS, OriginId } from '../content/origins';
@@ -14,16 +14,19 @@ import { ORIGINS, OriginId } from '../content/origins';
 const SAVE_KEY = 'xianxia_save_v1';
 const AUTO_SAVE_INTERVAL_MS = 5000;
 
-function loadInitialState(): GameState {
+function loadInitialState(): { state: GameState; createdAt?: number } {
   const saved = localStorage.getItem(SAVE_KEY);
   if (saved) {
-    return deserializeSave(saved);
+    const createdAt = extractCreatedAt(saved);
+    return { state: deserializeSave(saved), createdAt };
   }
-  return createInitialState();
+  return { state: createInitialState() };
 }
 
 export function useGameLoop() {
-  const [gameState, setGameState] = useState<GameState>(() => loadInitialState());
+  const initial = loadInitialState();
+  const [gameState, setGameState] = useState<GameState>(() => initial.state);
+  const createdAtRef = useRef<number | undefined>(initial.createdAt);
   const [logs, setLogs] = useState<string[]>(['请选择出身。']);
 
   const addLog = useCallback((msg: string) => {
@@ -38,7 +41,7 @@ export function useGameLoop() {
 
   // Save game manually
   const saveGame = useCallback(() => {
-    localStorage.setItem(SAVE_KEY, serializeSave(stateRef.current));
+    localStorage.setItem(SAVE_KEY, serializeSave(stateRef.current, createdAtRef.current));
   }, []);
 
   // Reset game
@@ -66,7 +69,7 @@ export function useGameLoop() {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setGameState((prev) => {
-        if (!hasSelectedOrigin(prev) || prev.activeEventId) return prev; // Pause game while event is active
+        if (!hasSelectedOrigin(prev) || prev.activeEventId || prev.choices.flags.game_over) return prev; // Pause game while event is active or game over
 
         let next = processTick(prev, TICK_INTERVAL_MS);
         next = checkUnlocks(next);

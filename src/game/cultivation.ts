@@ -1,4 +1,5 @@
 import { ELEMENT_LABELS, TECHNIQUE_BY_ELEMENT, TECHNIQUES } from '../content/cultivation';
+import { ACTION_ROUTE_QUALITIES } from './actions';
 import { Element, GameState, Season, SpiritualRoot, CultivationState, Resources } from './types';
 
 export const ELEMENT_ORDER = [Element.Wood, Element.Fire, Element.Earth, Element.Metal, Element.Water] as const;
@@ -8,6 +9,9 @@ const SEASON_ELEMENT: Record<Season, Element> = {
   [Season.Summer]: Element.Fire,
   [Season.Autumn]: Element.Metal,
   [Season.Winter]: Element.Water,
+  // Earth has no dedicated season — traditionally associated with late-summer/season transitions.
+  // Earth-phase cultivators benefit from location bonuses (e.g. home → Earth) rather than seasonal ones,
+  // which is thematically appropriate: Earth = stable, grounded, not bound by seasonal cycles.
 };
 
 const LOCATION_ELEMENT: Record<string, Element> = {
@@ -155,46 +159,93 @@ export function attuneTechnique(state: GameState): { state: GameState; log: stri
   };
 }
 
+/** Low-tier practice actions that receive full technique bonus */
+const LOW_TIER_PRACTICE_ACTIONS = ['tuna', 'rike_tuna', 'short_retreat'];
+
+/** Higher-realm daily practice actions that receive technique bonus at 80% effectiveness */
+const HIGHER_REALM_PRACTICE_ACTIONS = [
+  'golden_core_practice',
+  'nascent_soul_practice',
+  'spirit_transformation_practice',
+  'integration_practice',
+  'mahayana_practice',
+  'tribulation_practice',
+  'foundation_daily_practice',
+  'foundation_meditation',
+];
+
+/** All practice actions that can receive technique bonus */
+const ALL_PRACTICE_ACTIONS = [...LOW_TIER_PRACTICE_ACTIONS, ...HIGHER_REALM_PRACTICE_ACTIONS];
+
+/** Mapping from dao path ID to its primary quality (the quality with highest weight in DAO_PATHS) */
+const DAO_PATH_PRIMARY_QUALITY: Record<string, string> = {
+  alchemist: 'alchemy_affinity',
+  sword_way: 'combat_edge',
+  hermit: 'quiet_cultivation',
+  merchant: 'market_ties',
+  sect_servant: 'sect_trace',
+  formation_way: 'quiet_cultivation',
+  talisman_way: 'alchemy_affinity',
+  artifact_way: 'market_ties',
+  beast_way: 'combat_edge',
+  demonic_way: 'combat_edge',
+  buddhist_way: 'quiet_cultivation',
+  ghost_way: 'quiet_cultivation',
+};
+
 export function applyCultivationOutputModifiers(
   state: GameState,
   actionId: string,
   output: Partial<Resources>
 ): Partial<Resources> {
-  if (!['tuna', 'rike_tuna', 'short_retreat', 'array_retreat', 'foundation_daily_practice', 'cave_seclusion'].includes(actionId)) return output;
-  if (!state.cultivation.rootKnown) return output;
+  let modifiedOutput = { ...output };
 
-  const technique = TECHNIQUES[state.cultivation.activeTechniqueId];
-  if (!technique?.phase) return output;
+  // === Technique bonus ===
+  if (ALL_PRACTICE_ACTIONS.includes(actionId) && state.cultivation.rootKnown) {
+    const technique = TECHNIQUES[state.cultivation.activeTechniqueId];
+    if (technique?.phase) {
+      const affinity = state.cultivation.phaseAffinities[technique.phase] ?? 0;
+      if (affinity > 0) {
+        let bonus = Math.max(1, Math.floor(affinity / 4));
 
-  const affinity = state.cultivation.phaseAffinities[technique.phase] ?? 0;
-  if (affinity <= 0) return output;
+        if (SEASON_ELEMENT[state.time.season] === technique.phase) {
+          bonus += 1;
+        }
 
-  let bonus = Math.max(1, Math.floor(affinity / 4));
+        if (LOCATION_ELEMENT[state.currentLocationId] === technique.phase) {
+          bonus += 1;
+        }
 
-  if (SEASON_ELEMENT[state.time.season] === technique.phase) {
-    bonus += 1;
+        // Higher-realm practices get 80% effectiveness
+        const effectiveness = HIGHER_REALM_PRACTICE_ACTIONS.includes(actionId) ? 0.8 : 1.0;
+        const multiplier = actionId === 'short_retreat' ? 4 : actionId === 'rike_tuna' ? 2 : 1;
+
+        modifiedOutput = {
+          ...modifiedOutput,
+          qi: (modifiedOutput.qi ?? 0) + Math.max(1, Math.round(bonus * multiplier * effectiveness)),
+        };
+      }
+    }
   }
 
-  if (LOCATION_ELEMENT[state.currentLocationId] === technique.phase) {
-    bonus += 1;
+  // === Dao path bonus: boost output by 10% when path matches action's route quality ===
+  const currentPath = state.daoPath.currentPath;
+  if (currentPath) {
+    const pathQuality = DAO_PATH_PRIMARY_QUALITY[currentPath];
+    const actionQuality = ACTION_ROUTE_QUALITIES[actionId];
+    if (pathQuality && actionQuality && pathQuality === actionQuality) {
+      const boosted: Partial<Resources> = {};
+      for (const key of ['qi', 'herbs', 'coins', 'insight', 'essence'] as (keyof Resources)[]) {
+        const val = modifiedOutput[key] ?? 0;
+        if (val > 0) {
+          boosted[key] = val + Math.max(1, Math.floor(val * 0.1));
+        }
+      }
+      modifiedOutput = { ...modifiedOutput, ...boosted };
+    }
   }
 
-  const multiplier = actionId === 'cave_seclusion'
-    ? 9
-    : actionId === 'foundation_daily_practice'
-    ? 7
-    : actionId === 'array_retreat'
-      ? 6
-      : actionId === 'short_retreat'
-        ? 4
-        : actionId === 'rike_tuna'
-          ? 2
-          : 1;
-
-  return {
-    ...output,
-    qi: (output.qi ?? 0) + bonus * multiplier,
-  };
+  return modifiedOutput;
 }
 
 export function getRootLabel(root: SpiritualRoot): string {

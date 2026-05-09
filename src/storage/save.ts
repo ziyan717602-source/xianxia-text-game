@@ -5,8 +5,16 @@ import { createInitialCultivationState } from '../game/cultivation';
 import { createInitialState } from '../game/state';
 import { createInitialWorldState } from '../game/world';
 import { markLegacyOrigin } from '../game/origins';
+import { createInitialDaoPathState } from '../game/daopath';
+import { createInitialKarmaState } from '../game/karma';
+import { createInitialInnerDemonState } from '../game/innerDemon';
+import { createInitialSectState } from '../game/sect';
+import { createInitialDwellingState } from '../game/dwelling';
+import { createInitialFollowerState } from '../game/follower';
+import { createInitialSecretRealmState } from '../game/secretRealm';
+import { createInitialAscensionState } from '../game/ascension';
 
-export const CURRENT_SAVE_VERSION = 9;
+export const CURRENT_SAVE_VERSION = 14;
 
 /**
  * 迁移旧版本存档到当前版本
@@ -102,22 +110,106 @@ export function migrateSaveData(data: any): SaveData {
     migratedData.version = 9;
   }
 
+  if (migratedData.version === 9) {
+    migratedData.state = {
+      ...migratedData.state,
+      daoPath: migratedData.state.daoPath ?? createInitialDaoPathState(),
+      karma: migratedData.state.karma ?? createInitialKarmaState(),
+      innerDemon: migratedData.state.innerDemon ?? createInitialInnerDemonState(),
+    };
+    migratedData.version = 10;
+  }
+
+  if (migratedData.version === 10) {
+    migratedData.state = {
+      ...migratedData.state,
+      resources: {
+        ...migratedData.state.resources,
+        meridianCleansingPills: migratedData.state.resources?.meridianCleansingPills ?? 0,
+        foundationStrengtheningPills: migratedData.state.resources?.foundationStrengtheningPills ?? 0,
+        spiritGatheringPills: migratedData.state.resources?.spiritGatheringPills ?? 0,
+      },
+      sect: migratedData.state.sect ?? createInitialSectState(),
+      dwelling: migratedData.state.dwelling ?? createInitialDwellingState(),
+      followers: migratedData.state.followers ?? createInitialFollowerState(),
+    };
+    migratedData.version = 11;
+  }
+
+  if (migratedData.version === 11) {
+    migratedData.state = {
+      ...migratedData.state,
+      secretRealm: migratedData.state.secretRealm ?? createInitialSecretRealmState(),
+      ascension: migratedData.state.ascension ?? createInitialAscensionState(),
+    };
+    migratedData.version = 12;
+  }
+
+  if (migratedData.version === 12) {
+    migratedData.state = {
+      ...migratedData.state,
+      resources: {
+        ...migratedData.state.resources,
+        warmFurnacePills: migratedData.state.resources?.warmFurnacePills ?? 0,
+        nightSittingPills: migratedData.state.resources?.nightSittingPills ?? 0,
+      },
+    };
+    migratedData.version = 13;
+  }
+
+  if (migratedData.version === 13) {
+    migratedData.state = {
+      ...migratedData.state,
+      resources: {
+        ...migratedData.state.resources,
+        cloudGatheringPills: migratedData.state.resources?.cloudGatheringPills ?? 0,
+        ironBodyPills: migratedData.state.resources?.ironBodyPills ?? 0,
+        demonBanePills: migratedData.state.resources?.demonBanePills ?? 0,
+        foundationExplosionPills: migratedData.state.resources?.foundationExplosionPills ?? 0,
+        spiritVeinPills: migratedData.state.resources?.spiritVeinPills ?? 0,
+        shadowEscapePills: migratedData.state.resources?.shadowEscapePills ?? 0,
+        longevityPills: migratedData.state.resources?.longevityPills ?? 0,
+        fireFurnacePills: migratedData.state.resources?.fireFurnacePills ?? 0,
+        nineTurnFoundationPills: migratedData.state.resources?.nineTurnFoundationPills ?? 0,
+        buddhaHeartPills: migratedData.state.resources?.buddhaHeartPills ?? 0,
+        goldenCorePills: migratedData.state.resources?.goldenCorePills ?? 0,
+        nascentSoulPills: migratedData.state.resources?.nascentSoulPills ?? 0,
+        spiritTransformPills: migratedData.state.resources?.spiritTransformPills ?? 0,
+        integrationPills: migratedData.state.resources?.integrationPills ?? 0,
+        mahayanaPills: migratedData.state.resources?.mahayanaPills ?? 0,
+        tribulationPills: migratedData.state.resources?.tribulationPills ?? 0,
+        heavenlyTribulationPills: migratedData.state.resources?.heavenlyTribulationPills ?? 0,
+      },
+    };
+    migratedData.version = 14;
+  }
+
   return migratedData as SaveData;
 }
 
-export function createSaveData(state: GameState): SaveData {
+export function createSaveData(state: GameState, existingCreatedAt?: number): SaveData {
   return {
     version: CURRENT_SAVE_VERSION,
     state: state,
-    createdAt: Date.now(),
+    createdAt: existingCreatedAt ?? Date.now(),
     updatedAt: Date.now(),
     seed: state.seed
   };
 }
 
-export function serializeSave(state: GameState): string {
-  const saveData = createSaveData(state);
+export function serializeSave(state: GameState, existingCreatedAt?: number): string {
+  const saveData = createSaveData(state, existingCreatedAt);
   return JSON.stringify(saveData);
+}
+
+/** Extract createdAt timestamp from raw save JSON without full deserialization */
+export function extractCreatedAt(json: string): number | undefined {
+  try {
+    const data = JSON.parse(json);
+    return data.createdAt;
+  } catch {
+    return undefined;
+  }
 }
 
 export function deserializeSave(json: string): GameState {

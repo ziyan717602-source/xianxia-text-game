@@ -1,5 +1,6 @@
 import { BREAKTHROUGH_BY_ACTION, BREAKTHROUGH_RULES, BreakthroughRule } from '../content/breakthroughs';
 import { ELEMENT_LABELS } from '../content/cultivation';
+import { getKarmicBreakthroughPenalty } from './karma';
 import { BreakthroughState, GameState, Realm } from './types';
 
 export type BreakthroughOutcome = 'success' | 'partial' | 'failure';
@@ -85,6 +86,7 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
   const sectTraceBonus = rule.id === 'foundation'
     ? Math.min(0.06, (state.choices.qualities.sect_trace ?? 0) * 0.008)
     : 0;
+  const formationBonus = state.dwelling.formationBonus ?? 0;
   const woundPenalty = Math.min(0.18, state.resources.wounds * 0.06);
   const dantoxinPenalty = state.resources.dantoxin >= 60
     ? 0.22
@@ -93,6 +95,8 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
       : state.resources.dantoxin >= 10
         ? 0.05
         : 0;
+
+  const karmicPenalty = getKarmicBreakthroughPenalty(state);
 
   return Math.max(
     0.2,
@@ -106,9 +110,11 @@ export function getBreakthroughSuccessChance(state: GameState, rule: Breakthroug
       guardBonus +
       foundationGuardianBonus +
       borrowedAidBonus +
-      sectTraceBonus -
+      sectTraceBonus +
+      formationBonus -
       woundPenalty -
-      dantoxinPenalty
+      dantoxinPenalty -
+      karmicPenalty
     )
   );
 }
@@ -168,6 +174,7 @@ export function resolveBreakthrough(
             ? {
                 foundation_guardian: false,
                 borrowed_foundation_aid: false,
+                foundation_morning_seen: true,
               }
             : {}),
         },
@@ -285,7 +292,9 @@ export function getBreakthroughSummary(state: GameState): string[] {
     : null;
   const shownRule = rule ?? lastRule;
 
-  if (!shownRule || state.realm !== Realm.QiCondensation) return [];
+  if (!shownRule) return [];
+
+  if (state.realm !== Realm.QiCondensation && state.realm !== Realm.FoundationEstablishment && state.realm !== Realm.GoldenCore && state.realm !== Realm.NascentSoul && state.realm !== Realm.SpiritTransformation && state.realm !== Realm.Integration && state.realm !== Realm.Mahayana) return [];
 
   const preparation = getRulePreparation(state, shownRule);
   const attempts = state.breakthrough.attempts[shownRule.id] ?? 0;
