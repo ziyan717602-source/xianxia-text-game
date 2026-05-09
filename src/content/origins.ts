@@ -22,6 +22,7 @@ export interface OriginOption {
   flags: Record<string, boolean>;
   tags: Record<string, string>;
   qualities: Record<string, number>;
+  sectRank?: 'none' | 'outer' | 'inner' | 'core' | 'elder';
   log: string;
   selectable: boolean;
 }
@@ -79,9 +80,10 @@ export const ORIGINS: Record<OriginId, OriginOption> = {
     startingLocationId: 'outer_gate',
     resources: { insight: 1, coins: 2 },
     unlockedActions: ['kuzuo', 'sect_chore', 'listen_lesson'],
-    flags: { origin_outer_child: true, heard_outer_gate_rules: true, outer_gate_registered: true },
+    flags: { origin_outer_child: true, heard_outer_gate_rules: true, outer_gate_registered: true, sect_rank_outer: true },
     tags: { origin: 'outer_child', sect_trace: 'outer_registered' },
     qualities: { sect_trace: 2 },
+    sectRank: 'outer' as const,
     log: '某年春，外门点名。你站在末尾，听人念完规矩。',
     selectable: true,
   },

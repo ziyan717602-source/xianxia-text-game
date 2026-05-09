@@ -63,6 +63,13 @@ export function applyOrigin(state: GameState, originId: OriginId): GameState {
       ...state.world,
       logs: [...state.world.logs, origin.log].slice(-WORLD_LOG_LIMIT),
     },
+    // Apply sect rank if origin specifies it (e.g. outer_child)
+    ...(origin.sectRank ? {
+      sect: {
+        ...state.sect,
+        rank: origin.sectRank,
+      },
+    } : {}),
   };
 }
 

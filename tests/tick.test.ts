@@ -112,7 +112,7 @@ describe('Action System', () => {
     state.resources.qi = 15;
     state.resources.insight = 3;
     state.resources.essence = 100;
-    state.choices.flags.completed_rike_tuna = true;
+    state.choices.flags.unlocked_rike_tuna = true;
 
     const result = performAction(state, 'yinqi');
     expect(result.success).toBe(true);

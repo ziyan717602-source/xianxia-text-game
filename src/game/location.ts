@@ -48,6 +48,12 @@ export function moveToLocation(state: GameState, locationId: string): MoveResult
     return { state, log: `你已经在${targetLocation.name}了。`, success: false };
   }
 
+  // Validate realm requirement — cannot travel to locations beyond current realm
+  const visibleLocations = getVisibleLocations(state);
+  if (!visibleLocations.some(loc => loc.id === locationId)) {
+    return { state, log: '修为不足，无法前往该处。', success: false };
+  }
+
   // To move, maybe it takes essence or time. Let's make it cost a bit of essence or just time.
   // For simplicity, let's say moving takes 5 essence.
   const costStamina = 5;

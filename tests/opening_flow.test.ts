@@ -23,7 +23,17 @@ describe('Opening flow', () => {
     expect(getVisibleResourceIds(state)).toEqual(['essence', 'insight']);
 
     const event = rollEvent(state, () => 0);
-    expect(event?.id).toBe('find_jade_slip');
+    // The first event that fires for a new character is morning_breeze (starter event)
+    expect(event?.id).toBe('morning_breeze');
+
+    // Resolve morning_breeze to gain insight
+    const morningBreeze = EVENTS.find((item) => item.id === 'morning_breeze')!;
+    state = morningBreeze.choices[0].effect(state).state;
+    state = checkUnlocks(state);
+
+    // Now roll again for find_jade_slip (needs insight >= 2)
+    const event2 = rollEvent(state, () => 0);
+    expect(event2?.id).toBe('find_jade_slip');
 
     const jadeSlip = EVENTS.find((item) => item.id === 'find_jade_slip')!;
     state = jadeSlip.choices[0].effect(state).state;
@@ -46,7 +56,7 @@ describe('Opening flow', () => {
 
     state.resources.qi = 15;
     state.resources.insight = 3;
-    state.choices.flags.completed_rike_tuna = true;
+    state.choices.flags.unlocked_rike_tuna = true;
     state = checkUnlocks(state);
 
     const availableActions = getAvailableActionsAtLocation(state);
@@ -95,7 +105,8 @@ describe('Opening flow', () => {
     }
 
     expect(getAvailableActionsAtLocation(state)).toContain('rike_tuna');
-    expect(getAvailableActionsAtLocation(state)).not.toContain('yinqi');
+    // yinqi is now unlocked as soon as rike_tuna is unlocked (not requiring completion)
+    expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
 
     ensureEssence('rike_tuna');
     doAction('rike_tuna');

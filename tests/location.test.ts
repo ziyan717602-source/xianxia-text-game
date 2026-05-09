@@ -66,7 +66,7 @@ describe('Location System', () => {
 
     state.resources.qi = 15;
     state.resources.insight = 3;
-    state.choices.flags.completed_rike_tuna = true;
+    state.choices.flags.unlocked_rike_tuna = true;
 
     expect(getAvailableActionsAtLocation(state)).toContain('yinqi');
 

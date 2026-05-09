@@ -40,7 +40,7 @@ describe('Unlock System', () => {
     expect(state.unlockedActions).toContain('rike_tuna');
   });
 
-  it('should unlock yinqi only after daily practice has been completed', () => {
+  it('should unlock yinqi only after rike_tuna has been unlocked', () => {
     let state = createInitialState();
     state.resources.qi = 15;
     state.resources.insight = 3;
@@ -48,7 +48,7 @@ describe('Unlock System', () => {
     state = checkUnlocks(state);
     expect(state.unlockedActions).not.toContain('yinqi');
 
-    state.choices.flags.completed_rike_tuna = true;
+    state.choices.flags.unlocked_rike_tuna = true;
     state = checkUnlocks(state);
 
     expect(state.unlockedActions).toContain('yinqi');

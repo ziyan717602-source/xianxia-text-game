@@ -6,8 +6,9 @@ export const SECT_EVENTS: ActiveEvent[] = [
     text: '坊市角落有人议论外门规矩。名册、贡献、巡山时辰，几句话说得很碎。',
     condition: (state) =>
       (state.currentLocationId === 'market' || state.currentLocationId === 'outer_gate') &&
-      (state.choices.flags['heard_rumor_1'] || state.realm === Realm.QiCondensation) &&
-      !state.choices.flags['heard_outer_gate_rules'],
+      (state.choices.flags['heard_rumor_1'] || realmAtLeast(state, Realm.QiCondensation)) &&
+      !state.choices.flags['heard_outer_gate_rules'] &&
+      state.sect.rank === 'none',
     weight: (state) => 8 + (state.choices.qualities['market_ties'] ?? 0) * 2,
     choices: [
       {
@@ -57,9 +58,10 @@ export const SECT_EVENTS: ActiveEvent[] = [
     text: '外门石阶前坐着一名书吏。桌上一册薄簿，墨迹未干。',
     condition: (state) =>
       state.currentLocationId === 'outer_gate' &&
-      state.realm === Realm.QiCondensation &&
+      realmAtLeast(state, Realm.QiCondensation) &&
       Boolean(state.choices.flags['heard_outer_gate_rules']) &&
-      !state.choices.flags['outer_gate_clerk_seen'],
+      !state.choices.flags['outer_gate_clerk_seen'] &&
+      state.sect.rank === 'none',
     weight: (state) => 18 + (state.choices.qualities['sect_trace'] ?? 0) * 4,
     choices: [
       {
@@ -74,10 +76,11 @@ export const SECT_EVENTS: ActiveEvent[] = [
 
           newState.resources = { ...newState.resources, coins: newState.resources.coins - 3 };
           newState = setFlag(newState, 'outer_gate_registered');
+          newState = registerOuterDisciple(newState);
           newState = setTag(newState, 'sect_trace', 'registered');
           newState = adjustQuality(newState, 'sect_trace', 2);
           newState = recordOuterGateClerk(newState, { tags: ['记名'] });
-          return { state: newState, log: '三枚钱落入木匣。书吏在薄簿上添了你的名字。' };
+          return { state: newState, log: '三枚钱落入木匣。书吏在薄簿上添了你的名字，你已是外门弟子。' };
         },
       },
       {
@@ -85,11 +88,12 @@ export const SECT_EVENTS: ActiveEvent[] = [
         effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_clerk_seen');
           newState = setFlag(newState, 'accepted_outer_gate_errand');
+          newState = registerOuterDisciple(newState);
           newState = setTag(newState, 'sect_trace', 'errand');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           newState = adjustQuality(newState, 'sect_trace', 2);
           newState = recordOuterGateClerk(newState, { tags: ['给过短差'] });
-          return { state: newState, log: '书吏递来一张小条。差事不重，限期很明。' };
+          return { state: newState, log: '书吏递来一张小条。差事不重，限期很明。你已是外门弟子。' };
         },
       },
       {

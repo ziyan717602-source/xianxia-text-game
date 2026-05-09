@@ -1,5 +1,6 @@
 import { Action, Realm } from '../../game/types';
-import { QI_LAYER_2_COST, QI_LAYER_3_COST, QI_LAYER_4_COST, QI_LAYER_5_COST, QI_LAYER_6_COST, QI_LAYER_7_COST, QI_LAYER_8_COST, QI_LAYER_9_COST, FOUNDATION_COST } from './_costs';
+// NOTE: QI_LAYER_*_COST and FOUNDATION_COST removed — breakthrough costs are now
+// defined inline to separate actual cost (essence spend) from minResources (gate).
 
 export const BREAKTHROUGH_ACTIONS: Record<string, Action> = {
 yinqi: {
@@ -11,7 +12,7 @@ yinqi: {
     cooldown: 30,
     riskProbability: 0,
     conditions: {
-      requiredFlags: ['completed_rike_tuna'],
+      requiredFlags: ['unlocked_rike_tuna'],
       requiredRealm: Realm.Mortal,
     },
     isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
@@ -47,145 +48,154 @@ breakthrough_qi_2: {
     id: 'breakthrough_qi_2',
     actionGroup: 'breakthrough',
     name: '冲炼气二层',
-    cost: QI_LAYER_2_COST,
+    cost: { essence: 30, qi: 30, insight: 3 },
     output: {},
     cooldown: 60,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 30, insight: 3 },
       requiredFlags: ['prepared_qi_layer_2'],
       forbiddenFlags: ['reached_qi_layer_2'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_3: {
     id: 'breakthrough_qi_3',
     actionGroup: 'breakthrough',
     name: '冲炼气三层',
-    cost: QI_LAYER_3_COST,
+    cost: { essence: 35, qi: 45, insight: 5 },
     output: {},
     cooldown: 70,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 45, insight: 5 },
       requiredFlags: ['prepared_qi_layer_3'],
       forbiddenFlags: ['reached_qi_layer_3'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_4: {
     id: 'breakthrough_qi_4',
     actionGroup: 'breakthrough',
     name: '冲炼气四层',
-    cost: QI_LAYER_4_COST,
+    cost: { essence: 40, qi: 60, insight: 8 },
     output: {},
     cooldown: 80,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 60, insight: 8 },
       requiredFlags: ['prepared_qi_layer_4'],
       forbiddenFlags: ['reached_qi_layer_4'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_5: {
     id: 'breakthrough_qi_5',
     actionGroup: 'breakthrough',
     name: '冲炼气五层',
-    cost: QI_LAYER_5_COST,
+    cost: { essence: 45, qi: 75, insight: 10 },
     output: {},
     cooldown: 90,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 75, insight: 10 },
       requiredFlags: ['prepared_qi_layer_5'],
       forbiddenFlags: ['reached_qi_layer_5'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_6: {
     id: 'breakthrough_qi_6',
     actionGroup: 'breakthrough',
     name: '冲炼气六层',
-    cost: QI_LAYER_6_COST,
+    cost: { essence: 50, qi: 90, insight: 12 },
     output: {},
     cooldown: 100,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 90, insight: 12 },
       requiredFlags: ['prepared_qi_layer_6'],
       forbiddenFlags: ['reached_qi_layer_6'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_7: {
     id: 'breakthrough_qi_7',
     actionGroup: 'breakthrough',
     name: '冲炼气七层',
-    cost: QI_LAYER_7_COST,
+    cost: { essence: 50, qi: 110, insight: 15 },
     output: {},
     cooldown: 110,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 110, insight: 15 },
       requiredFlags: ['prepared_qi_layer_7'],
       forbiddenFlags: ['reached_qi_layer_7'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_8: {
     id: 'breakthrough_qi_8',
     actionGroup: 'breakthrough',
     name: '冲炼气八层',
-    cost: QI_LAYER_8_COST,
+    cost: { essence: 55, qi: 130, insight: 18 },
     output: {},
     cooldown: 120,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 130, insight: 18 },
       requiredFlags: ['prepared_qi_layer_8'],
       forbiddenFlags: ['reached_qi_layer_8'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_qi_9: {
     id: 'breakthrough_qi_9',
     actionGroup: 'breakthrough',
     name: '冲炼气九层',
-    cost: QI_LAYER_9_COST,
+    cost: { essence: 60, qi: 150, insight: 22 },
     output: {},
     cooldown: 130,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 150, insight: 22 },
       requiredFlags: ['prepared_qi_layer_9'],
       forbiddenFlags: ['reached_qi_layer_9'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 breakthrough_foundation: {
     id: 'breakthrough_foundation',
     actionGroup: 'breakthrough',
     name: '冲筑基',
-    cost: FOUNDATION_COST,
+    cost: { essence: 80, qi: 160, insight: 25 },
     output: {},
     cooldown: 120,
     riskProbability: 0,
     conditions: {
+      minResources: { qi: 160, insight: 25 },
       requiredFlags: ['prepared_foundation'],
       forbiddenFlags: ['reached_foundation'],
       requiredLocation: 'home',
       requiredRealm: Realm.QiCondensation,
     },
-    isGlobalAction: true, // Breakthrough — internal cultivation event, not location-bound
+    isGlobalAction: true,
   },
 attempt_ascension: {
     id: 'attempt_ascension',

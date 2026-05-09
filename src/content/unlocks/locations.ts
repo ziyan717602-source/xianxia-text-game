@@ -500,17 +500,8 @@ export const LOCATIONS_UNLOCKS: UnlockRule[] = [
       return state;
     }
   },
-{
-    id: 'unlock_cave_crystal_actions',
-    condition: (state) => Boolean(state.choices.flags['unlocked_cave_crystal']),
-    effect: (state) => {
-      const actionsToAdd = ['mine_spirit_crystal', 'deep_exploration'].filter((a) => !state.unlockedActions.includes(a));
-      if (actionsToAdd.length > 0) {
-        return { ...state, unlockedActions: [...state.unlockedActions, ...actionsToAdd], choices: { ...state.choices, flags: { ...state.choices.flags, unlocked_cave_crystal_actions: true } } };
-      }
-      return state;
-    }
-  },
+  // NOTE: unlock_cave_crystal_actions removed — superseded by unlock_mountain_cave_actions
+  // which uses the correct action IDs (mine_crystal, explore_depths)
 {
     id: 'unlock_water_meditation',
     condition: (state) => Boolean(state.choices.flags['entered_qi_condensation']) || Boolean(state.choices.flags['origin_mountain_dweller']),

@@ -60,7 +60,7 @@ export const CORE_UNLOCKS: UnlockRule[] = [
       state.realm === Realm.Mortal &&
       state.resources.qi >= 15 &&
       state.resources.insight >= 3 &&
-      Boolean(state.choices.flags['completed_rike_tuna']),
+      Boolean(state.choices.flags['unlocked_rike_tuna']),
     effect: (state) => {
       if (!state.unlockedActions.includes('yinqi')) {
         return {

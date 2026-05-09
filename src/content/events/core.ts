@@ -2,6 +2,35 @@ import { ActiveEvent, Season, Realm, GameState, LOCATIONS, setFlag, adjustQualit
 
 export const CORE_EVENTS: ActiveEvent[] = [
 {
+    // Starter event — no prerequisites, kicks off the event chain for new players
+    id: 'morning_breeze',
+    text: '晨风穿过窗缝，带着山间草木的气息。你深吸一口气，恍惚间感到体内有一丝微弱的暖流。',
+    condition: (state) =>
+      state.realm === Realm.Mortal &&
+      !state.choices.flags['morning_breeze_felt'] &&
+      state.time.tick >= 5,
+    weight: () => 200, // Very high weight — this is the entry point event
+    choices: [
+      {
+        text: '静心感受',
+        effect: (state, random) => {
+          let newState = setFlag(state, 'morning_breeze_felt');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 1, qi: newState.resources.qi + 1 };
+          newState = adjustQuality(newState, 'quiet_cultivation', 1);
+          return { state: newState, log: '你闭上眼，感受那一丝暖流。灵气似乎并不遥远。见闻与真气各增一分。' };
+        }
+      },
+      {
+        text: '不在意',
+        effect: (state, random) => {
+          let newState = setFlag(state, 'morning_breeze_felt');
+          newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
+          return { state: newState, log: '你不在意那丝暖流。但见闻似乎长了一分。' };
+        }
+      }
+    ]
+  },
+{
     id: 'find_jade_slip',
     text: '破败的茅草屋角落里，你在枯坐中摸到了一块沾满灰尘的硬物。抹去灰尘，竟是一枚残破的玉简。玉简边缘锐利，不小心划破了你的手指。',
     condition: (state) => !state.choices.flags['found_jade_slip'] && state.resources.insight >= 2,
