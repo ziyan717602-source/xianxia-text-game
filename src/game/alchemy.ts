@@ -104,7 +104,7 @@ function getAlchemySuccessChance(state: GameState, recipeId: string): number {
 export function brewRecipe(
   state: GameState,
   recipeId: string,
-  random: () => number = Math.random
+  random?: () => number, // seeded rng should be provided by callers for determinism
 ): { state: GameState; log: string } {
   const recipe = PILL_RECIPES[recipeId];
   if (!recipe) {
@@ -115,7 +115,7 @@ export function brewRecipe(
     return { state, log: '丹方未明，炉火无从安放。' };
   }
 
-  const roll = random();
+  const roll = random ? random() : 0.5;
   const successChance = getAlchemySuccessChance(state, recipeId);
   const count = state.alchemy.brewedRecipeCounts[recipeId] ?? 0;
   const baseAlchemy = {

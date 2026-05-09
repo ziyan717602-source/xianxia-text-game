@@ -12,6 +12,25 @@ import { createInitialFollowerState } from './follower';
 import { createInitialSecretRealmState } from './secretRealm';
 import { createInitialAscensionState } from './ascension';
 
+/**
+ * Create a deterministic PRNG from a seed and tick.
+ * Uses the mulberry32 algorithm for fast, high-quality 32-bit randomness.
+ * Each call to the returned function advances the internal counter,
+ * producing a deterministic sequence for the same seed+tick combination.
+ */
+export function createRng(seed: number, tick: number = 0): () => number {
+  // Combine seed and tick into a single 32-bit state
+  let state = (seed ^ (tick * 374761393)) >>> 0;
+  if (state === 0) state = 1; // avoid zero state
+  return () => {
+    state |= 0;
+    state = (state + 0x6D2B79F5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 export const INITIAL_MAX_STAMINA = 100;
 
 export function getMaxStamina(realm: Realm): number {
@@ -72,6 +91,8 @@ export function deriveGameTime(tick: number): GameTime {
 }
 
 export function createInitialState(seed?: number): GameState {
+  // Math.random() is acceptable here: this is only used at initial game creation
+  // when no seed is provided. Once a game exists, the seed is persisted and reused.
   const stateSeed = seed ?? Math.floor(Math.random() * 1000000);
   const time = deriveGameTime(0);
 

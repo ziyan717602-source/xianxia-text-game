@@ -9,7 +9,7 @@ import { getKarmicEventWeightModifier } from './karma';
  * @param random 随机数生成器 (0-1)
  * @returns 抽取到的事件，如果没有符合条件的事件则返回 null
  */
-export function rollEvent(state: GameState, random: () => number = Math.random): ActiveEvent | null {
+export function rollEvent(state: GameState, random: () => number): ActiveEvent | null {
   const possibleEvents = EVENTS.filter(e => e.condition(state));
 
   if (possibleEvents.length === 0) {

@@ -176,7 +176,7 @@ export interface ActiveEvent {
 
 export interface EventChoice {
   text: string;
-  effect: (state: GameState) => { state: GameState; log: string };
+  effect: (state: GameState, random?: () => number) => { state: GameState; log: string };
 }
 
 export const EVENTS: ActiveEvent[] = [
@@ -188,7 +188,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '探查玉简',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state };
           // 刺痛带来神识的开启和一丝灵气
           newState.resources = { ...state.resources, qi: state.resources.qi + 1 };
@@ -206,7 +206,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '施以援手 (消耗 5 药)',
-        effect: (state) => {
+        effect: (state, random) => {
           if (state.resources.herbs < 5) {
             let newState = { ...state };
             newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true } };
@@ -224,7 +224,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '冷眼旁观',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true } };
           return {
@@ -235,7 +235,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '搜刮财物',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state };
           newState.resources = { ...state.resources, coins: state.resources.coins + 20 };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'met_wounded_cultivator': true, 'robbed_cultivator': true } };
@@ -255,7 +255,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '驻足倾听',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state };
           newState.resources = { ...state.resources, insight: state.resources.insight + 2 };
           newState.choices = { ...state.choices, flags: { ...state.choices.flags, 'heard_rumor_1': true } };
@@ -276,7 +276,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '采下新芽',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, herbs: state.resources.herbs + 3 };
           newState = setFlag(newState, 'found_rain_after_sprouts');
@@ -286,7 +286,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '留种标记',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, herbs: state.resources.herbs + 1, insight: state.resources.insight + 1 };
           newState = setFlag(newState, 'found_rain_after_sprouts');
@@ -297,7 +297,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只记药形',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, insight: state.resources.insight + 2 };
           newState = setFlag(newState, 'found_rain_after_sprouts');
@@ -323,7 +323,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '收下谢礼',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, coins: state.resources.coins + 15 };
           newState = setFlag(newState, 'wounded_cultivator_returned');
@@ -337,7 +337,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问山中去路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, insight: state.resources.insight + 2 };
           newState = setFlag(newState, 'wounded_cultivator_returned');
@@ -352,7 +352,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不取',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'wounded_cultivator_returned');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           newState = touchRelationship(
@@ -384,7 +384,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '绕路避开',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState.resources = { ...state.resources, essence: Math.max(0, state.resources.essence - 10) };
           newState = setFlag(newState, 'wounded_cultivator_grudge_met');
@@ -394,7 +394,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '交涉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           if (newState.resources.coins >= 5) {
             newState.resources = { ...newState.resources, coins: newState.resources.coins - 5 };
@@ -414,12 +414,12 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = resolveCombatEvent(
             state,
             'fight',
             { id: WOUNDED_CULTIVATOR_ID, name: '受伤散修', realm: Realm.QiCondensation, power: 6 },
-            () => 0.5
+            random
           );
           let newState = setFlag(result.state, 'wounded_cultivator_grudge_met');
           newState = touchRelationship(
@@ -440,7 +440,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '买入十钱草药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState = setFlag(newState, 'market_price_rise_seen');
 
@@ -461,7 +461,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '观望行情',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'market_price_rise_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           newState = adjustQuality(newState, 'market_ties', 1);
@@ -471,7 +471,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '赊账取药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'market_price_rise_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 2 };
           newState = adjustQuality(newState, 'market_ties', 2);
@@ -492,7 +492,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '记下规矩',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_outer_gate_rules');
           newState = setTag(newState, 'sect_trace', 'heard_rules');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
@@ -502,7 +502,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '花钱细问',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_outer_gate_rules');
           if (newState.resources.coins >= 5) {
             newState.resources = {
@@ -523,7 +523,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_outer_gate_rules');
           newState = setFlag(newState, 'dismissed_outer_gate_rules');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -544,7 +544,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '照名登记（三钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_clerk_seen');
 
           if (newState.resources.coins < 3) {
@@ -562,7 +562,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问短差',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_clerk_seen');
           newState = setFlag(newState, 'accepted_outer_gate_errand');
           newState = setTag(newState, 'sect_trace', 'errand');
@@ -574,7 +574,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退下不记',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_clerk_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你退到阶下。薄簿仍摊在那里。' };
@@ -594,7 +594,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静坐逼毒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_in_meridians_seen');
 
           if (newState.resources.essence < 40) {
@@ -620,7 +620,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '翻检清躁方',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_in_meridians_seen');
           newState = setFlag(newState, 'sought_cleansing_formula');
           newState.resources = {
@@ -634,7 +634,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行压下',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_in_meridians_seen');
           newState = setFlag(newState, 'suppressed_dantoxin_heat');
           newState.resources = {
@@ -661,7 +661,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '闭门养骨',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_aches_seen');
 
           if (newState.resources.essence < 40) {
@@ -685,7 +685,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '寻药缓伤',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_aches_seen');
 
           if (newState.resources.herbs < 3) {
@@ -709,7 +709,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '照旧运功',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_aches_seen');
           newState.resources = {
             ...newState.resources,
@@ -734,7 +734,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '付清丹账（十二钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'market_foundation_debt_seen');
 
           if (newState.resources.coins < 12) {
@@ -753,7 +753,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '再记一笔',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'market_foundation_debt_seen');
           newState = setFlag(newState, 'foundation_debt_delayed');
           newState = adjustQuality(newState, 'market_ties', -1);
@@ -764,7 +764,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '避开掌柜',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'market_foundation_debt_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           newState = setFlag(newState, 'avoided_foundation_debt');
@@ -786,7 +786,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '按规谢过（四钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_guardian_account_seen');
 
           if (newState.resources.coins < 4) {
@@ -805,7 +805,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '补一件短差',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_guardian_account_seen');
           newState.resources = {
             ...newState.resources,
@@ -821,7 +821,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '置若罔闻',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_guardian_account_seen');
           newState = setFlag(newState, 'brushed_off_guardian_account');
           newState = setFlag(newState, 'foundation_guardian_account_open', false);
@@ -847,7 +847,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '补交罚钱（三钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
 
           if (newState.resources.coins < 3) {
@@ -867,7 +867,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '补做杂务',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
           newState.resources = {
             ...newState.resources,
@@ -883,7 +883,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '置之不理',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_missed_roll_call_seen');
           newState = setFlag(newState, 'ignored_outer_gate_roll_call');
           newState = adjustQuality(newState, 'sect_discipline', -2);
@@ -906,7 +906,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '照规交差',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_patrol_report_seen');
           newState.resources = { ...newState.resources, coins: newState.resources.coins + 2 };
           newState = setFlag(newState, 'reported_outer_gate_patrol');
@@ -918,7 +918,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '夹带草药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_patrol_report_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 2 };
           newState = setFlag(newState, 'kept_patrol_herbs');
@@ -930,7 +930,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问边界路径',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'outer_gate_patrol_report_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = setFlag(newState, 'heard_outer_gate_border_route');
@@ -953,7 +953,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '闭门静坐',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'winter_stillness_seen');
           newState.resources = {
             ...newState.resources,
@@ -966,7 +966,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '出门走走',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'winter_stillness_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 5) };
           return { state: newState, log: '你推门看雪。夜色无事，精元稍损。' };
@@ -986,7 +986,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '调养经脉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_lingering_seen');
 
           if (newState.resources.essence < 50) {
@@ -1011,7 +1011,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '药浴化瘀',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_lingering_seen');
 
           if (newState.resources.herbs < 5) {
@@ -1031,7 +1031,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强撑运功',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_scar_lingering_seen');
           newState.resources = {
             ...newState.resources,
@@ -1057,7 +1057,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '应下差事',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'guardian_favor_recalled_seen');
           newState.resources = {
             ...newState.resources,
@@ -1072,7 +1072,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '婉拒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'guardian_favor_recalled_seen');
           newState = setFlag(newState, 'declined_guardian_favor');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -1093,7 +1093,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '付清本息（十六钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_debt_collector_seen');
 
           if (newState.resources.coins < 16) {
@@ -1115,7 +1115,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '再拖一期',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_debt_collector_seen');
           newState = setFlag(newState, 'foundation_debt_delayed_again');
           newState = adjustQuality(newState, 'karmic_weight', 2);
@@ -1125,7 +1125,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '抵药还账',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_debt_collector_seen');
 
           if (newState.resources.herbs < 8) {
@@ -1152,7 +1152,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '巡视新身',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_morning_seen');
           newState = setFlag(newState, 'surveyed_new_body');
           newState.resources = {
@@ -1164,7 +1164,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静坐体悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_morning_seen');
           newState.resources = {
             ...newState.resources,
@@ -1191,7 +1191,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '顺应道途',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dao_path_recognized');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你顺着那丝暗线，气行比往日顺畅一分。' };
@@ -1199,7 +1199,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不以为意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dao_path_recognized');
           return { state: newState, log: '你照旧行气。道途在那里，不因你在不在意而改。' };
         },
@@ -1221,7 +1221,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '随新道而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dao_path_conflict_seen');
           const path = state.daoPath.currentPath;
           if (path) {
@@ -1232,7 +1232,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行收束',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dao_path_conflict_seen');
           newState = {
             ...newState,
@@ -1256,7 +1256,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静坐反省',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           newState = {
@@ -1271,7 +1271,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '置之不顾',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = { ...state };
           newState = {
             ...newState,
@@ -1299,7 +1299,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '直面心魔（消耗 5 真气 20 精元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_rashness_encountered');
           const result = confrontDemon(newState);
           return result;
@@ -1307,7 +1307,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压制心魔（消耗 80 寿元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_rashness_encountered');
           const result = suppressDemon(newState);
           return result;
@@ -1315,7 +1315,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '无视',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_rashness_encountered');
           const result = ignoreDemon(newState);
           return result;
@@ -1333,7 +1333,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '直面心魔（消耗 5 真气 20 精元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_attachment_encountered');
           const result = confrontDemon(newState);
           return result;
@@ -1341,7 +1341,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压制心魔（消耗 80 寿元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_attachment_encountered');
           const result = suppressDemon(newState);
           return result;
@@ -1349,7 +1349,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '无视',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_attachment_encountered');
           const result = ignoreDemon(newState);
           return result;
@@ -1367,7 +1367,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '直面心魔（消耗 5 真气 20 精元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_pride_encountered');
           const result = confrontDemon(newState);
           return result;
@@ -1375,7 +1375,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压制心魔（消耗 80 寿元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_pride_encountered');
           const result = suppressDemon(newState);
           return result;
@@ -1383,7 +1383,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '无视',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_pride_encountered');
           const result = ignoreDemon(newState);
           return result;
@@ -1401,7 +1401,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '直面心魔（消耗 5 真气 20 精元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_toxicity_encountered');
           const result = confrontDemon(newState);
           return result;
@@ -1409,7 +1409,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压制心魔（消耗 80 寿元）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_toxicity_encountered');
           const result = suppressDemon(newState);
           return result;
@@ -1417,7 +1417,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '无视',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_of_toxicity_encountered');
           const result = ignoreDemon(newState);
           return result;
@@ -1438,7 +1438,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '应考核入内门',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'inner_gate_admission_seen');
           newState = advanceSectRank(newState);
           if (newState.sect.rank === 'inner') {
@@ -1449,7 +1449,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '暂不',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'inner_gate_admission_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你退回阶下。内门仍在那里，不急。' };
@@ -1469,7 +1469,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '辩解',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_discipline_hearing_seen');
           if (state.choices.qualities.sect_trace ?? 0 >= 5) {
             newState = {
@@ -1485,7 +1485,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '领罚',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_discipline_hearing_seen');
           newState = {
             ...newState,
@@ -1498,7 +1498,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '出逃',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_discipline_hearing_seen');
           newState = leaveSect(newState);
           return { state: newState, log: '你转身出了山门。宗门簿上划掉你的名字，因果重了几分。' };
@@ -1517,7 +1517,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '退让',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'fellow_disciple_rivalry_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你退一步。面子丢了，气也消了。' };
@@ -1525,7 +1525,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '据理力争',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'fellow_disciple_rivalry_seen');
           newState = adjustQuality(newState, 'combat_edge', 1);
           return { state: newState, log: '你寸步不让。争执声大，但也立了威。' };
@@ -1533,7 +1533,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '从中调停',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'fellow_disciple_rivalry_seen');
           newState = adjustQuality(newState, 'market_ties', 1);
           return { state: newState, log: '你把两边都劝住。人脉添了一分，两边都记你一笔。' };
@@ -1553,7 +1553,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静坐逼毒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_meridian_decay_seen');
 
           if (newState.resources.essence < 50) {
@@ -1577,7 +1577,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '服通脉丸',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_meridian_decay_seen');
 
           if (newState.resources.meridianCleansingPills <= 0) {
@@ -1603,7 +1603,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行压下',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dantoxin_meridian_decay_seen');
           newState.resources = {
             ...newState.resources,
@@ -1628,7 +1628,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '研习新方',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'alchemist_insight_seen');
           newState = setFlag(newState, 'sought_meridian_cleansing_formula');
           newState.resources = {
@@ -1641,7 +1641,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '整理旧方',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'alchemist_insight_seen');
           newState.resources = {
             ...newState.resources,
@@ -1666,7 +1666,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '记下路径',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'misty_herb_valley');
           newState = setFlag(newState, 'has_discovered_realm');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
@@ -1675,7 +1675,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '听听便罢',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_valley_rumor_heard');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你听了几句，没往心里去。' };
@@ -1695,7 +1695,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '买下地图（五钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           if (state.resources.coins < 5) {
             return { state, log: '钱不够。残图被人买走。' };
           }
@@ -1707,7 +1707,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只记大致方位',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ruins_map_heard');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你记住大致方位，未买残图。' };
@@ -1727,7 +1727,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '探查魔气来源',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'demonic_cave');
           newState = setFlag(newState, 'has_discovered_realm');
           return { state: newState, log: '你找到了魔气洞窟的入口。危险，但也可能有机缘。' };
@@ -1735,7 +1735,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '避开',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_aura_avoided');
           return { state: newState, log: '你绕开那处裂隙。魔气不散，洞口仍在。' };
         },
@@ -1753,7 +1753,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '循气而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'heavenly_peak');
           newState = setFlag(newState, 'has_discovered_realm');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
@@ -1762,7 +1762,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '按住不动',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_vision_ignored');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你压住神识，没有追寻。那道清气散去。' };
@@ -1782,7 +1782,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '循药香深入',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_valley_discovery_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 3 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -1791,7 +1791,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '循水声而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_valley_discovery_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '水声引你到一处灵泉。饮了一口，神识清明了些。' };
@@ -1810,7 +1810,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ruins_guardian_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5, essence: Math.max(0, newState.resources.essence - 15) };
           newState = adjustQuality(newState, 'combat_edge', 1);
@@ -1819,7 +1819,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '交涉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ruins_guardian_seen');
           if (newState.resources.insight >= 20) {
             newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
@@ -1831,7 +1831,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '潜行绕过',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ruins_guardian_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你屏息绕过阵灵。多耗了些精元，但未添伤。' };
@@ -1850,7 +1850,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静心抵御',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_whispers_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5 };
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
@@ -1859,7 +1859,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '借助魔气修炼',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_whispers_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 10, dantoxin: newState.resources.dantoxin + 5 };
           newState = adjustQuality(newState, 'reckless_breakthrough', 1);
@@ -1879,7 +1879,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '硬扛',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_trial_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 15, wounds: newState.resources.wounds + 2 };
           newState = adjustQuality(newState, 'combat_edge', 2);
@@ -1888,7 +1888,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以功法化解',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_trial_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 8, insight: newState.resources.insight + 5 };
           return { state: newState, log: '你运转功法化解雷气。真气增八缕，见闻涨五分。' };
@@ -1905,7 +1905,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '感应天意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ascension_threshold_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
           return { state: newState, log: '你感应天意。飞升之路若隐若现，你还需积蓄力量。' };
@@ -1921,28 +1921,28 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '飞升（踏入更高层次）',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = executeAscension(state, 'ascend');
           return { state: result.state, log: result.log };
         },
       },
       {
         text: '留界（留下为尊）',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = executeAscension(state, 'remain');
           return { state: result.state, log: result.log };
         },
       },
       {
         text: '超脱（重入轮回，保留部分造化）',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = executeAscension(state, 'transcend');
           return { state: result.state, log: result.log };
         },
       },
       {
         text: '坐化（安然消散）',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = executeAscension(state, 'dissipate');
           return { state: result.state, log: result.log };
         },
@@ -1960,7 +1960,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '顺水入静',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_meditation_seen');
           newState.resources = {
             ...newState.resources,
@@ -1973,7 +1973,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '起身取水',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_meditation_seen');
           newState.resources = {
             ...newState.resources,
@@ -1984,7 +1984,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '细听水声',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_meditation_seen');
           newState.resources = {
             ...newState.resources,
@@ -2007,7 +2007,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '小心采下',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_night_sand_fungus');
           newState.resources = {
             ...newState.resources,
@@ -2019,7 +2019,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下位置',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_night_sand_fungus');
           newState = setFlag(newState, 'marked_night_sand_fungus');
           newState.resources = {
@@ -2031,7 +2031,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '放过不采',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_night_sand_fungus');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你没有动手。幼株尚嫩，留它在石下多长一季。' };
@@ -2050,7 +2050,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '揭取苔衣',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_iron_wire_moss');
           newState.resources = {
             ...newState.resources,
@@ -2063,7 +2063,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只取一点',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_iron_wire_moss');
           newState.resources = {
             ...newState.resources,
@@ -2074,7 +2074,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '辨其药性',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_iron_wire_moss');
           newState.resources = {
             ...newState.resources,
@@ -2096,7 +2096,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '倒茶听他讲',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_mountain_elder');
           newState.resources = {
             ...newState.resources,
@@ -2113,7 +2113,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问山下世事',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_mountain_elder');
           newState.resources = {
             ...newState.resources,
@@ -2130,7 +2130,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '送些草药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_mountain_elder');
           newState.resources = {
             ...newState.resources,
@@ -2158,7 +2158,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '细看符文',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_old_talisman');
           newState.resources = {
             ...newState.resources,
@@ -2170,7 +2170,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '收入袖中',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_old_talisman');
           newState = setFlag(newState, 'kept_old_talisman');
           newState.resources = {
@@ -2182,7 +2182,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不看',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_old_talisman');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你没有碰那张纸。灵意散去，灰落回原处。' };
@@ -2201,7 +2201,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '强记下来',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'read_forbidden_text');
           newState.resources = {
             ...newState.resources,
@@ -2214,7 +2214,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只看一眼',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'read_forbidden_text');
           newState.resources = {
             ...newState.resources,
@@ -2225,7 +2225,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '抹去',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'read_forbidden_text');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           newState = adjustQuality(newState, 'karmic_weight', -1);
@@ -2245,7 +2245,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '上前请教',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_wandering_lecturer');
           newState.resources = {
             ...newState.resources,
@@ -2261,7 +2261,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '旁听片刻',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_wandering_lecturer');
           newState.resources = {
             ...newState.resources,
@@ -2272,7 +2272,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '回避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_wandering_lecturer');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你转身离开。他仍在看石阶，没有抬头。' };
@@ -2291,7 +2291,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '连根取下',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_candle_heart_tendril');
           newState.resources = {
             ...newState.resources,
@@ -2305,7 +2305,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只取须尖',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_candle_heart_tendril');
           newState.resources = {
             ...newState.resources,
@@ -2317,7 +2317,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不碰',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'found_candle_heart_tendril');
           newState.resources = {
             ...newState.resources,
@@ -2343,7 +2343,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '按时采药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, `herb_bloom_${state.time.season}_seen`);
           newState.resources = {
             ...newState.resources,
@@ -2356,7 +2356,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只采一味',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, `herb_bloom_${state.time.season}_seen`);
           newState.resources = {
             ...newState.resources,
@@ -2368,7 +2368,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '留药不采',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, `herb_bloom_${state.time.season}_seen`);
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你没有动手。药草自生自落，你的心静了一些。' };
@@ -2387,7 +2387,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '花药除虫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_pest_seen');
           newState.resources = {
             ...newState.resources,
@@ -2399,7 +2399,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '手动摘虫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_pest_seen');
           newState.resources = {
             ...newState.resources,
@@ -2411,7 +2411,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不管',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'herb_pest_seen');
           newState.resources = {
             ...newState.resources,
@@ -2432,7 +2432,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '各采各的',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_rival_gatherer');
           newState.resources = {
             ...newState.resources,
@@ -2443,7 +2443,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '交涉分药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_rival_gatherer');
           if (newState.resources.coins >= 3) {
             newState.resources = {
@@ -2463,7 +2463,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '先到先得',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_rival_gatherer');
           newState.resources = {
             ...newState.resources,
@@ -2487,7 +2487,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '细听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_foreign_news');
           newState.resources = {
             ...newState.resources,
@@ -2499,7 +2499,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '花两钱打听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_foreign_news');
           newState.resources = {
             ...newState.resources,
@@ -2512,7 +2512,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不关心',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_foreign_news');
           return { state: newState, log: '你没有凑过去。商旅自去，消息散在渡口风中。' };
         },
@@ -2529,7 +2529,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '记下特征',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'saw_missing_person_post');
           newState.resources = {
             ...newState.resources,
@@ -2540,7 +2540,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '揭帖找人',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'saw_missing_person_post');
           newState.resources = {
             ...newState.resources,
@@ -2553,7 +2553,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不碰',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'saw_missing_person_post');
           return { state: newState, log: '你没有碰那张帖子。寻人帖仍在墙上，墨迹渐淡。' };
         },
@@ -2571,7 +2571,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '点头招呼',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_patrol_at_ferry');
           newState.resources = {
             ...newState.resources,
@@ -2587,7 +2587,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_patrol_at_ferry');
           newState = setFlag(newState, 'heard_ferry_route');
           newState.resources = {
@@ -2604,7 +2604,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '绕行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_patrol_at_ferry');
           newState.resources = {
             ...newState.resources,
@@ -2626,7 +2626,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '送药宽慰',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_disillusioned_fellow');
           newState.resources = {
             ...newState.resources,
@@ -2643,7 +2643,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '问失败经过',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_disillusioned_fellow');
           newState.resources = {
             ...newState.resources,
@@ -2659,7 +2659,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '旁观',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'met_disillusioned_fellow');
           return { state: newState, log: '你站在一旁。他坐了一会，起身走了。' };
         },
@@ -2683,7 +2683,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '悉心采摘',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_sprout_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 5 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -2692,7 +2692,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '留根培土',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_sprout_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 2, insight: newState.resources.insight + 2 };
           newState = setFlag(newState, 'tended_spirit_sprout');
@@ -2702,7 +2702,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以灵气温养',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_sprout_seen');
           newState.resources = { ...newState.resources, qi: Math.max(0, newState.resources.qi - 3), insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -2722,7 +2722,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以药驱虫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_pest_seen');
           if (newState.resources.herbs < 2) {
             newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 1) };
@@ -2736,7 +2736,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '亲手捉虫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_pest_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           newState = setFlag(newState, 'pest_hand_picked');
@@ -2745,7 +2745,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不管',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_pest_seen');
           newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 3) };
           return { state: newState, log: '你没有理会。虫啃了三株灵草，田里少了几分药香。' };
@@ -2763,7 +2763,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '强行封炉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 15), herbs: Math.max(0, newState.resources.herbs - 2) };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -2772,7 +2772,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '放炉自灭',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 4) };
           return { state: newState, log: '你退开一步。炉火自行燃尽，四份药材报废。人无碍。' };
@@ -2780,7 +2780,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '趁势收丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           if ((state.choices.qualities['alchemy_affinity'] ?? 0) >= 6) {
             newState.resources = { ...newState.resources, qi: newState.resources.qi + 3, dantoxin: newState.resources.dantoxin + 3 };
@@ -2804,7 +2804,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '旁听论丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_master_teaching_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4 };
           newState = adjustQuality(newState, 'alchemy_affinity', 2);
@@ -2813,7 +2813,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '请教师尊',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_master_teaching_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2, dantoxin: Math.max(0, newState.resources.dantoxin - 3) };
           newState = setFlag(newState, 'received_pill_hall_guidance');
@@ -2834,13 +2834,13 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '接剑',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_challenge_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'sword_brother', name: '剑阁师兄', realm: Realm.QiCondensation, power: 8 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -2852,7 +2852,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '认输回避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_challenge_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你抱拳认输。师兄收剑，剑阁照旧安静。' };
@@ -2872,7 +2872,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '闭目感悟剑意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_intent_insight_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, qi: newState.resources.qi + 3 };
           newState = adjustQuality(newState, 'combat_edge', 2);
@@ -2881,7 +2881,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '拔剑一试',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_intent_insight_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5, wounds: newState.resources.wounds + 1 };
           newState = adjustQuality(newState, 'combat_edge', 1);
@@ -2902,7 +2902,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '领命巡查',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_assignment_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 20), coins: newState.resources.coins + 5 };
           newState = setFlag(newState, 'completed_sect_assignment');
@@ -2913,7 +2913,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '婉拒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_assignment_seen');
           return { state: newState, log: '你婉拒令牌。执事收回，未有多言。' };
         },
@@ -2931,7 +2931,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '随众参拜',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_ceremony_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 3, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'sect_trace', 2);
@@ -2940,7 +2940,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '旁观',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_ceremony_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你站在殿角旁观。大典与你无涉，见闻略长。' };
@@ -2958,7 +2958,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '恭敬问路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_spirit_encounter_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = setFlag(newState, 'spirit_pointed_path');
@@ -2967,7 +2967,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以阵法禁制',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_spirit_encounter_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 2, dantoxin: newState.resources.dantoxin + 2 };
           newState = adjustQuality(newState, 'combat_edge', 1);
@@ -2976,7 +2976,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_spirit_encounter_seen');
           return { state: newState, log: '你退出荒庙。灵体消散，暗处归于寂静。' };
         },
@@ -2994,7 +2994,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '研读残篇',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_forbidden_scroll_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, dantoxin: newState.resources.dantoxin + 4 };
           newState = setFlag(newState, 'read_forbidden_scroll');
@@ -3004,7 +3004,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '烧毁',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_forbidden_scroll_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           newState = adjustQuality(newState, 'karmic_weight', -1);
@@ -3023,7 +3023,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '小心开采',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_crystal_seen');
           newState.resources = { ...newState.resources, coins: newState.resources.coins + 15, essence: Math.max(0, newState.resources.essence - 15) };
           return { state: newState, log: '你敲下灵晶。值十五钱，精元折了十五，手也震麻了。' };
@@ -3031,7 +3031,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下位置回头再来',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_crystal_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = setFlag(newState, 'noted_crystal_vein');
@@ -3050,13 +3050,13 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_beast_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'cave_beast', name: '灰毛地兽', realm: Realm.QiCondensation, power: 10 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -3068,7 +3068,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '逃出溶洞',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_beast_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 15) };
           return { state: newState, log: '你拔腿就跑。精元折了十五，但没添伤。' };
@@ -3086,7 +3086,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '请茶攀谈',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_old_tales_seen');
           if (newState.resources.coins < 2) {
             newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
@@ -3099,7 +3099,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '旁听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_old_tales_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你听着老者自言自语。只听清几句，见闻略长。' };
@@ -3117,12 +3117,12 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '押五钱',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_gamble_seen');
           if (newState.resources.coins < 5) {
             return { state: newState, log: '你钱不够。庄家没让你上桌。' };
           }
-          const win = Math.random() > 0.5;
+          const win = (random ? random() : 0.5) > 0.5; // use seeded rng for deterministic gambling
           if (win) {
             newState.resources = { ...newState.resources, coins: newState.resources.coins + 8 };
             return { state: newState, log: '你赢了！八枚钱到手，庄家脸色不好看。' };
@@ -3133,7 +3133,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只看不赌',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_gamble_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你看了一局。赌场的路数记下，见闻略长。' };
@@ -3151,13 +3151,13 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎战',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_ambush_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'red_fox', name: '赤目妖狐', realm: Realm.FoundationEstablishment, power: 12 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -3169,7 +3169,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '闪避退走',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_ambush_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 20) };
           return { state: newState, log: '你侧身躲过一击，退入林深处。精元折了二十。' };
@@ -3191,7 +3191,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '顺势引导',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'qi_breakthrough_omen_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -3200,7 +3200,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '稳住不动',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'qi_breakthrough_omen_seen');
           newState.resources = { ...newState.resources, dantoxin: Math.max(0, newState.resources.dantoxin - 2) };
           return { state: newState, log: '你压住气机。稳，丹毒退了两分。' };
@@ -3219,7 +3219,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静坐回味梦境',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_dream_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, qi: newState.resources.qi + 3 };
           newState = setFlag(newState, 'had_foundation_dream');
@@ -3228,7 +3228,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '翻身再睡',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'foundation_dream_seen');
           return { state: newState, log: '你没有多想。梦碎了，但石台仍在记忆深处。' };
         },
@@ -3246,7 +3246,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '凝神感应',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
           newState = setFlag(newState, 'sensed_thunder_omen');
@@ -3255,7 +3255,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压下心绪',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = { ...newState.resources, dantoxin: Math.max(0, newState.resources.dantoxin - 3) };
           return { state: newState, log: '你将心绪压回丹田。丹毒退了三分，天地复归寂静。' };
@@ -3274,7 +3274,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '追寻幻象',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_vision_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 6, essence: Math.max(0, newState.resources.essence - 30) };
           newState = setFlag(newState, 'chased_nascent_soul_vision');
@@ -3283,7 +3283,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '收束神识',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_vision_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你将神识收回。幻象散去，心却静了几分。' };
@@ -3302,7 +3302,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '尝试新路线',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'technique_insight_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 4, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你按新路线行气。真气多了四缕，见闻涨了两分。功法精进了一丝。' };
@@ -3310,7 +3310,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '先记下',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'technique_insight_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = setFlag(newState, 'noted_technique_insight');
@@ -3330,7 +3330,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '应允',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dual_cultivation_offer_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 8, insight: newState.resources.insight + 3 };
           newState = setFlag(newState, 'practiced_dual_cultivation');
@@ -3339,7 +3339,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '婉拒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'dual_cultivation_offer_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你婉言谢绝。对方点头离去，修行路各人有各人的走法。' };
@@ -3358,7 +3358,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '引导异变',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spiritual_root_mutation_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 6, dantoxin: newState.resources.dantoxin + 5, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'reckless_breakthrough', 1);
@@ -3367,7 +3367,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '压制回原',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spiritual_root_mutation_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 30) };
           return { state: newState, log: '你将灵根压回原状。精元折了三十，灵根归于平静。变数未生。' };
@@ -3385,7 +3385,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '观星感悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'breakthrough_sky_sign_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你盯着异光消散的方向。天地间似有一丝道理留在那里，见闻涨了三分。' };
@@ -3393,7 +3393,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不以为意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'breakthrough_sky_sign_seen');
           return { state: newState, log: '你低下头。天象是天象，修行是修行。' };
         },
@@ -3414,7 +3414,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '买奇药（八钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mysterious_merchant_seen');
           if (newState.resources.coins < 8) {
             return { state: newState, log: '钱不够。商人摇摇头，转身消失在雾中。' };
@@ -3426,7 +3426,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只看不买',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mysterious_merchant_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你看了一眼他的货。几个小瓶，标签你都不认得。见闻略长。' };
@@ -3434,7 +3434,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '回避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mysterious_merchant_seen');
           return { state: newState, log: '你绕路而走。商人的背影很快消失在山雾里。' };
         },
@@ -3452,7 +3452,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '据理力争',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'rival_cultivator_seen');
           if ((state.choices.qualities['combat_edge'] ?? 0) >= 5) {
             newState = adjustQuality(newState, 'combat_edge', 1);
@@ -3464,7 +3464,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '让路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'rival_cultivator_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你退了一步。灵脉是天地之物，争也无益。' };
@@ -3472,13 +3472,13 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'rival_cultivator_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'rival_cultivator', name: '异门修士', realm: Realm.FoundationEstablishment, power: 14 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -3500,7 +3500,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '回信',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'old_friend_letter_seen');
           newState.resources = { ...newState.resources, coins: Math.max(0, newState.resources.coins - 1), insight: newState.resources.insight + 2 };
           newState = setFlag(newState, 'replied_to_old_friend');
@@ -3509,7 +3509,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '收起不看',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'old_friend_letter_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你把信收入袖中。旧事已远，不提也罢。' };
@@ -3528,13 +3528,13 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎战',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_cultivator_ambush_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'demon_cultivator', name: '黑袍魔修', realm: Realm.FoundationEstablishment, power: 16 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -3546,7 +3546,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '逃跑',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_cultivator_ambush_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 25), coins: Math.max(0, newState.resources.coins - 5) };
           return { state: newState, log: '你拼命逃跑。精元折了二十五，丢了五枚钱，但保住了命。' };
@@ -3565,7 +3565,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以灵气引之',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_beast_taming_seen');
           newState.resources = { ...newState.resources, qi: Math.max(0, newState.resources.qi - 5), insight: newState.resources.insight + 3 };
           newState = setFlag(newState, 'tamed_spirit_beast');
@@ -3574,7 +3574,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静静观赏',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_beast_taming_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你看了它许久。小兽跳下石头，消失在草丛中。见闻略长。' };
@@ -3593,7 +3593,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以神识承接',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'lost_inheritance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5, qi: newState.resources.qi + 5, essence: Math.max(0, newState.resources.essence - 20) };
           newState = setFlag(newState, 'received_lost_inheritance');
@@ -3602,7 +3602,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下阵法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'lost_inheritance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = setFlag(newState, 'copied_inheritance_formation');
@@ -3622,7 +3622,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '请教',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_elder_guidance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, dantoxin: Math.max(0, newState.resources.dantoxin - 5) };
           newState = setFlag(newState, 'received_elder_guidance');
@@ -3632,7 +3632,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '道谢后自省',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_elder_guidance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -3652,7 +3652,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '尝试破解禁制',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'forbidden_area_discovery_seen');
           if ((state.choices.qualities['combat_edge'] ?? 0) >= 6 || (state.resources.insight ?? 0) >= 25) {
             newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, qi: newState.resources.qi + 5 };
@@ -3665,7 +3665,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '标记位置',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'forbidden_area_discovery_seen');
           newState = setFlag(newState, 'marked_forbidden_area');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
@@ -3689,20 +3689,20 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '击退',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'wild_beast_attack_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'wild_boar', name: '黑毛野猪', realm: Realm.Mortal, power: 5 },
-            () => 0.5
+            random
           );
           return { state: result.state, log: result.success ? '你击退野猪。它嗷嗷叫着逃入林中。' : result.log };
         },
       },
       {
         text: '闪避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'wild_beast_attack_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你侧身躲过。精元折了十分，野猪冲入了林深处。' };
@@ -3721,7 +3721,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '交钱保命',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'bandit_ambush_seen');
           newState.resources = { ...newState.resources, coins: Math.max(0, newState.resources.coins - 10) };
           return { state: newState, log: '你交出十枚钱。山匪收了钱，让你过去。' };
@@ -3729,13 +3729,13 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'bandit_ambush_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'bandit_leader', name: '山匪头目', realm: Realm.Mortal, power: 7 },
-            () => 0.5
+            random
           );
           if (result.success) {
             result.state.resources = { ...result.state.resources, coins: result.state.resources.coins + 8 };
@@ -3756,7 +3756,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '屏息冲过',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'poisonous_mist_seen');
           newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 3, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你屏息冲过毒雾。丹毒涨了三分，精元折了十分。' };
@@ -3764,7 +3764,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '绕路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'poisonous_mist_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 15) };
           return { state: newState, log: '你绕了大半圈避开毒雾。精元折了十五，但没中毒。' };
@@ -3772,7 +3772,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以药驱散',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'poisonous_mist_seen');
           if (newState.resources.herbs < 3) {
             newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 2 };
@@ -3795,7 +3795,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以见闻破阵',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'formation_trap_seen');
           if (newState.resources.insight >= 20) {
             newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
@@ -3807,7 +3807,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行破阵',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'formation_trap_seen');
           newState.resources = { ...newState.resources, qi: Math.max(0, newState.resources.qi - 5), wounds: newState.resources.wounds + 1 };
           return { state: newState, log: '你以真气硬冲阵壁。真气折了五缕，伤添一处，但人出来了。' };
@@ -3825,7 +3825,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '咬牙逼回正轨',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'qi_deviation_seen');
           if (newState.resources.essence < 50) {
             newState.resources = { ...newState.resources, wounds: newState.resources.wounds + 2, dantoxin: newState.resources.dantoxin + 5 };
@@ -3837,7 +3837,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以药稳住',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'qi_deviation_seen');
           if (newState.resources.herbs < 5) {
             newState.resources = { ...newState.resources, wounds: newState.resources.wounds + 1, dantoxin: newState.resources.dantoxin + 3 };
@@ -3863,7 +3863,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '借雷行气',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spring_thunder_awakening_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你趁雷声行气。真气多了五缕，见闻涨了一分。春雷催万物。' };
@@ -3871,7 +3871,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '闭门不听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spring_thunder_awakening_seen');
           return { state: newState, log: '你关上门窗。雷声仍在，但你选择不借天时。' };
         },
@@ -3889,7 +3889,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静心降温',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'summer_heat_wave_seen');
           newState.resources = { ...newState.resources, dantoxin: Math.max(0, newState.resources.dantoxin + 2), essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你静心抗暑。精元折了十分，丹毒涨了两分。热浪难消。' };
@@ -3897,7 +3897,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以药清火',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'summer_heat_wave_seen');
           if (newState.resources.herbs < 2) {
             newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 3 };
@@ -3920,7 +3920,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '月下悟道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'autumn_harvest_moon_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, qi: newState.resources.qi + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -3929,7 +3929,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '采月华入药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'autumn_harvest_moon_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 2, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -3950,7 +3950,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '冒雪前行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'winter_blizzard_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 25), wounds: newState.resources.wounds + 1 };
           return { state: newState, log: '你在暴雪中硬走。精元折了二十五，冻伤一处。但到了。' };
@@ -3958,7 +3958,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '避雪等晴',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'winter_blizzard_seen');
           newState.resources = { ...newState.resources, lifespan: Math.max(0, newState.resources.lifespan - 30) };
           return { state: newState, log: '你找个石洞避了一日。暴雪停了，但寿元少了三十刻。' };
@@ -3966,7 +3966,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以真气御寒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'winter_blizzard_seen');
           newState.resources = { ...newState.resources, qi: Math.max(0, newState.resources.qi - 3), insight: newState.resources.insight + 1 };
           return { state: newState, log: '你以真气温养全身。真气折了三缕，但无伤。暴雪中也有修行。' };
@@ -3989,7 +3989,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '深入探查',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'spirit_field_maze');
           newState = setFlag(newState, 'has_discovered_realm');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
@@ -3998,7 +3998,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下位置',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_maze_hint');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你记下阵盘位置。灵田迷阵仍在暗处。' };
@@ -4017,7 +4017,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '循药香',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_maze_chain_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 5 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -4026,7 +4026,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '循阵光',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_maze_chain_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3, qi: newState.resources.qi + 3 };
           return { state: newState, log: '阵光处是一座古阵核心。你参悟了一丝阵理，真气和见闻都有增长。' };
@@ -4034,7 +4034,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '入暗路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_maze_chain_seen');
           newState.resources = { ...newState.resources, coins: newState.resources.coins + 10, wounds: newState.resources.wounds + 1 };
           return { state: newState, log: '暗路尽头有一具骸骨和十枚钱。你拿了钱，但触发了机关，伤添一处。' };
@@ -4053,7 +4053,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '进入深处',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'demonic_forest_depths');
           newState = setFlag(newState, 'has_discovered_realm');
           return { state: newState, log: '你踏入妖林深处。瘴气弥漫，但奇药遍地。' };
@@ -4061,7 +4061,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退回',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_depths_avoided');
           return { state: newState, log: '你退了回来。妖林深处的瘴气不是你现在能扛的。' };
         },
@@ -4079,7 +4079,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以礼相待',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_exploration_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 8, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -4088,13 +4088,13 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '斗法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_exploration_seen');
           const result = resolveCombatEvent(
             newState,
             'fight',
             { id: 'ancient_tree_spirit', name: '古树精', realm: Realm.FoundationEstablishment, power: 18 },
-            () => 0.5
+            random
           );
           newState = result.state;
           if (result.success) {
@@ -4118,7 +4118,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '乘风而入',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'heavenly_wind_realm');
           newState = setFlag(newState, 'has_discovered_realm');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
@@ -4127,7 +4127,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '驻足观望',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_wind_realm_avoided');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你看着罡风裂隙。风太利，你暂时没有进去。' };
@@ -4146,7 +4146,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '硬扛风刃',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_wind_trial_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 15, wounds: newState.resources.wounds + 1 };
           newState = adjustQuality(newState, 'combat_edge', 2);
@@ -4155,7 +4155,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '随风而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heavenly_wind_trial_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 8, insight: newState.resources.insight + 5 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4175,7 +4175,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '破阵入门',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'underground_palace');
           newState = setFlag(newState, 'has_discovered_realm');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3, qi: Math.max(0, newState.resources.qi - 3) };
@@ -4184,7 +4184,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '暂时退避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'underground_palace_avoided');
           return { state: newState, log: '你退了一步。石门仍在，等你准备好了再来。' };
         },
@@ -4202,7 +4202,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '凝视古镜',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'underground_palace_chain_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 6, qi: newState.resources.qi + 10, dantoxin: newState.resources.dantoxin + 3 };
           return { state: newState, log: '你凝视古镜。镜中影子传出一丝造化。见闻暴涨六分，真气多十缕，但丹毒也涨了三分。' };
@@ -4210,7 +4210,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '覆布遮镜',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'underground_palace_chain_seen');
           newState.resources = { ...newState.resources, coins: newState.resources.coins + 20 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4219,7 +4219,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '击碎古镜',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'underground_palace_chain_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 20, wounds: newState.resources.wounds + 2 };
           newState = adjustQuality(newState, 'reckless_breakthrough', 1);
@@ -4237,7 +4237,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎雷而上',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -4251,7 +4251,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '闭关抵抗',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -4265,7 +4265,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '借丹护体',
-        effect: (state) => {
+        effect: (state, random) => {
           if ((state.resources.goldenCorePills ?? 0) < 1) {
             let newState = setFlag(state, 'golden_core_thunder_seen');
             newState.resources = { ...newState.resources, wounds: newState.resources.wounds + 2 };
@@ -4291,7 +4291,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '稳固金丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_breakthrough_sign_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 5, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4300,7 +4300,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '试探冲击',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_breakthrough_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -4314,7 +4314,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '寻求辅助',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_breakthrough_sign_seen');
           newState = setFlag(newState, 'sought_nascent_soul_help');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
@@ -4331,7 +4331,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '请教突破之道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'core_gate_guidance_received');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5, qi: newState.resources.qi + 5 };
           newState = adjustQuality(newState, 'sect_trace', 1);
@@ -4340,7 +4340,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '请教功法之疑',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'core_gate_guidance_received');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 8 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -4349,7 +4349,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '默立一旁',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'core_gate_guidance_received');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4366,7 +4366,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '加固封印',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_seal_weakening_seen');
           newState.resources = { ...newState.resources, essence: newState.resources.essence - 30, coins: newState.resources.coins + 10, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'sect_contribution', 2);
@@ -4375,7 +4375,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '观察研究',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_seal_weakening_seen');
           newState = setFlag(newState, 'studied_demon_seal');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
@@ -4384,7 +4384,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '避开不惹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_seal_weakening_seen');
           return { state: newState, log: '你转身离开。封印的裂纹仍在，但那不是你现在该管的事。' };
         },
@@ -4400,7 +4400,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '探查周围',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_vision_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 8, qi: newState.resources.qi + 10 };
           newState = adjustQuality(newState, 'combat_edge', 1);
@@ -4409,7 +4409,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '收神归位',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_vision_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 15 };
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
@@ -4418,7 +4418,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '借机修炼',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_vision_seen');
           newState = setFlag(newState, 'nascent_soul_out_of_body_practice');
           newState.resources = {
@@ -4440,7 +4440,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '细心参悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_revelation_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 10, qi: newState.resources.qi + 5 };
           return { state: newState, log: '你静心参悟古篆。见闻暴涨十分，真气也多了五缕。' };
@@ -4448,7 +4448,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '抄录带走',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_revelation_seen');
           newState = setFlag(newState, 'has_celestial_script_copy');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 6, coins: Math.max(0, newState.resources.coins - 10) };
@@ -4457,7 +4457,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '叩拜致谢',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_revelation_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4474,7 +4474,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '沉心观照',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_lake_reflection_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4, qi: newState.resources.qi + 3 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4483,7 +4483,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以手搅水',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_lake_reflection_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 2 };
           return { state: newState, log: '你以手搅水，灵根本相散去。真气多了两缕，但灵根之相未能看清。' };
@@ -4491,7 +4491,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下灵根之相',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_lake_reflection_seen');
           newState = setFlag(newState, 'understood_spiritual_root');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 6 };
@@ -4508,7 +4508,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '采下灵草',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'immortal_garden_herb_found');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 6, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -4517,7 +4517,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '护持生长',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'immortal_garden_herb_found');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 3, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -4526,7 +4526,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记录药性',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'immortal_garden_herb_found');
           newState = setFlag(newState, 'studied_immortal_herb');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
@@ -4544,7 +4544,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '引天地灵气入体',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -4557,7 +4557,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '稳守本心',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_sign_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 20, insight: newState.resources.insight + 5 };
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
@@ -4566,7 +4566,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '借机参悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -4588,7 +4588,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '与残灵交流',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'battlefield_remnant_seen');
           newState = setFlag(newState, 'received_ancient_knowledge');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 12, qi: newState.resources.qi + 10 };
@@ -4597,7 +4597,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '助其消散',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'battlefield_remnant_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 8 };
           newState = adjustQuality(newState, 'karmic_weight', -1);
@@ -4606,7 +4606,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '绕道而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'battlefield_remnant_seen');
           return { state: newState, log: '你绕道而行。残灵在身后沉默，你继续赶路。' };
         },
@@ -4622,7 +4622,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '顺应天地',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_void_call_seen');
           newState.resources = {
             ...newState.resources,
@@ -4635,7 +4635,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '保持独立',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_void_call_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 30, insight: newState.resources.insight + 10 };
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
@@ -4644,7 +4644,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '试探融合',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_void_call_seen');
           newState.resources = {
             ...newState.resources,
@@ -4665,7 +4665,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '吸收混沌之力',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_anomaly_seen');
           newState.resources = {
             ...newState.resources,
@@ -4679,7 +4679,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '稳固空间',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_anomaly_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 30, insight: newState.resources.insight + 10 };
           newState = adjustQuality(newState, 'karmic_weight', -1);
@@ -4688,7 +4688,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退出虚空',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_anomaly_seen');
           return { state: newState, log: '你退出虚空裂隙。异变在身后发生，但你已安全。' };
         },
@@ -4704,7 +4704,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '全力悟道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_enlightenment_seen');
           newState.resources = {
             ...newState.resources,
@@ -4718,7 +4718,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '稳步精进',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_enlightenment_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 50, insight: newState.resources.insight + 20 };
           return { state: newState, log: '你稳步精进。真气多五十缕，见闻长二十分。' };
@@ -4726,7 +4726,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '传道授业',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_enlightenment_seen');
           newState = setFlag(newState, 'taught_followers_dao');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 15 };
@@ -4744,7 +4744,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '接受天道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_enlightenment_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 80, insight: newState.resources.insight + 30 };
           return { state: newState, log: '你接受天道灌顶。真气暴涨八十缕，见闻长三十分。' };
@@ -4752,7 +4752,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以己道抗天道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_enlightenment_seen');
           newState.resources = {
             ...newState.resources,
@@ -4766,7 +4766,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '谦卑受教',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_enlightenment_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 40, insight: newState.resources.insight + 20 };
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
@@ -4784,7 +4784,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以肉身迎劫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -4798,7 +4798,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '借丹药护体',
-        effect: (state) => {
+        effect: (state, random) => {
           if ((state.resources.heavenlyTribulationPills ?? 0) < 1) {
             let newState = setFlag(state, 'tribulation_thunder_seen');
             newState.resources = { ...newState.resources, wounds: newState.resources.wounds + 3 };
@@ -4816,7 +4816,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '布阵抵御',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -4838,7 +4838,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎接天劫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_platform_breakthrough_seen');
           newState.resources = {
             ...newState.resources,
@@ -4852,7 +4852,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '再做筹备',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_platform_breakthrough_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 10 };
           return { state: newState, log: '你决定再做筹备。见闻长了十分，时机未到。' };
@@ -4860,7 +4860,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '暂离渡劫台',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_platform_breakthrough_seen');
           return { state: newState, log: '你暂离渡劫台。天劫的气息在身后渐渐消散。' };
         },
@@ -4876,7 +4876,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '记下传闻',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_dragon_palace_hint');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你记下伏潮旧宫传闻。见闻长了三分，也许日后能去探一探。' };
@@ -4884,7 +4884,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不以为意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'heard_dragon_palace_hint');
           return { state: newState, log: '你不以为意。传说终究是传说。' };
         },
@@ -4899,12 +4899,12 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '斗法镇压',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = resolveCombatEvent(
             state,
             'fight',
             { id: 'demon_shadow', name: '魔影', realm: Realm.NascentSoul, power: 15 },
-            () => 0.4
+            random
           );
           let newState = setFlag(result.state, 'demon_seal_breach_seen');
           newState.resources = {
@@ -4922,7 +4922,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '紧急修补',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_seal_breach_seen');
           newState.resources = {
             ...newState.resources,
@@ -4936,7 +4936,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '紧急撤离',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demon_seal_breach_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', -1);
           return { state: newState, log: '你紧急撤离。魔影在身后肆虐，你的心境也受了一丝影响。' };
@@ -4956,7 +4956,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静心感应',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -4969,7 +4969,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '催动金丹抵御',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -4982,7 +4982,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '置之不理',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_thunder_sign_seen');
           newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 3 };
           return { state: newState, log: '你没有理会。雷鸣渐弱，丹田中却多了一丝不安的药滞。' };
@@ -5001,7 +5001,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '趁势推演丹方',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_pill_insight_seen');
           newState.resources = {
             ...newState.resources,
@@ -5015,7 +5015,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下体悟留待后用',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_pill_insight_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -5035,7 +5035,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '闭关修补金丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_core_crack_seen');
           if (newState.resources.essence < 60) {
             newState.resources = {
@@ -5057,7 +5057,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以药固丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_core_crack_seen');
           if (newState.resources.herbs < 5) {
             newState.resources = { ...newState.resources, wounds: newState.resources.wounds + 1 };
@@ -5073,7 +5073,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行冲脉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_core_crack_seen');
           newState.resources = {
             ...newState.resources,
@@ -5097,7 +5097,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '临摹参悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_ancient_scroll_seen');
           newState.resources = {
             ...newState.resources,
@@ -5110,7 +5110,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以灵力拓印',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_ancient_scroll_seen');
           newState.resources = {
             ...newState.resources,
@@ -5123,7 +5123,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不去触碰',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_ancient_scroll_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
           return { state: newState, log: '你未去触碰石壁。符文静默，你静默。' };
@@ -5142,7 +5142,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '接纳灵兽',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_spirit_beast_seen');
           newState.resources = {
             ...newState.resources,
@@ -5156,7 +5156,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '赐药遣走',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_spirit_beast_seen');
           if (newState.resources.herbs < 2) {
             return { state: newState, log: '你手中无药可赐。灵兽在洞口徘徊片刻，转身消失于山林。' };
@@ -5168,7 +5168,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '驱赶',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'golden_core_spirit_beast_seen');
           newState = adjustQuality(newState, 'karmic_weight', 1);
           return { state: newState, log: '你挥手驱赶。灵兽低鸣一声，没入山林。因果已种。' };
@@ -5187,7 +5187,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '神识远游',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_soul_departure_seen');
           newState.resources = {
             ...newState.resources,
@@ -5200,7 +5200,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '速归肉身',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_soul_departure_seen');
           newState.resources = {
             ...newState.resources,
@@ -5213,7 +5213,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '滞留观察',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_soul_departure_seen');
           newState.resources = {
             ...newState.resources,
@@ -5236,7 +5236,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '追踪异象',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_heavenly_vision_seen');
           newState.resources = {
             ...newState.resources,
@@ -5249,7 +5249,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记录景象',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_heavenly_vision_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你将所见刻入玉简。远方景象化为见闻，三分为你所得。' };
@@ -5268,7 +5268,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎劫而立',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_dao_tribulation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5284,7 +5284,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以阵法化解',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_dao_tribulation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5297,7 +5297,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退避不出',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_dao_tribulation_seen');
           newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 5 };
           return { state: newState, log: '你退入洞府深处。小天劫在外徘徊，未能伤你，但丹田中多了一丝畏劫的药滞。' };
@@ -5315,7 +5315,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以神识探查',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_memory_seal_seen');
           newState.resources = {
             ...newState.resources,
@@ -5328,7 +5328,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '封存记忆',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_memory_seal_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你将残忆重新封存。前尘不可追，今生尚需行。心绪宁静。' };
@@ -5346,7 +5346,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '引导异力归元',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_nascent_beast_seen');
           newState.resources = {
             ...newState.resources,
@@ -5359,7 +5359,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行镇压',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_nascent_beast_seen');
           newState.resources = {
             ...newState.resources,
@@ -5371,7 +5371,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '顺其自然',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'nascent_soul_nascent_beast_seen');
           newState.resources = {
             ...newState.resources,
@@ -5394,7 +5394,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '全力展开神识',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_divine_sense_seen');
           newState.resources = {
             ...newState.resources,
@@ -5407,7 +5407,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '适度探测',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_divine_sense_seen');
           newState.resources = {
             ...newState.resources,
@@ -5419,7 +5419,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '收敛神识',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_divine_sense_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你将神识收回体内。不窥天地，只守己心。' };
@@ -5437,7 +5437,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '引灵入体',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_spirit_merge_seen');
           newState.resources = {
             ...newState.resources,
@@ -5449,7 +5449,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '引导灵气入阵',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_spirit_merge_seen');
           newState.resources = {
             ...newState.resources,
@@ -5471,7 +5471,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '凝神倾听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_ancient_voice_seen');
           newState.resources = {
             ...newState.resources,
@@ -5484,7 +5484,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只记不思',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_transform_ancient_voice_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4 };
           return { state: newState, log: '你记下残音，不去强解。见闻长了四分，余下待日后参悟。' };
@@ -5503,7 +5503,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '全力合体',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_body_spirit_merge_seen');
           newState.resources = {
             ...newState.resources,
@@ -5518,7 +5518,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '部分融合',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_body_spirit_merge_seen');
           newState.resources = {
             ...newState.resources,
@@ -5540,7 +5540,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '顺天共振',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_world_resonance_seen');
           newState.resources = {
             ...newState.resources,
@@ -5554,7 +5554,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '保持距离',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_world_resonance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你保持距离观察共振。见闻长了三分，但错过了更深的天人感应。' };
@@ -5572,7 +5572,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '坚守道心',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_dao_heart_test_seen');
           newState.resources = {
             ...newState.resources,
@@ -5586,7 +5586,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '直面心魔',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_dao_heart_test_seen');
           newState.resources = {
             ...newState.resources,
@@ -5600,7 +5600,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '回避试探',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'integration_dao_heart_test_seen');
           newState.resources = { ...newState.resources, dantoxin: newState.resources.dantoxin + 5 };
           return { state: newState, log: '你回避了道心试探。考验暂去，但丹田中多了一丝怯意的药滞。' };
@@ -5619,7 +5619,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '回应天道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_heavenly_call_seen');
           newState.resources = {
             ...newState.resources,
@@ -5632,7 +5632,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '沉默倾听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_heavenly_call_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 5 };
           return { state: newState, log: '你沉默倾听天道的低语。见闻长了五分，天道的深意仍需参悟。' };
@@ -5650,7 +5650,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '预做准备',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_tribulation_foreboding_seen');
           newState.resources = {
             ...newState.resources,
@@ -5663,7 +5663,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '感悟劫道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_tribulation_foreboding_seen');
           newState.resources = {
             ...newState.resources,
@@ -5675,7 +5675,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '顺其自然',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mahayana_tribulation_foreboding_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你不做特殊准备。天劫来时便来，道心不可因恐惧而失守。' };
@@ -5695,7 +5695,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以身迎劫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_final_tribulation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5711,7 +5711,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以法宝抵御',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_final_tribulation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5726,7 +5726,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以道心化解',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_final_tribulation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5750,7 +5750,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '随水入定',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_meditation_seen');
           newState.resources = {
             ...newState.resources,
@@ -5763,7 +5763,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '观水悟道',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_meditation_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -5782,7 +5782,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '采下灵草',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_herb_find_seen');
           newState.resources = { ...newState.resources, herbs: newState.resources.herbs + 4 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -5791,7 +5791,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只取一叶',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_herb_find_seen');
           newState.resources = {
             ...newState.resources,
@@ -5814,7 +5814,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '交换草药情报',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_encounter_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2, herbs: newState.resources.herbs + 1 };
           return { state: newState, log: '你与采药修士交换了溪谷草药的信息。见闻长了二分，草药添了一株。' };
@@ -5822,7 +5822,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '点头致意',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'stream_valley_encounter_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你点头致意，他回以一笑。溪谷中多了一段无声的默契。' };
@@ -5841,7 +5841,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '揭下符箓',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_old_talisman_seen');
           newState.resources = {
             ...newState.resources,
@@ -5853,7 +5853,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '临摹灵纹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_old_talisman_seen');
           newState.resources = {
             ...newState.resources,
@@ -5865,7 +5865,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不去触碰',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_old_talisman_seen');
           return { state: newState, log: '你未触碰符箓。灵纹在墙上继续发光，与你无关。' };
         },
@@ -5882,7 +5882,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '研读禁术',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_forbidden_knowledge_seen');
           newState.resources = {
             ...newState.resources,
@@ -5895,7 +5895,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '封存石板',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_forbidden_knowledge_seen');
           newState = adjustQuality(newState, 'karmic_weight', -1);
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -5914,7 +5914,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '凝视烛火',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_candle_heart_seen');
           newState.resources = {
             ...newState.resources,
@@ -5926,7 +5926,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '吹灭蜡烛',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'temple_candle_heart_seen');
           newState.resources = { ...newState.resources, qi: newState.resources.qi + 2 };
           return { state: newState, log: '你吹灭蜡烛。影子消失了，烛火熄灭的瞬间，真气多了两缕。' };
@@ -5945,7 +5945,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '切除枯萎部分',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_blight_seen');
           newState.resources = {
             ...newState.resources,
@@ -5957,7 +5957,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以灵力净化',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_blight_seen');
           newState.resources = {
             ...newState.resources,
@@ -5969,7 +5969,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '听之任之',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_blight_seen');
           newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 5) };
           return { state: newState, log: '你没有理会。枯萎蔓延，药草少了五株。灵田需要照料。' };
@@ -5987,7 +5987,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '接灵雨入田',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_spirit_rain_seen');
           newState.resources = {
             ...newState.resources,
@@ -5999,7 +5999,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '自身沐浴灵雨',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_spirit_rain_seen');
           newState.resources = {
             ...newState.resources,
@@ -6021,7 +6021,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以灵力驱虫',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_pest_infestation_seen');
           newState.resources = {
             ...newState.resources,
@@ -6033,7 +6033,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '采摘残余灵草',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_field_pest_infestation_seen');
           newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 3) };
           return { state: newState, log: '你抢收残余灵草。药草还是少了三株，但至少没全毁。' };
@@ -6052,7 +6052,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '紧急封炉',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           newState.resources = {
             ...newState.resources,
@@ -6064,7 +6064,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '趁机取丹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           newState.resources = {
             ...newState.resources,
@@ -6078,7 +6078,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '撤离丹房',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_furnace_accident_seen');
           newState.resources = { ...newState.resources, herbs: Math.max(0, newState.resources.herbs - 4) };
           return { state: newState, log: '你撤离丹房。炉中丹药全毁，药草损了四株。安全第一。' };
@@ -6096,7 +6096,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '虚心请教',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_senior_guidance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 4 };
           newState = adjustQuality(newState, 'alchemy_affinity', 2);
@@ -6105,7 +6105,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '在一旁观察',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_senior_guidance_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'alchemy_affinity', 1);
@@ -6124,7 +6124,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '提取残余药性',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_waste_residue_seen');
           newState.resources = {
             ...newState.resources,
@@ -6137,7 +6137,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '清理废渣',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'pill_hall_waste_residue_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你清理了废渣。丹房整洁了，见闻也长了一分。' };
@@ -6156,7 +6156,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '拔剑感应',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_sword_cry_seen');
           newState.resources = {
             ...newState.resources,
@@ -6170,7 +6170,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以剑意回应',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_sword_cry_seen');
           newState.resources = {
             ...newState.resources,
@@ -6183,7 +6183,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静观其变',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_sword_cry_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你静观其变。剑鸣渐歇，只留下几分感触，见闻长了一分。' };
@@ -6201,13 +6201,13 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '应战切磋',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_senior_duel_seen');
           const result = resolveCombatEvent(
             state,
             'fight',
             { id: 'sword_senior', name: '剑阁师兄', realm: state.realm, power: 10 },
-            () => 0.5
+            random
           );
           newState = setFlag(result.state, 'sword_pavilion_senior_duel_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
@@ -6217,7 +6217,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '婉拒',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_senior_duel_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你婉拒了切磋。师兄点头，继续练剑。见闻长了一分。' };
@@ -6235,7 +6235,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '研习残谱',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_lost_technique_seen');
           newState.resources = {
             ...newState.resources,
@@ -6248,7 +6248,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '归还书架',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sword_pavilion_lost_technique_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你将残谱放回原处。剑诀虽好，此刻还不是修习的时机。见闻长了二分。' };
@@ -6267,7 +6267,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '循声而去',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_whisper_seen');
           newState.resources = {
             ...newState.resources,
@@ -6279,7 +6279,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静坐抵抗',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_whisper_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你静坐不动，以心法抵御耳语。声音渐远，心境更加沉稳。' };
@@ -6297,7 +6297,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '神识追踪',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_shadow_encounter_seen');
           newState.resources = {
             ...newState.resources,
@@ -6309,7 +6309,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退避',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_shadow_encounter_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 5) };
           return { state: newState, log: '你退后几步。暗影没有追来，精元微微折损。' };
@@ -6327,7 +6327,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '研读古卷',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_hidden_scroll_seen');
           newState.resources = {
             ...newState.resources,
@@ -6340,7 +6340,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '仅做记录',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'deep_temple_hidden_scroll_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你记录古卷内容后放回原处。见闻长了三分，未与诅咒之力正面交锋。' };
@@ -6359,7 +6359,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '紧急加固',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_collapse_seen');
           newState.resources = {
             ...newState.resources,
@@ -6371,7 +6371,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '迅速撤离',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_collapse_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你迅速撤离。精元折十，碎石在身后落下。至少人无碍。' };
@@ -6389,7 +6389,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '采集灵晶',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_crystal_vein_seen');
           newState.resources = {
             ...newState.resources,
@@ -6401,7 +6401,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '吸纳灵气',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_crystal_vein_seen');
           newState.resources = {
             ...newState.resources,
@@ -6423,7 +6423,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '沿河探索',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_underground_river_seen');
           newState.resources = {
             ...newState.resources,
@@ -6435,7 +6435,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '取水炼药',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'mountain_cave_underground_river_seen');
           newState.resources = {
             ...newState.resources,
@@ -6458,7 +6458,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '搭话攀谈',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_stranger_seen');
           newState.resources = {
             ...newState.resources,
@@ -6470,7 +6470,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '保持警惕',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_stranger_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你保持距离观察。陌生修士喝完酒便走，见闻长了一分。' };
@@ -6488,7 +6488,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '劝解纠纷',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_gambler_quarrel_seen');
           newState.resources = { ...newState.resources, coins: Math.max(0, newState.resources.coins - 2), insight: newState.resources.insight + 2 };
           return { state: newState, log: '你出声劝解，花了两枚钱息事宁人。见闻长了二分。' };
@@ -6496,7 +6496,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '远离是非',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_gambler_quarrel_seen');
           return { state: newState, log: '你远离赌桌。争执与你无关。' };
         },
@@ -6513,7 +6513,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '记下消息',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_merchant_tip_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = setFlag(newState, 'heard_merchant_herb_tip');
@@ -6522,7 +6522,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '不感兴趣',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tea_house_merchant_tip_seen');
           return { state: newState, log: '你对行商的消息不感兴趣。他耸耸肩，去找下一个听众。' };
         },
@@ -6540,12 +6540,12 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎战',
-        effect: (state) => {
+        effect: (state, random) => {
           const result = resolveCombatEvent(
             state,
             'fight',
             { id: 'forest_beast', name: '林中妖兽', realm: Realm.FoundationEstablishment, power: 8 },
-            () => 0.5
+            random
           );
           let newState = setFlag(result.state, 'demonic_forest_beast_ambush_seen');
           if (result.success) {
@@ -6558,7 +6558,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '闪避退走',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_beast_ambush_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 15) };
           return { state: newState, log: '你闪身退走。精元折十五，好在没有被咬中。' };
@@ -6576,7 +6576,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '冒险采摘',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_rare_herb_seen');
           newState.resources = {
             ...newState.resources,
@@ -6589,7 +6589,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '只取一半',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_rare_herb_seen');
           newState.resources = {
             ...newState.resources,
@@ -6612,7 +6612,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '原地不动',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_terrifying_roar_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           return { state: newState, log: '你原地不动。咆哮渐远，你的心却更加坚定。不以物惧，不以兽惊。' };
@@ -6620,7 +6620,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '撤离林中',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'demonic_forest_terrifying_roar_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你撤离林中。精元折十，安全第一。' };
@@ -6639,7 +6639,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '迎风而立',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_wind_test_seen');
           newState.resources = {
             ...newState.resources,
@@ -6653,7 +6653,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '退避崖洞',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_wind_test_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你退入崖壁洞穴。天风在外面肆虐，见闻长了一分。' };
@@ -6672,7 +6672,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '借灵气冲关',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_breakthrough_sign_seen');
           newState.resources = {
             ...newState.resources,
@@ -6685,7 +6685,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静待机缘',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_breakthrough_sign_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           newState = adjustQuality(newState, 'quiet_cultivation', 1);
@@ -6704,7 +6704,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '灵力悬浮',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_falling_danger_seen');
           newState.resources = {
             ...newState.resources,
@@ -6716,7 +6716,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '攀壁脱险',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_cliff_falling_danger_seen');
           newState.resources = {
             ...newState.resources,
@@ -6739,7 +6739,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '仔细倾听',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_announcement_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           newState = adjustQuality(newState, 'sect_trace', 1);
@@ -6748,7 +6748,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '随众应付',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_announcement_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 1 };
           return { state: newState, log: '你随众站立，只听了个大概。见闻长了一分。' };
@@ -6766,7 +6766,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '恭敬领训',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_discipline_summon_seen');
           newState.resources = { ...newState.resources, coins: Math.max(0, newState.resources.coins - 5) };
           newState = adjustQuality(newState, 'sect_discipline', 2);
@@ -6775,7 +6775,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '据理力争',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_discipline_summon_seen');
           newState = adjustQuality(newState, 'sect_discipline', -2);
           newState = adjustQuality(newState, 'sect_trace', -1);
@@ -6795,7 +6795,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '上前领赏',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_reward_ceremony_seen');
           newState.resources = {
             ...newState.resources,
@@ -6808,7 +6808,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '谦让不受',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'sect_hall_reward_ceremony_seen');
           newState = adjustQuality(newState, 'quiet_cultivation', 2);
           newState = adjustQuality(newState, 'sect_contribution', 1);
@@ -6828,7 +6828,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '参悟功法',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'core_gate_technique_scroll_seen');
           newState.resources = {
             ...newState.resources,
@@ -6840,7 +6840,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记下目录',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'core_gate_technique_scroll_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你记下功法目录。见闻长了二分，来日再来细读。' };
@@ -6859,7 +6859,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '潜入湖底',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_lake_treasure_seen');
           newState.resources = {
             ...newState.resources,
@@ -6872,7 +6872,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以灵识探测',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_lake_treasure_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你以灵识探测湖底。宝物轮廓隐约可见，见闻长了二分。潜水取宝尚需准备。' };
@@ -6891,7 +6891,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '引雷淬体',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'thunder_peak_strike_seen');
           newState.resources = {
             ...newState.resources,
@@ -6905,7 +6905,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '闪避雷击',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'thunder_peak_strike_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你闪避了雷击。雷力在身旁炸开，见闻长了二分。' };
@@ -6923,7 +6923,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '静坐悟雷',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'thunder_peak_insight_seen');
           newState.resources = {
             ...newState.resources,
@@ -6935,7 +6935,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '记录感悟',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'thunder_peak_insight_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 3 };
           return { state: newState, log: '你将感悟记下。见闻长了三分，来日再参。' };
@@ -6954,7 +6954,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '挖掘法器',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ancient_battlefield_treasure_seen');
           newState.resources = {
             ...newState.resources,
@@ -6966,7 +6966,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '以灵识解析',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ancient_battlefield_treasure_seen');
           newState.resources = {
             ...newState.resources,
@@ -6989,7 +6989,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '伸手取宝',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_spatial_treasure_seen');
           newState.resources = {
             ...newState.resources,
@@ -7002,7 +7002,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '远观不动',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'void_rift_spatial_treasure_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你远观宝珠。空间之力的运作方式令你有所悟，见闻长了二分。' };
@@ -7021,7 +7021,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以礼相待',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_pavilion_guardian_seen');
           newState.resources = {
             ...newState.resources,
@@ -7033,7 +7033,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '强行闯入',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'celestial_pavilion_guardian_seen');
           newState.resources = {
             ...newState.resources,
@@ -7056,7 +7056,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '以道心破阵',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_test_seen');
           newState.resources = {
             ...newState.resources,
@@ -7069,7 +7069,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '绕道而行',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'spirit_mountain_test_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 10) };
           return { state: newState, log: '你绕道而行。精元折十，没有直面幻阵，但路也走成了。' };
@@ -7088,7 +7088,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '承受余雷',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_platform_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -7101,7 +7101,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '观摩雷纹',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'tribulation_platform_thunder_seen');
           newState.resources = {
             ...newState.resources,
@@ -7123,7 +7123,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '喂食灵花',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'immortal_garden_spirit_beast_seen');
           newState.resources = {
             ...newState.resources,
@@ -7135,7 +7135,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '静静观察',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'immortal_garden_spirit_beast_seen');
           newState.resources = { ...newState.resources, insight: newState.resources.insight + 2 };
           return { state: newState, log: '你静静观察小兽。它灵性的举动令你若有所悟，见闻长了二分。' };
@@ -7154,7 +7154,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '交钱渡河（五钱）',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ferry_tax_seen');
           if (newState.resources.coins < 5) {
             return { state: newState, log: '钱不够。摆渡人摇头，你只好在岸边等候。' };
@@ -7165,7 +7165,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '步行绕路',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = setFlag(state, 'ferry_tax_seen');
           newState.resources = { ...newState.resources, essence: Math.max(0, newState.resources.essence - 15) };
           return { state: newState, log: '你步行绕路。精元折十五，但省下了钱。路远不怕。' };
@@ -7184,7 +7184,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '进入查看',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'spirit_cave');
           newState = { ...newState, choices: { ...newState.choices, flags: { ...newState.choices.flags, discovered_spirit_cave: true } } };
           newState = { ...newState, resources: { ...newState.resources, insight: newState.resources.insight + 2 } };
@@ -7193,7 +7193,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '先记下位置',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state, choices: { ...state.choices, flags: { ...state.choices.flags, discovered_spirit_cave: true } }, resources: { ...state.resources, insight: state.resources.insight + 1 } };
           return { state: newState, log: '你记下了洞口方位，待日后再来探寻。' };
         },
@@ -7210,7 +7210,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '进入探墓',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'ancient_tomb');
           newState = { ...newState, choices: { ...newState.choices, flags: { ...newState.choices.flags, discovered_ancient_tomb: true } } };
           newState = { ...newState, resources: { ...newState.resources, insight: newState.resources.insight + 3 } };
@@ -7219,7 +7219,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '先记下位置',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state, choices: { ...state.choices, flags: { ...state.choices.flags, discovered_ancient_tomb: true } }, resources: { ...state.resources, insight: state.resources.insight + 1 } };
           return { state: newState, log: '你记下了古墓方位，待日后再来探寻。' };
         },
@@ -7236,7 +7236,7 @@ export const EVENTS: ActiveEvent[] = [
     choices: [
       {
         text: '踏入裂隙',
-        effect: (state) => {
+        effect: (state, random) => {
           let newState = discoverRealm(state, 'void_passage');
           newState = { ...newState, choices: { ...newState.choices, flags: { ...newState.choices.flags, discovered_void_passage: true } } };
           newState = { ...newState, resources: { ...newState.resources, insight: newState.resources.insight + 5 } };
@@ -7245,7 +7245,7 @@ export const EVENTS: ActiveEvent[] = [
       },
       {
         text: '先记下位置',
-        effect: (state) => {
+        effect: (state, random) => {
           const newState = { ...state, choices: { ...state.choices, flags: { ...state.choices.flags, discovered_void_passage: true } }, resources: { ...state.resources, insight: state.resources.insight + 2 } };
           return { state: newState, log: '你记下了裂隙方位，待日后再来探寻。' };
         },

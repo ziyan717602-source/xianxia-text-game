@@ -369,7 +369,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
     }
   }
   // Risk check
-  const rand = action.riskProbability > 0 ? (random ? random() : Math.random()) : 1;
+  const rand = action.riskProbability > 0 ? (random ? random() : 0.5) : 1; // default 0.5 if no rng provided (should not happen in gameplay)
   if (rand < action.riskProbability) {
     // Basic risk consequence for now: action fails, maybe essence lost
     newState = spendTicks(newState, action.cooldown);
@@ -1442,7 +1442,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
   if (actionId === 'continue_exploration') {
     if (newState.secretRealm.activeExploration) {
       // Advance by 20-40 randomly
-      const progressGain = 20 + Math.floor((random ? random() : Math.random()) * 20);
+      const progressGain = 20 + Math.floor((random ? random() : 0.5) * 20); // default 0.5 if no rng provided
       const result = advanceExploration(newState, progressGain);
       newState = result.state;
 
@@ -1465,7 +1465,7 @@ export function performAction(state: GameState, actionId: string, random?: () =>
       // Risk of encounter during exploration
       const dangerLevel = getSecretRealmDef(newState.secretRealm.activeExploration ?? '')?.dangerLevel ?? 1;
       const encounterChance = dangerLevel * 0.03;
-      if ((random ? random() : Math.random()) < encounterChance) {
+      if ((random ? random() : 0.5) < encounterChance) { // default 0.5 if no rng provided
         newState.resources = {
           ...newState.resources,
           wounds: newState.resources.wounds + 1,

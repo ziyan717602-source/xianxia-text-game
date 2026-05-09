@@ -8,7 +8,7 @@ describe('Event System', () => {
   it('should not roll event if conditions are not met', () => {
     const state = createInitialState();
     state.resources.insight = 0; // Less than 2, won't trigger find_jade_slip
-    const event = rollEvent(state);
+    const event = rollEvent(state, () => 0.5);
     expect(event).toBeNull();
   });
 

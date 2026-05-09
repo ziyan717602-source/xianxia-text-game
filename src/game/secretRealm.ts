@@ -119,7 +119,7 @@ export function advanceExploration(state: GameState, ticks: number): { state: Ga
 /** Complete exploration and collect rewards */
 export function completeExploration(
   state: GameState,
-  random: () => number = Math.random
+  random?: () => number, // seeded rng should be provided by callers for determinism
 ): { state: GameState; log: string; rareLootFound: boolean } {
   if (state.secretRealm.activeExploration === null) {
     return { state, log: '当前没有正在探索的秘境。', rareLootFound: false };
@@ -159,7 +159,7 @@ export function completeExploration(
   };
 
   // Check rare loot
-  const rareLootRoll = random();
+  const rareLootRoll = random ? random() : 0;
   let rareLootFound = false;
   if (rareLootRoll < def.rareLootChance) {
     newState = setFlag(newState, def.rareLootId);
@@ -177,7 +177,7 @@ export function completeExploration(
 }
 
 /** Abandon exploration with partial rewards */
-export function abandonExploration(state: GameState, random: () => number = Math.random): { state: GameState; log: string } {
+export function abandonExploration(state: GameState, random?: () => number): { state: GameState; log: string } {
   if (state.secretRealm.activeExploration === null) {
     return { state, log: '当前没有正在探索的秘境。' };
   }
@@ -192,7 +192,7 @@ export function abandonExploration(state: GameState, random: () => number = Math
 
   // Risk: chance of wound based on danger level and progress
   const woundChance = def.dangerLevel * 0.05 * progressFraction;
-  const wounds = random() < woundChance ? 1 : 0;
+  const wounds = (random ? random() : 0) < woundChance ? 1 : 0;
 
   // For demonic cave, also risk inner demon trigger
   let innerDemonFlag = false;

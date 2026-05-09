@@ -130,7 +130,7 @@ function resolveRuleForAction(state: GameState, actionId: string): BreakthroughR
 export function resolveBreakthrough(
   state: GameState,
   actionId: string,
-  random: () => number = Math.random
+  random?: () => number, // seeded rng should be provided by callers for determinism
 ): { state: GameState; log: string; outcome: BreakthroughOutcome } {
   const rule = resolveRuleForAction(state, actionId);
   if (!rule) {
@@ -138,7 +138,7 @@ export function resolveBreakthrough(
   }
 
   const chance = getBreakthroughSuccessChance(state, rule);
-  const roll = random();
+  const roll = random ? random() : 0.5;
   const isFoundation = rule.id === 'foundation';
   const attempts = (state.breakthrough.attempts[rule.id] ?? 0) + 1;
   const baseBreakthrough = {

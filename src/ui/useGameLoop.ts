@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { GameState } from '../game/types';
-import { createInitialState } from '../game/state';
+import { createInitialState, createRng } from '../game/state';
 import { processTick, TICK_INTERVAL_MS } from '../game/tick';
 import { checkUnlocks } from '../game/unlock';
 import { performAction } from '../game/actions';
@@ -75,8 +75,10 @@ export function useGameLoop() {
         next = checkUnlocks(next);
         
         // Randomly roll event (e.g. 5% chance per tick)
-        if (Math.random() < 0.05) {
-          const evt = rollEvent(next);
+        // Use seeded RNG for deterministic event rolls (save/replay compatible)
+        const tickRng = createRng(next.seed, next.time.tick);
+        if (tickRng() < 0.05) {
+          const evt = rollEvent(next, tickRng);
           if (evt) {
             next = { ...next, activeEventId: evt.id };
             // We can't call addLog here directly without causing issues or needing refs, 
@@ -94,13 +96,16 @@ export function useGameLoop() {
   const doAction = useCallback((actionId: string) => {
     setGameState((prev) => {
       if (!hasSelectedOrigin(prev) || prev.activeEventId) return prev; // Prevent actions during events
-      const result = performAction(prev, actionId);
+      // Use seeded RNG for deterministic action outcomes and event rolls
+      const actionRng = createRng(prev.seed, prev.time.tick);
+      const result = performAction(prev, actionId, actionRng);
       addLog(result.log);
       let nextState = checkUnlocks(result.state);
       
       // Optionally roll event on action (e.g. 10% chance)
-      if (result.success && Math.random() < 0.1) {
-        const evt = rollEvent(nextState);
+      // Use the same seeded rng (already advanced past action rolls)
+      if (result.success && actionRng() < 0.1) {
+        const evt = rollEvent(nextState, actionRng);
         if (evt) {
           nextState = { ...nextState, activeEventId: evt.id };
         }
@@ -118,7 +123,7 @@ export function useGameLoop() {
         return { ...prev, activeEventId: null };
       }
       
-      const result = evt.choices[choiceIndex].effect(prev);
+      const result = evt.choices[choiceIndex].effect(prev, createRng(prev.seed, prev.time.tick));
       addLog(result.log);
       let nextState = checkUnlocks(result.state);
       nextState = { ...nextState, activeEventId: null };

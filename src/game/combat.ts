@@ -28,7 +28,7 @@ export function resolveCombatEvent(
   state: GameState, 
   choice: CombatChoice, 
   enemy: Enemy, 
-  random: () => number = Math.random
+  random?: () => number, // seeded rng should be provided by callers for determinism
 ): CombatResult {
   let newState = { ...state };
   let log = '';
@@ -47,7 +47,7 @@ export function resolveCombatEvent(
       const fame = state.choices.qualities['fame'] || 0;
       const negotiateChance = 0.3 + (fame * 0.05) + (state.resources.coins > 50 ? 0.2 : 0);
       
-      if (random() < negotiateChance) {
+      if ((random ? random() : 0.5) < negotiateChance) {
         log = `你以言语交涉，${enemy.name}收下了你的几分薄面（或银两），没有动手。`;
         if (state.resources.coins >= 10) {
           newState.resources = { ...newState.resources, coins: newState.resources.coins - 10 };
@@ -63,8 +63,8 @@ export function resolveCombatEvent(
     case 'fight':
       const playerPower = getPlayerPower(state);
       // Let's say random roll modifies power by +/- 20%
-      const playerRoll = playerPower * (0.8 + random() * 0.4);
-      const enemyRoll = enemy.power * (0.8 + random() * 0.4);
+      const playerRoll = playerPower * (0.8 + (random ? random() : 0.5) * 0.4);
+      const enemyRoll = enemy.power * (0.8 + (random ? random() : 0.5) * 0.4);
 
       if (playerRoll >= enemyRoll) {
         log = `你与${enemy.name}斗法，经过一番周折将其击败。`;

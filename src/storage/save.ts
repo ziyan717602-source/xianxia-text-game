@@ -32,6 +32,7 @@ export function migrateSaveData(data: any): SaveData {
         state: migratedData,
         createdAt: Date.now(),
         updatedAt: Date.now(),
+        // Math.random() acceptable here: generating a fallback seed for legacy saves that lack one
         seed: migratedData.seed || Math.floor(Math.random() * 1000000)
       };
     }
@@ -59,6 +60,7 @@ export function migrateSaveData(data: any): SaveData {
   }
 
   if (migratedData.version === 4) {
+    // Math.random() acceptable here: generating a fallback seed for legacy saves that lack one
     const stateSeed = migratedData.state.seed ?? migratedData.seed ?? Math.floor(Math.random() * 1000000);
     migratedData.state = {
       ...migratedData.state,
